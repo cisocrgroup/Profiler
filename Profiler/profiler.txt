@@ -1,0 +1,137 @@
+14.5.2009
+
+Hier der aktuelle Entwurf zum Sprachmodell (getunte Frequenzliste):
+
+
+freq(interp): 	    Ausgegebener Freq.-wert für die Anfrage $interp$
+freq_{corpus}(w)    ganz trivial die Auftretenshäufigkeit von String $w$ im
+                    Guikorpus
+freq_{corpus}(int)  nicht trivial: die Auftretenshäufigkeit von $int$ im
+                    Guikorpus. S. unten.
+freq_{base}(w)	    Die Häufigkeit, mit der String $w$ als "Baseword" im
+                    Guikorpus auftritt. S. unten, wie das abgeschätzt wird.
+prob_{instr}(w,i)   Die Wahrscheinlichkeit, dass Wort $w$ durch Vorschrift $i$
+                    verändert wird 
+prob_{pat}(l->r)    Wahrscheinlichkeit (relative Häufigkeit), dass String $l$
+                    durch $r$ ersetzt wird.
+
+
+
+Die Anfragen an die Frequenzliste sind Interpretationen, z.B.:
+theil:teil+[(t_th,0)] , oder kritischer:
+statt:statt+[]
+oder
+statt:stadt+[d_t,3]
+
+
+
+$freq_{base}$, $prob_{pat}$, $freq_{corpus}(int)$
+Alle diese Werte werden bei einem Lauf durch den Guikorpus
+abgeschätzt, wobei immer die erste Interpretation (mit den wenigsten Patterns)
+vereinfachend als die alleinig richtige angenommen wird. $brob_{pat}$
+(eigtl. auch die anderen Werte) kann in weiteren Läufen durch die dynamisch im
+Text ermittelten Werte ersetzt werden.
+
+
+$prob_{instr}(w,i)$ ist einfach das Produkt der Wahrscheinlichkeiten aller in
+$i$ veranschlagten Patterns. Das entspricht der Annahme, dass die Ersetzungen
+statistisch unabhängig voneinander auf dem Wort ``einschlagen''.
+
+
+Die These ist nun, dass sich Werte freq(word: baseWord+instruction ) stets so
+herleiten: 
+
+freq(word: baseWord+Instruction ) =
+  freq_{base}( baseWord ) *
+  prob_{instr}( instruction ) *
+  corrective_factor( word ) 
+
+
+
+Was ist $corrective_factor$, und was passiert also bei versch.-artigen Anfragen?
+
+$int := word: baseWord + instr$ ...
+
+$int$ ist eine Interpretation, die beim Lauf durch den GUIkorpus gesehen wurde:
+$corrective_factor$ wird so gewählt, dass als freq(int) gerade die tatsächlich
+gezählte Frequenz freq_{corpus}(word) zurückgegeben wird. Kurz: es wird
+$freq_{corpus}(word)$ zurückgegeben.
+
+Zwar wurde $word$ im Korpus gesehen, aber es wurde eine andere
+(wahrscheinlichere) Vorschrift angenommen: Das ist kein Sonderfall. Die
+Anfrage wird ganz normal behandelt: $freq_{corpus}(int) == 0$, daher ab zum
+nächsten Fall. statt:stadt+[d_t,3] fällt hier z.B. rein.
+
+
+$int$ ist zwar unbekannt, aber $baseWord$ ist im Guikorpus vertreten:
+$freq_{base}( baseWord ) > 0$. Dann wird die Rückgabe nach obiger Formel aus
+$freq_{base}( baseWord )$ und $prob_{instr}( instr )$ und einem Standardwert
+für $corrective_factor$.
+
+Ist auch noch $baseWord$ im GUIkorpus unbekannt, dann wird ein
+``smoothing''-Standardwert für $freq_{base}$ verwendet.
+
+
+
+
+
+
+
+
+
+
+============================================================================
+============================================================================
+============================================================================
+April 2009
+
+Hier meine erste Idee zur Berechnung der Patterngewichte,
+"Mitsprache-Gewichte" und Pattern-Counts im Profiler.
+
+Die Vor-Überlegungen zu den erlaubten Klassen gehen nur in die Konfiguration
+des DictSearch-Lookups ein; d.h. die ausgespuckte Liste der Interpretationen
+für ein Wort enthält dann nur gewünschte Konstellationen, z.B. eben KEINE
+lateinischen Wörter mit Patterns.
+
+= Init =
+Wir haben zwei Funktionen
+histWeights: Pattern -> [0;1]
+ocrWeights: Pattern -> [0;1]
+
+Diese Funktionen sind quasi das Hauptprodukt der ganzen Veranstaltung.
+
+= Schleife =
+
+== Für jedes Token im Text ==
+Wir kriegen eine Liste von Interpretationen:
+interp_0 = [histPat_0,histPat_1,...] + [ocrPat_0,ocrPat_1,...] 
+interp_1 = ...
+interp_2 = ...
+...
+interp_m = ...
+
+=== penalty ===
+Eine Funktion
+penalty: interpretation -> Fließkommazahl
+summiert ganz einfach alle Gewichte aller Patterns der Interpretation auf.
+
+Wir berechnen penalty_i für alle Interpretationen, erhalten auch
+den größten der dabei entstehenden Werte: penalty_max.
+
+=== voteWeight ===
+Das "Mitsprachegewicht" von interp_i ist:
+voteWeight_i = 1 - ( penalty_i / penalty_max )
+
+
+=== Beitrag zum Pattern-Count ===
+Beim Durchlauf durch den Text werden für alle Patterns P aus allen
+Interpretationen interp_i aufsummiert:
+
+ocrPatternCount_P = OCRPatternCount_P + voteWeight_i 
+bzw.
+histPatternCount_P = HistPatternCount_P + voteWeight_i 
+
+
+== Nach jedem Durchlauf: Neuberechnung von histWeights und ocrWeights aus den
+patternCounts ==
+???

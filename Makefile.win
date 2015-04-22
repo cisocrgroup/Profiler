@@ -1,0 +1,67 @@
+JAVA=c:/Programme/Java/jdk1.6.0_02
+
+JAVAH=$(JAVA)/bin/javah
+
+GCC = g++-4.2.1 -O2 -DNDEBUG -Wall -I$(JAVA)/include -I$(JAVA)/include/win32 # use this for optimal speed results
+
+all: ./libJNICorrectionSystem.so
+
+win: ./JNICorrectionSystem.dll
+
+OBJS_FOR_JNI = ./objs/JNICorrectionSystem.o ./objs/JNIDocument.o ./objs/JNIToken.o ./objs/JNICandidate.o ./objs/LevDEA.o ./objs/Alphabet.o ./objs/JNICandidateExtractor.o
+
+./libJNICorrectionSystem.so: $(OBJS_FOR_JNI)
+	$(GCC) -o libJNICorrectionSystem.so -shared -fpic $(OBJS_FOR_JNI)
+	cp ./libJNICorrectionSystem.so ../
+
+
+./JNICorrectionSystem.dll: $(OBJS_FOR_JNI)
+	$(GCC) -D_JNI_IMPLEMENTATION_ -Wl,--kill-at -shared $(OBJS_FOR_JNI)  -o JNICorrectionSystem.dll
+	cp JNICorrectionSystem.dll ../
+
+./objs/JNICorrectionSystem.o: jni/jav_correctionBackend_CorrectionSystem.h jni/jav_correctionBackend_CorrectionSystem.cxx ./CorrectionSystem/CorrectionSystem.h ./Document/Document.h ./Token/Token.h ./Candidate/Candidate.h make_csl
+	mkdir -vp objs
+	$(GCC) -o objs/JNICorrectionSystem.o -c jni/jav_correctionBackend_CorrectionSystem.cxx
+
+./objs/JNIDocument.o: jni/jav_correctionBackend_document_Document.h jni/jav_correctionBackend_document_Document.cxx ./Document/Document.h ./Token/Token.h ./Candidate/Candidate.h
+	mkdir -vp objs
+	$(GCC) -o objs/JNIDocument.o -c jni/jav_correctionBackend_document_Document.cxx
+
+./objs/JNIToken.o: jni/jav_correctionBackend_document_Token.h jni/jav_correctionBackend_document_Token.cxx ./Token/Token.h ./Candidate/Candidate.h
+	mkdir -vp objs
+	$(GCC) -o objs/JNIToken.o -c jni/jav_correctionBackend_document_Token.cxx
+
+./objs/JNICandidate.o: jni/jav_correctionBackend_document_Candidate.h jni/jav_correctionBackend_document_Candidate.cxx ./Document/Document.h ./Token/Token.h ./Candidate/Candidate.h
+	mkdir -vp objs
+	$(GCC) -o objs/JNICandidate.o -c jni/jav_correctionBackend_document_Candidate.cxx
+
+./objs/JNICandidateExtractor.o: ./jni/jav_correctionBackend_candidateExtractor_CandidateExtractor.h ./jni/jav_correctionBackend_candidateExtractor_CandidateExtractor.cxx
+	mkdir -vp objs
+	$(GCC) -o objs/JNICandidateExtractor.o -c jni/jav_correctionBackend_candidateExtractor_CandidateExtractor.cxx
+
+
+#################### javah ####################
+
+#./jni/jav_correctionBackend_CorrectionSystem.h: ../jav/correctionBackend/CorrectionSystem.class
+#	$(JAVAH) -jni -classpath ../ -d ./jni/ jav.correctionBackend.CorrectionSystem
+
+#./jni/jav_correctionBackend_document_Document.h: ../jav/correctionBackend/document/Document.class
+#	$(JAVAH) -jni -classpath ../ -d ./jni/ jav.correctionBackend.document.Document
+
+#./jni/jav_correctionBackend_document_Token.h: ../jav/correctionBackend/document/Token.class
+#	$(JAVAH) -jni -classpath ../ -d ./jni/ jav.correctionBackend.document.Token
+
+#./jni/jav_correctionBackend_document_Candidate.h: ../jav/correctionBackend/document/Candidate.class
+#	$(JAVAH) -jni -classpath ../ -d ./jni/ jav.correctionBackend.document.Candidate
+
+#./bin/correctionSystem: ./CorrectionSystem/correctionSystem.cxx ./CorrectionSystem/CorrectionSystem.h ./Document/Document.h ./Token/Token.h ./Candidate/Candidate.h  make_csl
+#	$(GCC) -o ./bin/correctionSystem ./CorrectionSystem/correctionSystem.cxx ./objs/LevDEA.o ./objs/Alphabet.o
+
+make_csl:
+	make -f ./Makefile.win -C ./csl MSMatch
+	cp ./csl/objs/* ./objs
+
+clean:
+	rm -fv ./objs/*
+	rm -fv ./libJNICorrectionSystem.so
+

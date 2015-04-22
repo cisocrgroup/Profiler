@@ -1,0 +1,1124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+<head>
+<created>Tue Jun  8 17:36:49 2010
+</created>
+<changed>0</changed>
+<finished>false</finished>
+</head>
+<page imageFile="imagedir/test1.tiff">
+<token token_id="1" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>﻿</wOCR>
+<wOCR_lc>﻿</wOCR_lc>
+<wOrig>Wir</wOrig>
+<wOrig_lc>wir</wOrig_lc>
+<ocrInstructions count="4">
+<instruction instr_id="1_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="1_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="1_2" selected="false">[(wi_﻿,0)(r_,2)]</instruction>
+<instruction instr_id="1_3" selected="false">[(w_,0)(ir_﻿,1)]</instruction>
+</ocrInstructions>
+<cands count="2">
+<cand cand_id="1_0" selected="false">wir:wir+[],dist=0(modern)</cand>
+<cand cand_id="1_1" selected="false">wir:wirr+[(rr_r,2)],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="2" isNormal="false" verified="false">
+<classified>split_tail</classified>
+<wOCR>Wir</wOCR>
+<wOCR_lc>wir</wOCR_lc>
+<wOrig></wOrig>
+<wOrig_lc></wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="2_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="2_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="2_2" selected="false">[(_w,0)(_i,0)(_r,0)]</instruction>
+</ocrInstructions>
+<cands count="0">
+</cands>
+</token>
+<token token_id="3" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="4" isNormal="true" verified="false">
+<classified>hypothetic</classified>
+<wOCR>urtheilen</wOCR>
+<wOCR_lc>urtheilen</wOCR_lc>
+<wOrig>urtheilen</wOrig>
+<wOrig_lc>urtheilen</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="4_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="4_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="4_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="1">
+<cand cand_id="4_0" selected="false">urtheilen:urteilen+[(t_th,2)],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="5" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="6" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>selten</wOCR>
+<wOCR_lc>selten</wOCR_lc>
+<wOrig>selten</wOrig>
+<wOrig_lc>selten</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="6_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="6_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="6_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="1">
+<cand cand_id="6_0" selected="false">selten:selten+[],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="7" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="8" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>nach</wOCR>
+<wOCR_lc>nach</wOCR_lc>
+<wOrig>nach</wOrig>
+<wOrig_lc>nach</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="8_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="8_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="8_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="1">
+<cand cand_id="8_0" selected="false">nach:nach+[],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="9" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="10" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>der</wOCR>
+<wOCR_lc>der</wOCR_lc>
+<wOrig>der</wOrig>
+<wOrig_lc>der</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="10_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="10_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="10_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="2">
+<cand cand_id="10_0" selected="false">der:der+[],dist=0(modern)</cand>
+<cand cand_id="10_1" selected="false">der:teer+[(t_d,0)(ee_e,1)],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="11" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="12" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>Sache</wOCR>
+<wOCR_lc>sache</wOCR_lc>
+<wOrig>Sache</wOrig>
+<wOrig_lc>sache</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="12_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="12_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="12_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="2">
+<cand cand_id="12_0" selected="false">sache:sache+[],dist=0(modern)</cand>
+<cand cand_id="12_1" selected="false">sache:sake+[(k_ch,2)],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="13" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="14" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>selbst</wOCR>
+<wOCR_lc>selbst</wOCR_lc>
+<wOrig>selbst</wOrig>
+<wOrig_lc>selbst</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="14_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="14_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="14_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="1">
+<cand cand_id="14_0" selected="false">selbst:selbst+[],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="15" isNormal="false" verified="false">
+<classified>unknown</classified>
+<wOCR>,</wOCR>
+<wOCR_lc>,</wOCR_lc>
+<wOrig>,</wOrig>
+<wOrig_lc>,</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="15_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="15_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="15_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="0">
+</cands>
+</token>
+<token token_id="16" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>sondern</wOCR>
+<wOCR_lc>sondern</wOCR_lc>
+<wOrig>sondern</wOrig>
+<wOrig_lc>sondern</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="16_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="16_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="16_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="1">
+<cand cand_id="16_0" selected="false">sondern:sondern+[],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="17" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="18" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>nach</wOCR>
+<wOCR_lc>nach</wOCR_lc>
+<wOrig>nach</wOrig>
+<wOrig_lc>nach</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="18_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="18_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="18_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="1">
+<cand cand_id="18_0" selected="false">nach:nach+[],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="19" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="20" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>den</wOCR>
+<wOCR_lc>den</wOCR_lc>
+<wOrig>den</wOrig>
+<wOrig_lc>den</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="20_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="20_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="20_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="5">
+<cand cand_id="20_0" selected="false">den:den+[],dist=0(modern)</cand>
+<cand cand_id="20_1" selected="false">den:dehn+[(eh_e,1)],dist=0(modern)</cand>
+<cand cand_id="20_2" selected="false">den:denn+[(nn_n,2)],dist=0(modern)</cand>
+<cand cand_id="20_3" selected="false">den:teen+[(t_d,0)(ee_e,1)],dist=0(modern)</cand>
+<cand cand_id="20_4" selected="false">den:tenn+[(t_d,0)(nn_n,2)],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="21" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="22" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>Begriffen</wOCR>
+<wOCR_lc>begriffen</wOCR_lc>
+<wOrig>Begriffen</wOrig>
+<wOrig_lc>begriffen</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="22_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="22_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="22_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="1">
+<cand cand_id="22_0" selected="false">begriffen:begriffen+[],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="23" isNormal="false" verified="false">
+<classified>unknown</classified>
+<wOCR>,</wOCR>
+<wOCR_lc>,</wOCR_lc>
+<wOrig>,</wOrig>
+<wOrig_lc>,</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="23_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="23_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="23_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="0">
+</cands>
+</token>
+<token token_id="24" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>die</wOCR>
+<wOCR_lc>die</wOCR_lc>
+<wOrig>die</wOrig>
+<wOrig_lc>die</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="24_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="24_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="24_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="2">
+<cand cand_id="24_0" selected="false">die:die+[],dist=0(modern)</cand>
+<cand cand_id="24_1" selected="false">die:di+[(i_ie,1)],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="25" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="26" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>wir</wOCR>
+<wOCR_lc>wir</wOCR_lc>
+<wOrig>wir</wOrig>
+<wOrig_lc>wir</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="26_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="26_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="26_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="2">
+<cand cand_id="26_0" selected="false">wir:wir+[],dist=0(modern)</cand>
+<cand cand_id="26_1" selected="false">wir:wirr+[(rr_r,2)],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="27" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="28" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>von</wOCR>
+<wOCR_lc>von</wOCR_lc>
+<wOrig>von</wOrig>
+<wOrig_lc>von</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="28_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="28_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="28_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="3">
+<cand cand_id="28_0" selected="false">von:von+[],dist=0(modern)</cand>
+<cand cand_id="28_1" selected="false">von:fon+[(f_v,0)],dist=0(modern)</cand>
+<cand cand_id="28_2" selected="false">von:fön+[(f_v,0)(ö_o,1)],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="29" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="30" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>der</wOCR>
+<wOCR_lc>der</wOCR_lc>
+<wOrig>der</wOrig>
+<wOrig_lc>der</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="30_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="30_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="30_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="2">
+<cand cand_id="30_0" selected="false">der:der+[],dist=0(modern)</cand>
+<cand cand_id="30_1" selected="false">der:teer+[(t_d,0)(ee_e,1)],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="31" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="32" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>Sache</wOCR>
+<wOCR_lc>sache</wOCR_lc>
+<wOrig>Sache</wOrig>
+<wOrig_lc>sache</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="32_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="32_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="32_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="2">
+<cand cand_id="32_0" selected="false">sache:sache+[],dist=0(modern)</cand>
+<cand cand_id="32_1" selected="false">sache:sake+[(k_ch,2)],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="33" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="34" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>haben</wOCR>
+<wOCR_lc>haben</wOCR_lc>
+<wOrig>haben</wOrig>
+<wOrig_lc>haben</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="34_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="34_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="34_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="1">
+<cand cand_id="34_0" selected="false">haben:haben+[],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="35" isNormal="false" verified="false">
+<classified>unknown</classified>
+<wOCR>.</wOCR>
+<wOCR_lc>.</wOCR_lc>
+<wOrig>.</wOrig>
+<wOrig_lc>.</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="35_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="35_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="35_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="0">
+</cands>
+</token>
+<token token_id="36" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>Dar</wOCR>
+<wOCR_lc>dar</wOCR_lc>
+<wOrig>Darinn</wOrig>
+<wOrig_lc>darinn</wOrig_lc>
+<ocrInstructions count="6">
+<instruction instr_id="36_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="36_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="36_2" selected="false">[(i_,3)(n_,4)(n_,5)]</instruction>
+<instruction instr_id="36_3" selected="false">[(r_,2)(i_,3)(nn_r,4)]</instruction>
+<instruction instr_id="36_4" selected="false">[(a_,1)(ri_a,2)(nn_r,4)]</instruction>
+<instruction instr_id="36_5" selected="false">[(r_,2)(in_r,3)(n_,5)]</instruction>
+</ocrInstructions>
+<cands count="2">
+<cand cand_id="36_0" selected="false">darinn:darinn+[],dist=0(modern)</cand>
+<cand cand_id="36_1" selected="false">darinn:darin+[(n_nn,4)],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="37" isNormal="false" verified="false">
+<classified>split_tail</classified>
+<wOCR>- </wOCR>
+<wOCR_lc>- </wOCR_lc>
+<wOrig></wOrig>
+<wOrig_lc></wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="37_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="37_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="37_2" selected="true">[(_-,0)(_ ,0)]</instruction>
+</ocrInstructions>
+<cands count="0">
+</cands>
+</token>
+<token token_id="38" isNormal="false" verified="false">
+<classified>split_tail</classified>
+<wOCR>inn</wOCR>
+<wOCR_lc>inn</wOCR_lc>
+<wOrig></wOrig>
+<wOrig_lc></wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="38_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="38_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="38_2" selected="false">[(_i,0)(_n,0)(_n,0)]</instruction>
+</ocrInstructions>
+<cands count="0">
+</cands>
+</token>
+<token token_id="39" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="40" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>liegt</wOCR>
+<wOCR_lc>liegt</wOCR_lc>
+<wOrig>liegt</wOrig>
+<wOrig_lc>liegt</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="40_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="40_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="40_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="2">
+<cand cand_id="40_0" selected="false">liegt:liegt+[],dist=0(modern)</cand>
+<cand cand_id="40_1" selected="false">liegt:liekt+[(k_g,3)],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="41" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="42" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>unsere</wOCR>
+<wOCR_lc>unsere</wOCR_lc>
+<wOrig>unsere</wOrig>
+<wOrig_lc>unsere</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="42_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="42_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="42_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="1">
+<cand cand_id="42_0" selected="false">unsere:unsere+[],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="43" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="44" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>Beschränktheit</wOCR>
+<wOCR_lc>beschränktheit</wOCR_lc>
+<wOrig>Beschränktheit</wOrig>
+<wOrig_lc>beschränktheit</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="44_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="44_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="44_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="1">
+<cand cand_id="44_0" selected="false">beschränktheit:beschränktheit+[],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="45" isNormal="false" verified="false">
+<classified>unknown</classified>
+<wOCR>,</wOCR>
+<wOCR_lc>,</wOCR_lc>
+<wOrig>,</wOrig>
+<wOrig_lc>,</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="45_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="45_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="45_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="0">
+</cands>
+</token>
+<token token_id="46" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>unser</wOCR>
+<wOCR_lc>unser</wOCR_lc>
+<wOrig>unser</wOrig>
+<wOrig_lc>unser</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="46_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="46_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="46_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="1">
+<cand cand_id="46_0" selected="false">unser:unser+[],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="47" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="48" isNormal="true" verified="false">
+<classified>hypothetic</classified>
+<wOCR>Irrthum</wOCR>
+<wOCR_lc>irrthum</wOCR_lc>
+<wOrig>Irrthum</wOrig>
+<wOrig_lc>irrthum</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="48_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="48_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="48_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="1">
+<cand cand_id="48_0" selected="false">irrthum:irrtum+[(t_th,3)],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="49" isNormal="false" verified="false">
+<classified>unknown</classified>
+<wOCR>.</wOCR>
+<wOCR_lc>.</wOCR_lc>
+<wOrig>.</wOrig>
+<wOrig_lc>.</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="49_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="49_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="49_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="0">
+</cands>
+</token>
+<token token_id="50" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>Laßt</wOCR>
+<wOCR_lc>laßt</wOCR_lc>
+<wOrig>Laßt</wOrig>
+<wOrig_lc>laßt</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="50_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="50_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="50_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="4">
+<cand cand_id="50_0" selected="false">laßt:laßt+[],dist=0(modern)</cand>
+<cand cand_id="50_1" selected="false">laßt:lasst+[(ss_ß,2)],dist=0(modern)</cand>
+<cand cand_id="50_2" selected="false">laßt:last+[(s_ß,2)],dist=0(modern)</cand>
+<cand cand_id="50_3" selected="false">laßt:läßt+[(ä_a,1)],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="51" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="52" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>«</wOCR>
+<wOCR_lc>«</wOCR_lc>
+<wOrig>uns</wOrig>
+<wOrig_lc>uns</wOrig_lc>
+<ocrInstructions count="4">
+<instruction instr_id="52_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="52_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="52_2" selected="false">[(un_«,0)(s_,2)]</instruction>
+<instruction instr_id="52_3" selected="false">[(u_,0)(ns_«,1)]</instruction>
+</ocrInstructions>
+<cands count="2">
+<cand cand_id="52_0" selected="false">uns:uns+[],dist=0(modern)</cand>
+<cand cand_id="52_1" selected="false">uns:ins+[(i_u,0)],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="53" isNormal="false" verified="false">
+<classified>split_tail</classified>
+<wOCR>ns</wOCR>
+<wOCR_lc>ns</wOCR_lc>
+<wOrig></wOrig>
+<wOrig_lc></wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="53_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="53_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="53_2" selected="true">[(_n,0)(_s,0)]</instruction>
+</ocrInstructions>
+<cands count="0">
+</cands>
+</token>
+<token token_id="54" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="55" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>nicht</wOCR>
+<wOCR_lc>nicht</wOCR_lc>
+<wOrig>nicht</wOrig>
+<wOrig_lc>nicht</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="55_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="55_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="55_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="1">
+<cand cand_id="55_0" selected="false">nicht:nicht+[],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="56" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="57" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>Begriffe</wOCR>
+<wOCR_lc>begriffe</wOCR_lc>
+<wOrig>Begriffe</wOrig>
+<wOrig_lc>begriffe</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="57_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="57_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="57_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="1">
+<cand cand_id="57_0" selected="false">begriffe:begriffe+[],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="58" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="59" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>aus</wOCR>
+<wOCR_lc>aus</wOCR_lc>
+<wOrig>aus</wOrig>
+<wOrig_lc>aus</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="59_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="59_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="59_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="2">
+<cand cand_id="59_0" selected="false">aus:aus+[],dist=0(modern)</cand>
+<cand cand_id="59_1" selected="false">aus:ais+[(i_u,1)],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="60" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="61" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>Begriffen</wOCR>
+<wOCR_lc>begriffen</wOCR_lc>
+<wOrig>Begriffen</wOrig>
+<wOrig_lc>begriffen</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="61_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="61_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="61_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="1">
+<cand cand_id="61_0" selected="false">begriffen:begriffen+[],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="62" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="63" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>ziehen</wOCR>
+<wOCR_lc>ziehen</wOCR_lc>
+<wOrig>ziehen</wOrig>
+<wOrig_lc>ziehen</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="63_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="63_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="63_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="1">
+<cand cand_id="63_0" selected="false">ziehen:ziehen+[],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="64" isNormal="false" verified="false">
+<classified>unknown</classified>
+<wOCR>,</wOCR>
+<wOCR_lc>,</wOCR_lc>
+<wOrig>,</wOrig>
+<wOrig_lc>,</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="64_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="64_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="64_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="0">
+</cands>
+</token>
+<token token_id="65" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>sondern</wOCR>
+<wOCR_lc>sondern</wOCR_lc>
+<wOrig>sondern</wOrig>
+<wOrig_lc>sondern</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="65_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="65_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="65_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="1">
+<cand cand_id="65_0" selected="false">sondern:sondern+[],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="66" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="67" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>uns</wOCR>
+<wOCR_lc>uns</wOCR_lc>
+<wOrig>uns</wOrig>
+<wOrig_lc>uns</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="67_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="67_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="67_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="2">
+<cand cand_id="67_0" selected="false">uns:uns+[],dist=0(modern)</cand>
+<cand cand_id="67_1" selected="false">uns:ins+[(i_u,0)],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="68" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="69" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>der</wOCR>
+<wOCR_lc>der</wOCR_lc>
+<wOrig>der</wOrig>
+<wOrig_lc>der</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="69_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="69_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="69_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="2">
+<cand cand_id="69_0" selected="false">der:der+[],dist=0(modern)</cand>
+<cand cand_id="69_1" selected="false">der:teer+[(t_d,0)(ee_e,1)],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="70" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="71" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>Sache</wOCR>
+<wOCR_lc>sache</wOCR_lc>
+<wOrig>Sache</wOrig>
+<wOrig_lc>sache</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="71_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="71_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="71_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="2">
+<cand cand_id="71_0" selected="false">sache:sache+[],dist=0(modern)</cand>
+<cand cand_id="71_1" selected="false">sache:sake+[(k_ch,2)],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="72" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="73" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>selbst</wOCR>
+<wOCR_lc>selbst</wOCR_lc>
+<wOrig>selbst</wOrig>
+<wOrig_lc>selbst</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="73_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="73_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="73_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="1">
+<cand cand_id="73_0" selected="false">selbst:selbst+[],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="74" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="75" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>nahern</wOCR>
+<wOCR_lc>nahern</wOCR_lc>
+<wOrig>nähern</wOrig>
+<wOrig_lc>nähern</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="75_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="75_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="75_2" selected="true">[(ä_a,1)]</instruction>
+</ocrInstructions>
+<cands count="1">
+<cand cand_id="75_0" selected="false">nähern:nähern+[],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="76" isNormal="false" verified="false">
+<classified>unknown</classified>
+<wOCR>,</wOCR>
+<wOCR_lc>,</wOCR_lc>
+<wOrig>,</wOrig>
+<wOrig_lc>,</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="76_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="76_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="76_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="0">
+</cands>
+</token>
+<token token_id="77" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>und</wOCR>
+<wOCR_lc>und</wOCR_lc>
+<wOrig>und</wOrig>
+<wOrig_lc>und</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="77_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="77_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="77_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="1">
+<cand cand_id="77_0" selected="false">und:und+[],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="78" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="79" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>wir</wOCR>
+<wOCR_lc>wir</wOCR_lc>
+<wOrig>wir</wOrig>
+<wOrig_lc>wir</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="79_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="79_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="79_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="2">
+<cand cand_id="79_0" selected="false">wir:wir+[],dist=0(modern)</cand>
+<cand cand_id="79_1" selected="false">wir:wirr+[(rr_r,2)],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="80" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="81" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>werden</wOCR>
+<wOCR_lc>werden</wOCR_lc>
+<wOrig>werden</wOrig>
+<wOrig_lc>werden</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="81_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="81_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="81_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="4">
+<cand cand_id="81_0" selected="false">werden:werden+[],dist=0(modern)</cand>
+<cand cand_id="81_1" selected="false">werden:werten+[(t_d,3)],dist=0(modern)</cand>
+<cand cand_id="81_2" selected="false">werden:wehrten+[(eh_e,1)(t_d,4)],dist=0(modern)</cand>
+<cand cand_id="81_3" selected="false">werden:währten+[(äh_e,1)(t_d,4)],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="82" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="83" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>Wahrheit</wOCR>
+<wOCR_lc>wahrheit</wOCR_lc>
+<wOrig>Wahrheit</wOrig>
+<wOrig_lc>wahrheit</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="83_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="83_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="83_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="1">
+<cand cand_id="83_0" selected="false">wahrheit:wahrheit+[],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="84" special_seq="space" isNormal="false" verified="false">
+<classified>null</classified>
+<wOCR> </wOCR>
+<wOCR_lc> </wOCR_lc>
+<wOrig> </wOrig>
+<wOrig_lc> </wOrig_lc>
+<cands count="0">
+</cands>
+</token>
+<token token_id="85" isNormal="true" verified="false">
+<classified>modern</classified>
+<wOCR>finden</wOCR>
+<wOCR_lc>finden</wOCR_lc>
+<wOrig>finden</wOrig>
+<wOrig_lc>finden</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="85_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="85_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="85_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="2">
+<cand cand_id="85_0" selected="false">finden:finden+[],dist=0(modern)</cand>
+<cand cand_id="85_1" selected="false">finden:finten+[(t_d,3)],dist=0(modern)</cand>
+</cands>
+</token>
+<token token_id="86" isNormal="false" verified="false">
+<classified>unknown</classified>
+<wOCR>.</wOCR>
+<wOCR_lc>.</wOCR_lc>
+<wOrig>.</wOrig>
+<wOrig_lc>.</wOrig_lc>
+<ocrInstructions count="3">
+<instruction instr_id="86_0" selected="false">*DESTROYED*</instruction>
+<instruction instr_id="86_1" selected="false">*MERGE_SPLIT*</instruction>
+<instruction instr_id="86_2" selected="true">[]</instruction>
+</ocrInstructions>
+<cands count="0">
+</cands>
+</token>
+</page>
+</document>
