@@ -1,0 +1,3 @@
+[submodule "gsm/csl"]
+	path = gsm/csl
+	url = git@gitlab.cis.lmu.de:CLARIN/csl
