@@ -24,3 +24,7 @@ $(CSL_LIB): $(CSL_CMAKE)
 	cd $(CSL_BUILD) &&                                           \
 	JAVA_HOME=$(JAVA_HOME) cmake -DCMAKE_BUILD_TYPE=relase .. && \
 	$(MAKE)
+
+.PHONY: clean
+clean:
+	$(RM) -r build
