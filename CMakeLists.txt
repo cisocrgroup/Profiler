@@ -16,7 +16,7 @@ ADD_CUSTOM_TARGET(postcorrection DEPENDS JNICorrectionSystem )
 SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
 # when building, don't use the install RPATH already
 # (but later on when installing)
-SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 # the RPATH to be used when installing
 SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
@@ -68,7 +68,7 @@ FIND_PACKAGE( CSL REQUIRED)
 IF( CSL_FOUND )
  INCLUDE_DIRECTORIES( ${CSL_INCLUDE_DIR} )
 ENDIF( CSL_FOUND )
-
+INCLUDE_DIRECTORIES(.)
 
 
 add_subdirectory( Utils )
@@ -86,7 +86,7 @@ add_subdirectory(TXTReader)
 add_subdirectory( SimpleEnrich )
 
 ###### TO DO: Move this (and all related headers and sources) to a separate folder ##########
-SET( OCRCORRECTION_SOURCES             
+SET( OCRCORRECTION_SOURCES
              Utils/Utils.cxx
 	     Document/Document.cxx
 	     CorrectionSystem/CorrectionSystem.cxx
@@ -104,30 +104,30 @@ SET( OCRCORRECTION_SOURCES
 	     Token/TokenImageInfoBox.cxx
 	     GlobalProfile/GlobalProfileXMLReader.cxx
 	     GlobalProfile/PatternContainerXMLReader.cxx
-	     
+
 	     )
 
 add_library( OCRCorrection SHARED ${OCRCORRECTION_SOURCES})
 
 
 target_link_libraries( OCRCorrection
-  ${CSL_LIBRARY} 
+  ${CSL_LIBRARY}
   )
 
-install( 
+install(
   TARGETS OCRCorrection
   DESTINATION lib
   )
 
 IF( CPPUNIT_FOUND )
-target_link_libraries( OCRCorrection 
-  ${CPPUNIT_LIBRARIES} 
+target_link_libraries( OCRCorrection
+  ${CPPUNIT_LIBRARIES}
   )
 ENDIF( CPPUNIT_FOUND )
 
 IF( XERCES_FOUND )
-target_link_libraries( OCRCorrection 
-  ${XERCES_LIBRARIES} 
+target_link_libraries( OCRCorrection
+  ${XERCES_LIBRARIES}
   )
 ENDIF( XERCES_FOUND )
 
@@ -137,7 +137,7 @@ ENDIF( XERCES_FOUND )
 
 
 # The JNI shared lib
-add_library(JNICorrectionSystem SHARED 
+add_library(JNICorrectionSystem SHARED
 		${OCRCORRECTION_SOURCES}
 	    jni/jav_JNITest.cxx
 	    jni/jav_correctionBackend_CorrectionSystem.cxx
@@ -151,4 +151,3 @@ add_library(JNICorrectionSystem SHARED
 	    )
 target_link_libraries( JNICorrectionSystem ${CSL_LIBRARY} )
 target_link_libraries( JNICorrectionSystem ${XERCES_LIBRARIES} )
-

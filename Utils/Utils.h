@@ -6,10 +6,10 @@
 #include<map>
 #include<vector>
 
-#include<Exceptions.h>
+#include <Exceptions.h>
 
 namespace OCRCorrection {
-    
+
 
     class Utils {
     public:
