@@ -1,10 +1,12 @@
+#include <memory>
+
 #include "./FrequencyList.h"
 #include<csl/Getopt/Getopt.h>
 #include<Stopwatch.h>
 #include<TXTReader/TXTReader.h>
 
 void printHelp() {
-    std::wcerr 
+    std::wcerr
 	<< "This program uses a ground truth historical text to estimate an initial probabilistic model" << std::endl
 	<< "for the Profiling tool." << std::endl
 	<< std::endl
@@ -19,9 +21,6 @@ void printHelp() {
 	<< std::endl
 	<< std::endl
 	<< "Options:" << std::endl
-	<< "--out_freqlist=<freqlist.binfrq>        (Default: ./freqlist.binfrq)" << std::endl
-	<< "--out_weights=<weights.txt>             (Default: ./weights.txt)" << std::endl
-	<< "--out_corpusLexicon=<corpusLexicon.lex> (Default: ./corpusLexicon.lex)"  << std::endl
 	<< "--frequencyThreshold=<N>                " << std::endl
 	<< std::endl;
 }
@@ -41,14 +40,14 @@ int main( int argc, char const** argv ) {
     options.specifyOption( "textFile", csl::Getopt::STRING );
     options.specifyOption( "typeFreqList", csl::Getopt::STRING );
     options.specifyOption( "frequencyThreshold", csl::Getopt::STRING );
-    
+
     options.specifyOption( "allModern", csl::Getopt::VOID );
     options.specifyOption( "config", csl::Getopt::STRING );
-    
+
     options.specifyOption( "out_freqlist", csl::Getopt::STRING, "./freqlist.binfrq" );
     options.specifyOption( "out_weights", csl::Getopt::STRING, "./weights.txt" );
     options.specifyOption( "out_corpusLexicon", csl::Getopt::STRING, "./corpusLexicon.lex" );
-    
+
     try {
 	options.getOptionsAsSpecified( argc, argv );
     } catch( csl::Getopt::Exception& exc ) {
@@ -69,29 +68,29 @@ int main( int argc, char const** argv ) {
 	exit( EXIT_SUCCESS );
     }
     if( ! ( options.hasOption( "textFile" ) || options.hasOption( "typeFreqList" ) ) ) {
-	std::wcerr << "Give text file or type-frequency list for training. Use --help to learn more." << std::endl; 
+	std::wcerr << "Give text file or type-frequency list for training. Use --help to learn more." << std::endl;
 	exit( EXIT_FAILURE );
     }
-    if( ! ( options.hasOption( "allModern" ) || 
+    if( ! ( options.hasOption( "allModern" ) ||
 	    ( options.hasOption( "config" ) ) ) ) {
-	std::wcerr << "Specify obligatory option 'config'. Otherwise, use --allModern. Use --help to learn more." << std::endl; 
+	std::wcerr << "Specify obligatory option 'config'. Otherwise, use --allModern. Use --help to learn more." << std::endl;
 	exit( EXIT_FAILURE );
     }
-    
+
 
     OCRCorrection::FrequencyList freqlist;
-    
-    
+
+
     OCRCorrection::FrequencyList::Trainer* trainer = 0;
 
     try {
 	if( options.hasOption( "allModern" ) ) {
-	    trainer = new OCRCorrection::FrequencyList::Trainer( freqlist );
+            trainer = new OCRCorrection::FrequencyList::Trainer( freqlist );
 	}
 	else {
-	    trainer = new OCRCorrection::FrequencyList::Trainer( freqlist, options.getOption( "config" ).c_str() );
+            trainer = new OCRCorrection::FrequencyList::Trainer( freqlist, options.getOption( "config" ).c_str() );
 	}
-	
+
 	if( options.hasOption( "frequencyThreshold" ) ) { // for freqlist processing, ignored otherwise
 	    trainer->setFrequencyThreshold( csl::CSLLocale::string2number< size_t >( options.getOption( "frequencyThreshold" ) ) );
 	}
@@ -101,26 +100,29 @@ int main( int argc, char const** argv ) {
 	    OCRCorrection::Document doc;
 	    OCRCorrection::TXTReader reader;
 	    reader.parse( options.getOption( "textFile" ).c_str(), &doc );
-	    
+
 	    trainer->doTraining( doc );
 	}
 	else if( options.hasOption( "typeFreqList" ) ) {
 	    trainer->doTrainingOnFreqlist( options.getOption( "typeFreqList" ).c_str() );
 	}
 	trainer->finishTraining();
-	
-	if( ! options.hasOption( "allModern" ) ) {
-	    trainer->writeCorpusLexicon( options.getOption( "out_corpusLexicon" ).c_str() );
+
+	csl::INIConfig iniConf(options.getOption("config").c_str());
+    const char *wpath = iniConf.getstring("language_model:patternWeightsFile");
+    const char *fpath = iniConf.getstring("language_model:freqListFile");
+    const char *cpath = iniConf.getstring("language_model:corpusLexicon");
+
+	if ( not options.hasOption( "allModern" ) ) {
+            trainer->writeCorpusLexicon( cpath );
 	}
-
-	freqlist.writeToFile( options.getOption( "out_freqlist" ).c_str(), options.getOption( "out_weights" ).c_str() );
-
+    freqlist.writeToFile(fpath, wpath);
 	std::wcerr << "Training took " << stopwatch.readMilliseconds() << " ms" <<  std::endl;
     } catch( std::exception& exc ) {
 	std::wcerr << "trainFrequencyList failed: " << exc.what() << std::endl;
 	return EXIT_FAILURE;
     }
-    
+
 
     return EXIT_SUCCESS;
 }
