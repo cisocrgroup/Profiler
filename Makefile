@@ -19,7 +19,7 @@ $(PROFILER): $(CSL_LIB)
 	JAVA_HOME=$(JAVA_HOME) cmake            	\
 	        -DCMAKE_BUILD_TYPE=release      	\
 		-DCSL_INCLUDE_DIR=$(CSL_BASE)   	\
-		-DCSL_LIBRARY=$(CSL_LIB) .. &&	$(MAK)  \
+		-DCSL_LIBRARY=$(CSL_LIB) .. &&	$(MAKE)  \
 
 $(CSL_CMAKE):
 	git submodule update --init --recursive $(CSL_BASE)
