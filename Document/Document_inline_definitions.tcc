@@ -1,3 +1,4 @@
+#include <locale>
 namespace OCRCorrection {
     Token& Document::at( size_t i ) {
 	return *( tokens_.at( i ) );
@@ -40,10 +41,13 @@ namespace OCRCorrection {
 	    *isNormal = false;
 	    return 0;
 	}
-	*isNormal = std::isalnum( *pos, csl::CSLLocale::Instance() );
+        std::locale loc = std::locale::global(std::locale(""));
+	// *isNormal = std::isalnum( *pos, csl::CSLLocale::Instance() );
+        *isNormal = std::isalnum( *pos, loc);
 	size_t length = 1;
 	++pos;
-	while( *pos && ( std::isalnum( *pos, csl::CSLLocale::Instance() ) == *isNormal ) ) {
+        //	while( *pos && ( std::isalnum( *pos, csl::CSLLocale::Instance() ) == *isNormal ) ) {
+	while( *pos && ( std::isalnum( *pos, loc ) == *isNormal ) ) {
 	    ++pos;
 	    ++length;
 	}
@@ -54,22 +58,22 @@ namespace OCRCorrection {
 	std::wstring removeThem = L".;,:!?-_|¬\"'&^/()[]{}=# ";
 	removeThem += 0x201e; // komisches Anführungszeichen unten
 	removeThem += 0xbb;
-	
+
 	//std::wcerr<<"Vorher:"<<word<<std::endl;
 
 	*pre = L"";
 	*post = L"";
-	
+
 	while( !word->empty() && ( removeThem.find( word->at( 0 ) ) != removeThem.npos ) ) {
 	    *pre += word->at( 0 );
 	    word->erase( 0, 1 );
 	}
-	
+
 	while( !word->empty() && ( removeThem.find( *( word->rbegin() ) ) != removeThem.npos ) ) {
-	    *post = *post + *( word->rbegin() ); 
+	    *post = *post + *( word->rbegin() );
 	    word->erase( word->end() - 1 );
 	}
-	
+
     }
 
 
