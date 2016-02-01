@@ -1,4 +1,6 @@
 #include <locale>
+#include <unicode/uchar.h>
+
 namespace OCRCorrection {
     Token& Document::at( size_t i ) {
 	return *( tokens_.at( i ) );
@@ -26,10 +28,10 @@ namespace OCRCorrection {
 	    *isNormal = false;
 	    return std::wstring::npos;
 	}
-	*isNormal = std::isalnum( str.at( offset ), csl::CSLLocale::Instance() );
+	*isNormal = isWord(str.at(offset));
 
 	++offset;
-	while( offset < str.length() && ( std::isalnum( str.at( offset ), csl::CSLLocale::Instance() ) == *isNormal ) ) {
+	while( offset < str.length() && ( isWord(str.at(offset)) == *isNormal)) {
 	    ++offset;
 	}
 	return offset;
@@ -41,16 +43,16 @@ namespace OCRCorrection {
 	    *isNormal = false;
 	    return 0;
 	}
-        std::locale loc = std::locale::global(std::locale(""));
-	// *isNormal = std::isalnum( *pos, csl::CSLLocale::Instance() );
-        *isNormal = std::isalnum( *pos, loc);
+        const wchar_t *str = pos;
+        *isNormal = isWord(*pos);
 	size_t length = 1;
 	++pos;
-        //	while( *pos && ( std::isalnum( *pos, csl::CSLLocale::Instance() ) == *isNormal ) ) {
-	while( *pos && ( std::isalnum( *pos, loc ) == *isNormal ) ) {
+        while( *pos && (isWord(*pos) == *isNormal)) {
 	    ++pos;
 	    ++length;
 	}
+        // std::wcerr << "getBorder(\"" << str << "\", " << *isNormal << "): '"
+        //            << std::wstring(str, length) << "'" << std::endl;
 	return length;
     }
 
@@ -76,5 +78,28 @@ namespace OCRCorrection {
 
     }
 
-
+        bool
+        Document::isWord(wchar_t c) {
+                //std::wcerr << "type('" << c << "'): " << u_charType(c);
+                switch (u_charType(c)) {     // all cases fall through
+                case U_UPPERCASE_LETTER:     // Lu
+                case U_LOWERCASE_LETTER:     // Al
+                case U_TITLECASE_LETTER:     // Lt
+                case U_MODIFIER_LETTER:      // Lm
+                case U_OTHER_LETTER:         // Lo
+                case U_DECIMAL_DIGIT_NUMBER: // Nd
+                case U_LETTER_NUMBER:        // Nl
+                case U_OTHER_NUMBER:         // No
+                case U_NON_SPACING_MARK:     // Mn
+                        //std::wcerr << " = true" << std::endl;
+                        return true;
+                default:
+                        //std::wcerr << " = false" << std::endl;
+                        return false;
+                }
+        }
+        bool
+        Document::isSpace(wchar_t c) {
+                return u_isspace(c);
+        }
 }

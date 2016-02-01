@@ -36,7 +36,7 @@ namespace OCRCorrection {
 	 * @brief A very basic constructor.
 	 */
 	Document();
-	
+
 	/**
 	 * As Tokens are created on the heap, they have to be destroyed here.
 	 */
@@ -68,7 +68,7 @@ namespace OCRCorrection {
 	 * the Token with index %position
 	 */
 	inline void insertToken( size_t position, const wchar_t* token, size_t length, bool isNormal, size_t pageIndex );
-	
+
 	/**
 	 * @brief Erase a sequence of tokens as specified by the two positions. These positions are to be
 	 *        understood similar to iterators: the tokens at position @c begin is the first to be deleted,
@@ -84,7 +84,7 @@ namespace OCRCorrection {
 	 */
 	void clear();
 
-	
+
 	/**
 	 * @brief Set LINE_BEGIN and LINE_END token properties
 	 *
@@ -108,7 +108,7 @@ namespace OCRCorrection {
 	 * const version of getter function at().
 	 */
 	inline const Token& at( size_t i ) const;
-	
+
 	/**
 	 * @brief Dumps a plaintext version of the ocr result. (Not necessarily the original version! See deatils of the description!)
 	 *
@@ -154,7 +154,7 @@ namespace OCRCorrection {
 
 
 	/**
-	 * @brief clears all special characters from beginning or end of a string, 
+	 * @brief clears all special characters from beginning or end of a string,
          * and converts it to lower case.
 	 */
 	inline static void cleanupWord( std::wstring* word, std::wstring* pre, std::wstring* post );
@@ -193,7 +193,7 @@ namespace OCRCorrection {
 	    iterator() {
 	    }
 
-	
+
 	    bool operator==( const iterator& other ) const {
 		return it_ == other.it_;
 	    }
@@ -204,7 +204,7 @@ namespace OCRCorrection {
 	    Token& operator*() {
 		return **it_;
 	    }
-	    
+
 	    Token* operator->() {
 		return *it_;
 	    }
@@ -213,7 +213,7 @@ namespace OCRCorrection {
 		++it_;
 		return *this;
 	    }
-	    
+
 	    iterator& operator+( size_t s ) {
 		it_ += s;
 		return *this;
@@ -227,7 +227,7 @@ namespace OCRCorrection {
 	private:
 	    explicit iterator( std::vector< Token* >::iterator it ) :
 		it_( it) {
-	    } 
+	    }
 
 	    std::vector< Token* >::iterator it_;
 	};
@@ -240,8 +240,8 @@ namespace OCRCorrection {
 	public:
 	    const_iterator( std::vector< Token* >::const_iterator it ) :
 		it_( it ) {
-	    } 
-	
+	    }
+
 	    bool operator==( const_iterator const& other ) const {
 		return it_ == other.it_;
 	    }
@@ -252,7 +252,7 @@ namespace OCRCorrection {
 	    Token const& operator*() {
 		return **it_;
 	    }
-	    
+
 	    Token const* operator->() {
 		return *it_;
 	    }
@@ -261,7 +261,7 @@ namespace OCRCorrection {
 		++it_;
 		return *this;
 	    }
-	    
+
 	    const_iterator& operator+( size_t s ) {
 		it_ += s;
 		return *this;
@@ -298,7 +298,7 @@ namespace OCRCorrection {
 	 *
 	 * The Page objects do not contain Token s themselves - those are always stored
 	 * in a vector of Token s in the Document object. Instead each Page just knows offsets
-	 * into this vector of Token s. 
+	 * into this vector of Token s.
 	 */
 	class Page {
 
@@ -324,18 +324,18 @@ namespace OCRCorrection {
 		imageFile_( imageFile ),
 		offsetBegin_( offsetBegin ),
 		offsetEnd_( offsetBegin ) {
-		
+
 	    }
 
 	    Page( Document& doc, size_t offsetBegin ) :
 		myDocument_( doc ),
 		offsetBegin_( offsetBegin ),
 		offsetEnd_( offsetBegin ) {
-		
+
 	    }
 
 	public:
-	    
+
 
 	    /**
 	     * @brief returns the number of tokens on the Page
@@ -359,8 +359,8 @@ namespace OCRCorrection {
 	    std::string const& getImageFile() const {
 		return imageFile_;
 	    }
-	    
-	    
+
+
 	    /**
 	     *
 	     * @return this Page (for method chaining)
@@ -428,12 +428,12 @@ namespace OCRCorrection {
 
 	    /**
 	     * @brief returns the (document-wide) token index of the first token of the page
-	     * 
+	     *
 	     */
 	    size_t getOffsetBegin() const {
 		return offsetBegin_;
 	    }
-	    
+
 	    /**
 	     * @brief returns the (document-wide) token index of the after-the-last token of the page
 	     *
@@ -441,7 +441,7 @@ namespace OCRCorrection {
 	    size_t getOffsetEnd() const {
 		return offsetEnd_;
 	    }
-	    
+
 	private:
 
             void setOffsetBegin( size_t x ) {
@@ -477,7 +477,7 @@ namespace OCRCorrection {
              */
             size_t offsetEnd_;
 	}; // class Page
-	
+
 
 	/**
 	 * @brief This iterator class is used to iterate through all Page s of the Document
@@ -492,37 +492,37 @@ namespace OCRCorrection {
 
 	    PageIterator( std::vector< Page* >::iterator const& it ) :
 		it_( it) {
-	    } 
-	    
+	    }
+
 	    bool operator==( const PageIterator& other ) const {
 		return it_ == other.it_;
 	    }
 	    bool operator!=( const PageIterator& other ) const {
 		return ! ( *this == other );
 	    }
-	    
+
 	    Page& operator*() {
 		return **it_;
 	    }
-	    
+
 	    Page* operator->() {
 		return *it_;
 	    }
-	    
+
 	    PageIterator& operator++() {
 		++it_;
 		return *this;
 	    }
-	    
+
 	    PageIterator& operator+( size_t s ) {
 		it_ += s;
 		return *this;
 	    }
-	    
+
 	private:
 	    std::vector< Page* >::iterator it_;
 	};
-	
+
 	/**
 	 * @brief the const version of PageIterator
 	 * @see PageIterator
@@ -531,7 +531,7 @@ namespace OCRCorrection {
 	public:
 	    const_PageIterator( std::vector< Page* >::const_iterator it ) :
 		it_( it ) {
-	    } 
+	    }
 
 	    bool operator==( const_PageIterator const& other ) const {
 		return it_ == other.it_;
@@ -543,16 +543,16 @@ namespace OCRCorrection {
 	    Page const& operator*() {
 		return **it_;
 	    }
-	    
+
 	    Page const* operator->() {
 		return *it_;
 	    }
-	
+
 	    const_PageIterator& operator++() {
 		++it_;
 		return *this;
 	    }
-	    
+
 	    const_PageIterator& operator+( size_t s ) {
 		it_ += s;
 		return *this;
@@ -577,7 +577,7 @@ namespace OCRCorrection {
 	PageIterator pagesBegin() {
 	    return PageIterator( pages_.begin() );
 	}
-	
+
         /**
          * @brief returns a const_PageIterator pointing to the first page of the document
          * @return a const_PageIterator pointing to the first page of the document
@@ -630,7 +630,7 @@ namespace OCRCorrection {
 	    if( ( pages_.size() == 0 ) && ( tokens_.size() > 0 ) ) {
 		throw OCRCException( "OCRC::Document::newPage: First page must be initialized before first token is added." );
 	    }
-	    Page* newPage = new Page( *this, imageFile, tokens_.size() ); 
+	    Page* newPage = new Page( *this, imageFile, tokens_.size() );
 	    pages_.push_back( newPage );
 
 	    return *newPage;
@@ -638,7 +638,7 @@ namespace OCRCorrection {
 
 	/**
 	 * @brief Change the directory where image files of the pages can be found.
-	 * 
+	 *
 	 * This presumes that all images are in the same directory.
 	 */
 	inline void changeImageDir( std::string const& dir ) {
@@ -669,7 +669,7 @@ namespace OCRCorrection {
 
     private: 	/////  PRIVATE  of class Document ///////////////////////////
 
-	
+
 	friend class IBMGTReader;
 
 	/**
@@ -683,17 +683,19 @@ namespace OCRCorrection {
 	/**
 	 * @brief A vector of Page s.
 	 *
-	 * This vector being empty indicates that the Document has no page information. 
+	 * This vector being empty indicates that the Document has no page information.
 	 */
 	std::vector< Page* > pages_;
 
-	
+        static inline bool isWord(wchar_t c);
+        static inline bool isSpace(wchar_t c);
+
 //	std::locale locale_;
-	
+
     }; // class Document
 
-    
-    
+
+
 } // ns OCRCorrection
 
 #include "./Document_inline_definitions.tcc"
