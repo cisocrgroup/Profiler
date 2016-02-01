@@ -109,9 +109,19 @@ SET( OCRCORRECTION_SOURCES
 
 add_library( OCRCorrection SHARED ${OCRCORRECTION_SOURCES})
 
+# BEGIN ICU Library
+find_package(ICU 4.4 REQUIRED)
+include_directories(
+    ${ICU_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+#add_executable(tables tables.c)
+#target_link_libraries(tables ${ICU_LIBRARIES})
+# END ICU Library
 
 target_link_libraries( OCRCorrection
   ${CSL_LIBRARY}
+  ${ICU_LIBRARIES}
   )
 
 install(
