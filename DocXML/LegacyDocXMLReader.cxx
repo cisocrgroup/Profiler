@@ -9,7 +9,7 @@ namespace OCRCorrection {
 
     LegacyDocXMLReader::LegacyDocXMLReader() :
 	selected_( false ),
-	doc_( 0 ) 
+	doc_( 0 )
     {
     }
 
@@ -20,17 +20,17 @@ namespace OCRCorrection {
 	doc_->newPage();
 
 	xercesc::XMLPlatformUtils::Initialize();
-    
+
 	xercesc::SAXParser parser_;
-    
+
 	parser_.setDocumentHandler( this );
 	parser_.setErrorHandler( this );
 
 	parser_.parse( xmlFile.c_str() );
-    
-    
+
+
 	//  xercesc::XMLPlatformUtils::Terminate();
-    
+
     }
 
 
@@ -39,16 +39,16 @@ namespace OCRCorrection {
 	if( xmlDir.at( 0 ) == '~' ) {
 	    xmlDir.replace( 0, 1, getenv( "HOME" ) );
 	}
-	
+
 	std::wstring wide_xmlDir;
 	csl::CSLLocale::string2wstring( xmlDir, wide_xmlDir );
 
 
 	DIR *pDIR = opendir( xmlDir.c_str() );
 	struct dirent *pDirEnt;
-	
+
 	std::vector< std::string > dirEntries;
-	
+
 	/* Get each directory entry */
 	pDirEnt = readdir( pDIR );
 	while ( pDirEnt != NULL ) {
@@ -70,18 +70,18 @@ namespace OCRCorrection {
 
 		// create the image path
 		std::string imageFile = xmlDir + std::string( "/" ) +  entry->substr( 0, (entry->size() - 4 ) ) + std::string( ".tif" );
-		
+
 		//doc->newPage( imageFile );
 		parse( inFile.c_str(), doc );
 	    }
 	}
 
-	std::wcerr << "OCRC::DocXMLParser::parseDirToDocument: parsed directory " << wide_xmlDir << ", " 
-		   << doc->getNrOfTokens() << " tokens, " 
+	std::wcerr << "OCRC::DocXMLParser::parseDirToDocument: parsed directory " << wide_xmlDir << ", "
+		   << doc->getNrOfTokens() << " tokens, "
 		   << doc->getNrOfPages() << " pages."
 		   << std::endl;
-        
-    
+
+
     }
 
 
@@ -95,25 +95,25 @@ namespace OCRCorrection {
     void LegacyDocXMLReader::startElement(const XMLCh* const name
 				    , AttributeList& attrs) {
 
-  
+
 	char* message = XMLString::transcode(name);
-	
+
 	content_.clear();
-	
+
 	if(strcmp(message, "document") == 0) {
 	}
-	
+
 	else if(strcmp(message, "page") == 0) {
-	    
+
 	    XMLCh const* attrValue = attrs.getValue( "imageFile" );
 	    char* attrValue_cstr = XMLString::transcode( attrValue );
 	    doc_->newPage( attrValue_cstr );
 	    XMLString::release( &attrValue_cstr );
 	    std::wcerr << "Page " << doc_->getNrOfPages() << std::endl;
 	}
-      
+
 	else if( strcmp( message, "token" ) == 0 ) {
-      
+
 	    tok_ = new Token(*doc_, doc_->getNrOfTokens(), true);
 	    tok_->initGroundtruth();
 
@@ -121,7 +121,7 @@ namespace OCRCorrection {
 	    char* attrValue_cstr = XMLString::transcode( attrValue );
 	    tok_->getGroundtruth().setNormal( strcmp( attrValue_cstr, "true" ) == 0 );
 	    XMLString::release( &attrValue_cstr );
-      
+
 	    attrValue = attrs.getValue( "verified" );
 	    attrValue_cstr = XMLString::transcode( attrValue );
 	    if( strcmp( attrValue_cstr, "true" ) == 0 ) {
@@ -131,8 +131,8 @@ namespace OCRCorrection {
 		tok_->getGroundtruth().setVerified( Token::VERIFIED_FALSE );
 	    }
 	    XMLString::release( &attrValue_cstr );
-      
-      
+
+
 //      std::wcout << __FILE__ << ":\"" <<  tok_->getWOCR() << "\"" << std::endl;
 	}
 
@@ -152,7 +152,7 @@ namespace OCRCorrection {
 		else {
 		    throw OCRCException( "OCRC::DocXMLParser: unknown value for attribute 'verified'" );
 		}
-		
+
 		XMLString::release( &attrValue_cstr );
 	    }
 	}
@@ -176,41 +176,41 @@ namespace OCRCorrection {
 
 	else if(strcmp(message, "ocrInstructions") == 0) {
 	}
-  
+
 	else if(strcmp(message, "instruction") == 0) {
-    
+
 	    XMLSize_t len = attrs.getLength();
 	    for (XMLSize_t index = 0; index < len; index++) {
-      
+
 		selected_ = false;
 		if(strcmp(XMLString::transcode(attrs.getName(index)), "selected") == 0) {
 		    if(strcmp(XMLString::transcode(attrs.getValue(index)), "true") == 0) {
 			selected_ = true;
 		    }
-		}   
+		}
 	    }
 	}
-    
+
 	else if(strcmp(message, "cands") == 0) {
 	}
 
 	else if(strcmp(message, "cand") == 0) {
 
 	    XMLSize_t len = attrs.getLength();
-    
+
 	    selected_ = false;
 	    for (XMLSize_t index = 0; index < len; index++) {
-      
+
 		if(strcmp(XMLString::transcode(attrs.getName(index)), "selected") == 0) {
 		    if(strcmp(XMLString::transcode(attrs.getValue(index)), "true") == 0) {
 			selected_ = true;
 		    }
-		}      
+		}
 	    }
 	}
 
 	else if( strcmp( message, "coord" ) == 0 ) {
-	    tok_->setCoordinates( 
+	    tok_->setCoordinates(
 		XMLString::parseInt(attrs.getValue( "l"  ) ),
 		XMLString::parseInt(attrs.getValue( "t"  ) ),
 		XMLString::parseInt(attrs.getValue( "r"  ) ),
@@ -226,7 +226,7 @@ namespace OCRCorrection {
 	    }
 	}
 
-	XMLString::release(&message);  
+	XMLString::release(&message);
     }
 
 
@@ -238,15 +238,15 @@ namespace OCRCorrection {
 
 	if(strcmp(message, "document") == 0) {
 	}
-  
+
 	else if(strcmp(message, "token") == 0) {
-      
+
 	    doc_->pushBackToken( tok_ );
 	    //std::wcout << L"Parser:" << tok_->getWOCR() << "#" << tok_->getGroundtruth().getHistTrace() << std::endl;
 	    tok_ = 0;
-      
+
 	}
-  
+
 	else if(strcmp(message, "classified") == 0) {
 	    tok_->getGroundtruth().setClassified( content_ );
 	}
@@ -265,7 +265,8 @@ namespace OCRCorrection {
 	    else {
 		tok_->setNormal( true );
 		for( std::wstring::const_iterator c = tok_->getWOCR().begin(); c != tok_->getWOCR().end(); ++c ) {
-		    if( ! std::isalnum( *c, csl::CSLLocale::Instance() ) ) {
+                        //if( ! std::isalnum( *c, csl::CSLLocale::Instance() ) ) {
+                        if(!Document::isWord(*c)) {
 			tok_->setNormal( false );
 			break;
 		    }
@@ -326,10 +327,10 @@ namespace OCRCorrection {
 	else if(strcmp(message, "baseWord") == 0) {
 	    tok_->getGroundtruth().setBaseWord( content_ );
 	}
-	
+
 	else if(strcmp(message, "cands") == 0) {
 	}
-    
+
 	else if(strcmp(message, "cand") == 0) {
 	    if( selected_ ) {
 		size_t colon = content_.find( L':', 0 );
@@ -348,12 +349,12 @@ namespace OCRCorrection {
 		if( right_bracket == std::wstring::npos ) {
 		    throw OCRCException( "OCRC::DocXMLParser::endElement: Parse of hist instruction failed (right_bracket not found)" );
 		}
-		
+
 		tok_->getGroundtruth().setBaseWord( content_.substr( colon +1, plus - colon - 1  ) ); // note that separators are not part of the catch
-		
+
                 std::wstring histTrace = content_.substr( left_bracket, right_bracket - left_bracket + 1 );
-                
-                size_t pos = 0;        
+
+                size_t pos = 0;
                 while( ( pos = histTrace.find( '_', pos ) ) != std::string::npos ) {
                     histTrace.at( pos ) = ':';
                 }
@@ -373,18 +374,18 @@ namespace OCRCorrection {
 	static std::wstring eingabe_wide;
 
 	eingabe = eingabe_cstr;
-    
+
 	static std::locale loc( CSL_UTF8_LOCALE );
 	csl::CSLLocale::string2wstring( eingabe, eingabe_wide );
 
 
 	content_ += eingabe_wide;
-    
-	XMLString::release( &eingabe_cstr ); 
+
+	XMLString::release( &eingabe_cstr );
     }
 
     void LegacyDocXMLReader::ignorableWhitespace(const XMLCh* const chars, const XMLSize_t length) {
-    
+
     }
 
     void LegacyDocXMLReader::startDocument() {

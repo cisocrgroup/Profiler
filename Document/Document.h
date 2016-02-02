@@ -667,6 +667,12 @@ namespace OCRCorrection {
 	//     return locale_;
 	// }
 
+        // these two functions should be used to determine if a character is
+        // normal or not using the character categories of the icu library.
+        // *Do not use isAlnum(...).
+        static inline bool isWord(wchar_t c);
+        static inline bool isSpace(wchar_t c);
+
     private: 	/////  PRIVATE  of class Document ///////////////////////////
 
 
@@ -686,9 +692,6 @@ namespace OCRCorrection {
 	 * This vector being empty indicates that the Document has no page information.
 	 */
 	std::vector< Page* > pages_;
-
-        static inline bool isWord(wchar_t c);
-        static inline bool isSpace(wchar_t c);
 
 //	std::locale locale_;
 
