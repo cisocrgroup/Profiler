@@ -211,19 +211,22 @@ namespace OCRCorrection {
 
     void Token::setWOCR( std::wstring const& w ) {
 	wOCR_ = w;
-
-	if( ( !wOCR_.empty() ) && std::use_facet< std::ctype< wchar_t > >( csl::CSLLocale::Instance() ).is( std::ctype_base::upper, wOCR_.at( 0 ) ) ) {
+        std::locale loc("");
+	if ((not wOCR_.empty()) and isupper(wOCR_.at(0), loc)) {
 	    setCapitalized();
 	}
 
-	wOCR_lc_ = wOCR_;
-	for( std::wstring::iterator c = wOCR_lc_.begin(); c != wOCR_lc_.end(); ++c ) {
-
-            *c = std::tolower( *c, csl::CSLLocale::Instance() );
-
+        if (wOCR_lc_.empty()) {
+                wOCR_lc_ = wOCR_;
+                for( std::wstring::iterator c = wOCR_lc_.begin(); c != wOCR_lc_.end(); ++c ) {
+                        *c = std::tolower(*c, loc);
+                }
 	}
     }
 
+        void Token::setWOCR_lc(std::wstring const& wlc) {
+                wOCR_lc_ = wlc;
+        }
 
     size_t Token::mergeRight() {
 	if( indexInDocument_ + 1 >= myDocument_.getNrOfTokens() ) {

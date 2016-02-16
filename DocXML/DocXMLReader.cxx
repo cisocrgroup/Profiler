@@ -229,9 +229,6 @@ namespace OCRCorrection {
 
 	else if( strcmp( message, "cand" ) == 0 ) {
 	    Candidate cand;
-	    //std::wcout << "content_=" << content_;
-	    //std::wcout << ", os=" << cand.parseFromString( content_, 0 ) << std::endl;
-
 	    if( cand.parseFromString( content_, 0 ) != content_.length() ) {
 		throw OCRCException( "OCRC::DocXMLReader: Parsing of topCand failed" );
 	    }
@@ -239,7 +236,7 @@ namespace OCRCorrection {
 	}
 
 	else if(strcmp(message, "wOCR_lc") == 0) {
-	    // ignore this field
+                tok_->setWOCR_lc(content_);
 	}
 
 	else if(strcmp(message, "wOrig") == 0) {
