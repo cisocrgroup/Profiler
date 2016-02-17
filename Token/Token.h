@@ -213,11 +213,9 @@ namespace OCRCorrection {
 	void setWOCR( std::wstring const& w );
 
         /**
-         * Set lower case representation. Not that this will be overwritten by a call
-         * to `setWOCR`.
+         * Explicitly sets the lowercase version of the token
          */
-        void setWOCR_lc(std::wstring const& wlc);
-
+        void setWOCR_lc(std::wstring const& w);
 
 	/**
 	 * @brief set a new correction for the Token

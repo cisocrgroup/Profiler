@@ -211,21 +211,19 @@ namespace OCRCorrection {
 
     void Token::setWOCR( std::wstring const& w ) {
 	wOCR_ = w;
-        std::locale loc("");
-	if ((not wOCR_.empty()) and isupper(wOCR_.at(0), loc)) {
-	    setCapitalized();
+	if ((not wOCR_.empty()) and iswupper(wOCR_[0])) {
+                setCapitalized();
 	}
-
         if (wOCR_lc_.empty()) {
-                wOCR_lc_ = wOCR_;
-                for( std::wstring::iterator c = wOCR_lc_.begin(); c != wOCR_lc_.end(); ++c ) {
-                        *c = std::tolower(*c, loc);
-                }
-	}
+                setWOCR_lc(w);
+        }
     }
 
         void Token::setWOCR_lc(std::wstring const& wlc) {
-                wOCR_lc_ = wlc;
+                wOCR_lc_.clear();
+                for (std::wstring::const_iterator i = wlc.begin(); i != wlc.end(); ++i) {
+                        wOCR_lc_.push_back(towlower(*i));
+                }
         }
 
     size_t Token::mergeRight() {
@@ -365,9 +363,9 @@ namespace OCRCorrection {
 
 	// if token is capitalized, also capitalize the candidate
 	if( this->isCapitalized() && !candItem->getCandidate().getString().empty() ) {
-	    candItem->getCandidate().getString().at( 0 ) =
-		std::use_facet< std::ctype< wchar_t > >( csl::CSLLocale::Instance() ).toupper( candItem->getCandidate().getString().at( 0 ));
-	}
+                wchar_t firstCharToUpperCase = towupper(candItem->getCandidate().getString()[0]);
+                candItem->getCandidate().getString()[0] = firstCharToUpperCase;
+        }
 	if( candidates_ == 0 ) {
 	    candidates_ = candItem;
 	}
