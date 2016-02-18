@@ -7,7 +7,6 @@
 #include<fstream>
 #include<exception>
 #include<wctype.h>
-#include<csl/CSLLocale/CSLLocale.h>
 
 #include "../Exceptions.h"
 

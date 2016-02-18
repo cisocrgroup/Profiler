@@ -1,8 +1,8 @@
 
 
 
-#include<csl/Getopt/Getopt.h>
-#include<csl/Val/Val.h>
+#include<Getopt/Getopt.h>
+#include<Val/Val.h>
 
 #include"../Exceptions.h"
 
@@ -11,7 +11,7 @@ void printHelp() {
 }
 
 int main( int argc, char const** argv ) {
-    
+
     std::locale::global( std::locale( "" ));
 
     csl::Getopt options;
@@ -24,28 +24,28 @@ int main( int argc, char const** argv ) {
 	printHelp();
 	return EXIT_SUCCESS;
     }
-    
+
     if( ! ( options.hasOption( "baseDict" ) && options.hasOption( "patternFile" ) ) ) {
 	printHelp();
 	return EXIT_FAILURE;
     }
-    
-    
+
+
     std::wstring line;
-    
+
     csl::MinDic<> baseDict( options.getOption( "baseDict" ).c_str() );
 
     csl::Val val( baseDict, options.getOption( "patternFile" ).c_str() );
     csl::Val::CandidateReceiver candset;
 
-    
+
     std::wstring answerString;
     while( std::getline( std::wcin, line ).good() ) {
 	candset.clear();
 	answerString.clear();
 	val.query( line, &candset );
 	std::sort( candset.begin(), candset.end() );
-	if( ( ! candset.empty() )  && 
+	if( ( ! candset.empty() )  &&
 	    ( ! candset.at( 0 ).getHistInstruction().empty() ) ) {
 
 	    std::wcout << line << "#";
@@ -59,7 +59,7 @@ int main( int argc, char const** argv ) {
     if( errno == EILSEQ ) { // catch encoding error
 	throw OCRCorrection::OCRCException( "createHistoricLexicon: Encoding error in input sequence." );
     }
-    
+
 
     return 0;
 };

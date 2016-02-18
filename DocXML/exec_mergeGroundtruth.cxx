@@ -1,4 +1,4 @@
-#include<csl/Getopt/Getopt.h>
+#include<Getopt/Getopt.h>
 #include<DocXML/MergedGroundtruthReader.h>
 #include<DocXML/DocXMLReader.h>
 #include<DocXML/DocXMLWriter.h>
@@ -11,19 +11,19 @@ int main( int argc, char const** argv ) {
 
 	csl::Getopt options;
 	options.getOptionsAsSpecified( argc, argv );
-	
+
 	if( options.getArgumentCount() != 2 ) {
-	    std::wcerr 
-		<< "Use like: mergeGroundtruth masterDoc addInfoDoc" 
+	    std::wcerr
+		<< "Use like: mergeGroundtruth masterDoc addInfoDoc"
 		<<  std::endl;
 	    return 1;
 	}
-	
-	
+
+
 	OCRCorrection::MergedGroundtruthReader mgr;
 
 	OCRCorrection::DocXMLReader reader;
-	
+
 	OCRCorrection::Document master;
 	reader.parse( argv[1], &master );
 
@@ -31,7 +31,7 @@ int main( int argc, char const** argv ) {
 	reader.parse( argv[2], &addInfo );
 
 	mgr.mergeDocuments( &master, addInfo  );
-	
+
 	OCRCorrection::DocXMLWriter writer;
 
 	std::wostream& os = std::wcout;
@@ -41,7 +41,7 @@ int main( int argc, char const** argv ) {
 	writer.writeXML( master, os );
 
 	return EXIT_SUCCESS;
-	
+
     } catch ( OCRCorrection::OCRCException exc ) {
 	std::wcerr << "mergeGroundtruth: Caught exception: " << exc.what() << std::endl;
 	return EXIT_FAILURE;

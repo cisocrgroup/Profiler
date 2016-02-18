@@ -40,8 +40,8 @@ namespace OCRCorrection {
 	    xmlDir.replace( 0, 1, getenv( "HOME" ) );
 	}
 
-	std::wstring wide_xmlDir;
-	csl::CSLLocale::string2wstring( xmlDir, wide_xmlDir );
+	std::wstring wide_xmlDir = Utils::utf8(xmlDir);
+	//csl::CSLLocale::string2wstring( xmlDir, wide_xmlDir );
 
 
 	DIR *pDIR = opendir( xmlDir.c_str() );
@@ -375,8 +375,9 @@ namespace OCRCorrection {
 
 	eingabe = eingabe_cstr;
 
-	static std::locale loc( CSL_UTF8_LOCALE );
-	csl::CSLLocale::string2wstring( eingabe, eingabe_wide );
+    eingabe_wide = Utils::utf8(eingabe);
+	//static std::locale loc( CSL_UTF8_LOCALE );
+	//csl::CSLLocale::string2wstring( eingabe, eingabe_wide );
 
 
 	content_ += eingabe_wide;
@@ -407,8 +408,8 @@ namespace OCRCorrection {
 	my_message += message;
 	throw OCRCException( my_message );
 
-	std::wstring wideMessage;
-	csl::CSLLocale::string2wstring( std::string( message), wideMessage );
+	std::wstring wideMessage = Utils::utf8(message);
+	//csl::CSLLocale::string2wstring( std::string( message), wideMessage );
 	std::wcerr << wideMessage << std::endl;
 	XMLString::release(&message);
     }
@@ -421,8 +422,8 @@ namespace OCRCorrection {
 
 	throw OCRCException( my_message );
 
-	std::wstring wideMessage;
-	csl::CSLLocale::string2wstring( std::string( message), wideMessage );
+	std::wstring wideMessage(Utils::utf8(message));
+	//csl::CSLLocale::string2wstring( std::string( message), wideMessage );
 	std::wcerr << wideMessage << std::endl;
 
 	XMLString::release(&message);
@@ -435,8 +436,8 @@ namespace OCRCorrection {
 
 	throw OCRCException( my_message );
 
-	std::wstring wideMessage;
-	csl::CSLLocale::string2wstring( std::string( message), wideMessage );
+	std::wstring wideMessage(Utils::utf8(message));
+	//csl::CSLLocale::string2wstring( std::string( message), wideMessage );
 	std::wcerr << wideMessage << std::endl;
 	XMLString::release(&message);
     }

@@ -1,7 +1,7 @@
-#include<csl/DictSearch/DictSearch.h>
+#include<DictSearch/DictSearch.h>
 #include "./FrequencyList.h"
 
-#include<csl/Getopt/Getopt.h>
+#include<Getopt/Getopt.h>
 
 /**
  * This is to explore the behaviour of the FrequencyList.
@@ -11,11 +11,11 @@
 int main( int argc, char const** argv ) {
 
     std::locale::global( std::locale( "" ) );
-    
+
     csl::Getopt options( argc, argv );
 
     if( options.getArgumentCount() != 2 ) {
-      std::wcerr << "Use like: queryFrequencyList <frequencies.binfrq> <patternweights.txt>" << std::endl; 
+      std::wcerr << "Use like: queryFrequencyList <frequencies.binfrq> <patternweights.txt>" << std::endl;
       exit( 1 );
     }
 
@@ -30,7 +30,7 @@ int main( int argc, char const** argv ) {
     csl::DictSearch dictSearch;
 
     OCRCorrection::FrequencyList freqlist( histFreqFile.c_str(), weightFile.c_str() );
-    
+
     dictSearch.initHypothetic( patternFile.c_str() );
 
     csl::DictSearch::DictModule& modernMod = dictSearch.addDictModule( L"modern", modernDict );
@@ -55,7 +55,7 @@ int main( int argc, char const** argv ) {
 		       << L"   interpretationCount=" << freqlist.getInterpretationCount( *cand ) << std::endl
 		       << L"   baseWordFreq="<< freqlist.getBaseWordFrequency( cand->getBaseWord() ) << std::endl
 		       << L"   instructionProb="<< freqlist.getInstructionProb( cand->getInstruction() ) << std::endl
-		       << L"   actually returned freq value="<< freqlist.getInterpretationFrequency( *cand ) << std::endl 
+		       << L"   actually returned freq value="<< freqlist.getInterpretationFrequency( *cand ) << std::endl
 		       <<std::endl;
 	}
     }

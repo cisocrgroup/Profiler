@@ -17,22 +17,22 @@ namespace OCRCorrection {
     template< typename Document_t >
     void AlphaScore::addScoreToDocument( Document_t& document ) const {
 
-	Stopwatch watch;
+    csl::Stopwatch watch;
 	watch.start();
 	//std::wcout<<"AlphaScore::addScoreToDocument: do nothing yet"<<std::endl;
-	
+
 	// Compute maximum standard Lev. distance and maximum Frequency
 	size_t maxDLev = 0;
 	double maxFreq = 0;
-	
+
 	for( typename Document_t::iterator iter = document.begin(); iter != document.end(); ++iter) {
 	    for( size_t i = 0; i < iter->getNrOfCandidates(); i++ ) {
-		if( iter->candidateAt(i).getDlev()>maxDLev ) 
+		if( iter->candidateAt(i).getDlev()>maxDLev )
 		    maxDLev = iter->candidateAt(i).getDlev();
 		if(iter->candidateAt(i).getFrequency()>maxFreq)
 		    maxFreq = iter->candidateAt(i).getFrequency();
 	    }
-	} 
+	}
 
 	maxFreq = log10( (float) maxFreq );
 	//std::wcerr<<"max dlev is "<<maxDLev<<", max freq is "<<maxFreq<<std::endl;
@@ -48,12 +48,12 @@ namespace OCRCorrection {
 		// std::wcout<<"burdayim";
 		dLev_norm = 1 - ( dLev_norm / (double) maxDLev );
 		freq_norm = freq_norm / (double) maxFreq;
-		//std::wcout<<"dlev norm="<<dLev_norm<<"freq norm="<<freq_norm<<std::endl;			
+		//std::wcout<<"dlev norm="<<dLev_norm<<"freq norm="<<freq_norm<<std::endl;
 		alphaScore = ( ( alpha_ * dLev_norm ) + ( ( 1.0 - alpha_ ) * freq_norm ) ) / 2;
 		//std::wcout<<"Alpha Score= "<<alphaScore<<"alpha= "<<alpha_<<std::endl;
 		iter->candidateAt(i).setAlphaScore(alphaScore);
 	    }
-	} 
+	}
 
 	std::wcout<<"OCRCorrection::AlphaScore: Alphascored "<<document.getNrOfTokens()<<" tokens in "<<watch.readMilliseconds()<<" milliseconds"<<std::endl;;
 	return;

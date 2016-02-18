@@ -140,7 +140,7 @@ namespace OCRCorrection {
     }
 
     void Profiler::doIteration( size_t iterationNumber, bool lastIteration ) {
-	Stopwatch iterationTime;
+            csl::Stopwatch iterationTime;
 
 	std::wcout << "*** Iteration " << iterationNumber << " ***" << std::endl;
 
@@ -164,7 +164,7 @@ namespace OCRCorrection {
 
 	std::map< std::wstring, double > counter;
 
-	Stopwatch stopwatch;
+	csl::Stopwatch stopwatch;
 
 	histCounter_.clear();
 	ocrCounter_.clear();
@@ -623,7 +623,7 @@ namespace OCRCorrection {
     void Profiler::profile2xml( char const* filename ) const {
 	std::wofstream fo( filename );
 	if( ! fo.good() ) throw OCRCException( std::string( "OCRC::Profiler::profile2xml: Can not open file for writing: " ) + filename );
-	fo.imbue( csl::CSLLocale::Instance() );
+//	fo.imbue( csl::CSLLocale::Instance() );
 	profile2xml( fo );
     }
 
@@ -634,8 +634,8 @@ namespace OCRCorrection {
 	time_t t = time(NULL);
 	std::string timeString( asctime(localtime(&t)) );
 	timeString.resize( timeString.size() - 1 ); // remove newline
-	std::wstring wide_timeString;
-	csl::CSLLocale::string2wstring( timeString, wide_timeString );
+	std::wstring wide_timeString = Utils::utf8(timeString);
+	//csl::CSLLocale::string2wstring( timeString, wide_timeString );
 
 	os << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl
 	   << "<profile>" << std::endl

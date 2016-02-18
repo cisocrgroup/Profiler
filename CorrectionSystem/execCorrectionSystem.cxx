@@ -12,15 +12,16 @@
  * [wort] "normal tokens", nur aus Buchstaben bestehend.
  *     Dahinter in runden Klammern alle Kandidaten: (token,levenshtein-dist, frequency)
  * {bla} "not normal token" hierfür wurden keine Kandidaten berechnet
- * 
- * normal/not normal ist übrigens für jedes Token mit Token::isNormal() abfragbar   
+ *
+ * normal/not normal ist übrigens für jedes Token mit Token::isNormal() abfragbar
  *
  * @todo Make this live again.
  */
 
 int main( int argc, char** argv ) {
 
-    std::locale::global( CSL_UTF8_LOCALE ); // set the environment's default locale
+        std::locale::global(std::locale(""));
+        //std::locale::global( CSL_UTF8_LOCALE ); // set the environment's default locale
 //    std::locale::global( std::locale( "de_DE.utf8" ) );
 //    setlocale(LC_CTYPE, "de_DE.utf8");  /*Setzt das Default Encoding für das Programm */
 

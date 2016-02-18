@@ -52,7 +52,7 @@ namespace OCRCorrection {
 	testTokenErase();
 	testTokenSplit();
     }
-    
+
 
     /**
      * test the basic methods
@@ -64,8 +64,8 @@ namespace OCRCorrection {
 	// for( Document::iterator tok = doc.begin(); tok != doc.end(); ++tok ) {
 	//     std::wcout << L"'" << tok->getWOCR() << L"'" << std::endl;
 	// }
-	
-	
+
+
     }
 
     void TestDocument::testAlignedIn() {
@@ -100,16 +100,16 @@ namespace OCRCorrection {
 	doc.pushBackToken( L".", false );
 
 	for( Document::PageIterator pageIt= doc.pagesBegin(); pageIt != doc.pagesEnd(); ++pageIt ) {
-	    std::wstring wide_imageFile;
-	    csl::CSLLocale::string2wstring( pageIt->getImageFile(), wide_imageFile );
+                std::wstring wide_imageFile(Utils::utf8(pageIt->getImageFile()));
+                //csl::CSLLocale::string2wstring( pageIt->getImageFile(), wide_imageFile );
 	    std::wcout << "PAGE: image=" << wide_imageFile << std::endl;
-	    
+
 	    for( Document::iterator it = pageIt->begin(); it != pageIt->end(); ++it ) {
 		(*it).print();
 	    }
 	    std::wcout << "PAGE END" << std::endl;
 	}
-	
+
 	CPPUNIT_ASSERT( doc.at( 0 ).getPageIndex() == 0 );
 	CPPUNIT_ASSERT( doc.at( 3 ).getPageIndex() == 0 );
 	CPPUNIT_ASSERT( doc.at( 7 ).getPageIndex() == 0 );
@@ -154,23 +154,23 @@ namespace OCRCorrection {
 	doc.pushBackToken( L" ", false );
 	doc.pushBackToken( L"word3", true ); // 4
 	doc.pushBackToken( L" ", false );
-	doc.pushBackToken( L"word4", true ); // 6  
+	doc.pushBackToken( L"word4", true ); // 6
 	doc.pushBackToken( L" ", false );
-	doc.pushBackToken( L"word5", true ); // 8   
+	doc.pushBackToken( L"word5", true ); // 8
 	doc.pushBackToken( L" ", false );
 	doc.pushBackToken( L"word6", true ); // 10
 	doc.pushBackToken( L" ", false );
 	doc.pushBackToken( L"word7", true ); // 12
-	
+
 	doc.newPage( "page2.tif" );
 	doc.pushBackToken( L"word8", true ); // 13
 	doc.pushBackToken( L" ", false );
 	doc.pushBackToken( L"word9", true ); // 15
-	
+
 	CPPUNIT_ASSERT_EQUAL( (size_t)16, doc.getNrOfTokens() );
-	
+
 	doc.eraseToken( 2, 6 ); // delete word2, word3 and the space afterwards
-	
+
 	CPPUNIT_ASSERT_EQUAL( (size_t)12, (size_t)doc.getNrOfTokens() );
 	CPPUNIT_ASSERT( L"word4" == doc.at( 2 ).getWOCR() );
 
@@ -197,7 +197,7 @@ namespace OCRCorrection {
 	CPPUNIT_ASSERT( doc.at( 0 ).getWDisplay() == L"split" );
 	CPPUNIT_ASSERT( doc.at( 1 ).getWDisplay() == L" " );
 	CPPUNIT_ASSERT( doc.at( 2 ).getWDisplay() == L"split" );
-	
+
 	CPPUNIT_ASSERT( doc.at( 0 ).isCorrected() );
 	CPPUNIT_ASSERT( doc.at( 2 ).isCorrected() );
 	std::wcout << "wOCR: " << doc.at( 2  ).getWOCR() << std::endl;
@@ -254,7 +254,7 @@ namespace OCRCorrection {
 	CPPUNIT_ASSERT( std::wstring( L"tok2," ) == doc.at( 2 ).getWDisplay() );
 	CPPUNIT_ASSERT( std::wstring( L"tok3" ) ==  doc.at( 3 ).getWDisplay() );
 
-	
+
 	// merge with a specified nr of 4 tokens
 	doc.at( 3 ).mergeRight( 4 );
 	CPPUNIT_ASSERT( std::wstring( L"tok3tok4tok5" ) == doc.at( 3 ).getWDisplay() );
@@ -266,11 +266,11 @@ namespace OCRCorrection {
 	CPPUNIT_ASSERT( std::wstring( L"tok6tok7" ) == doc.at( 5 ).getWDisplay() );
 	CPPUNIT_ASSERT( std::wstring( L"\n" ) ==  doc.at( 6 ).getWDisplay() );
 	CPPUNIT_ASSERT( std::wstring( L"tok8" ) ==  doc.at( 7 ).getWDisplay() );
-	
-	
 
-	
-	
+
+
+
+
     }
 
 
@@ -304,7 +304,7 @@ namespace OCRCorrection {
 	CPPUNIT_ASSERT( doc.at( 11 ).hasProperty( Token::HYPHENATION_2ND ) );
 	CPPUNIT_ASSERT( doc.at( 11 ).getHyphenationMerged() == L"zeilenumbruch" );
 
-		
+
     }
 
 }

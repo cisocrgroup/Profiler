@@ -57,10 +57,10 @@ namespace OCRCorrection {
 		    + "Next abbyy file is for image " + abbyyPage->getImageFile()
 		);
 	    }
-	    std::wstring wideAbbyyFilename;
-	    std::wstring wideAlignedTXTFilename;
-	    csl::CSLLocale::string2wstring( abbyyPage->getImageFile(), wideAbbyyFilename );
-	    csl::CSLLocale::string2wstring( alignedTXTPage->getImageFile(), wideAlignedTXTFilename );
+	    std::wstring wideAbbyyFilename(Utils::utf8(abbyyPage->getImageFile()));
+	    std::wstring wideAlignedTXTFilename(Utils::utf8(alignedTXTPage->getImageFile()));
+	    //csl::CSLLocale::string2wstring( abbyyPage->getImageFile(), wideAbbyyFilename );
+	    //csl::CSLLocale::string2wstring( alignedTXTPage->getImageFile(), wideAlignedTXTFilename );
 
 	    std::wcerr << "New page: " << pageCount << ", abbyyFile=" << wideAbbyyFilename << ", alignedTXTFile=" << wideAlignedTXTFilename << std::endl;
 
@@ -95,7 +95,7 @@ namespace OCRCorrection {
     void MergedGroundtruthReader::mergeAreas( Document::iterator abbyyBegin, Document::iterator abbyyEnd,
 					      Document::iterator alignedTXTBegin, Document::iterator alignedTXTEnd ) {
 
-	std::locale loc_( CSL_UTF8_LOCALE );
+            //std::locale loc_( CSL_UTF8_LOCALE );
 
 
 	// make sure all abbyyTokens have Groundtruth space allocated

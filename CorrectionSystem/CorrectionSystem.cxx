@@ -21,9 +21,9 @@ namespace OCRCorrection {
 
 
     void CorrectionSystem::readConfiguration( char const* configFile ) {
-	std::wstring wideFilename;
-	csl::CSLLocale::string2wstring( configFile, wideFilename );
-	
+            std::wstring wideFilename = Utils::utf8(configFile);
+            //csl::CSLLocale::string2wstring( configFile, wideFilename );
+
 
 	iniConf_.load( configFile );
 
@@ -41,10 +41,10 @@ namespace OCRCorrection {
 
     void CorrectionSystem::newDocument(  char const* dirName, char const* imageDirName, InputMode inputMode ) {
 	std::wcerr
-	    << "c++::CorrSys::newDocument." 
-	    // << "dirName=" << dirName 
-	    // <<  ", imageDir=" << imageDirName 
-	    // << ", Input mode is " << inputMode 
+	    << "c++::CorrSys::newDocument."
+	    // << "dirName=" << dirName
+	    // <<  ", imageDir=" << imageDirName
+	    // << ", Input mode is " << inputMode
 	    << std::flush
 	    << std::endl;
 
@@ -63,7 +63,7 @@ namespace OCRCorrection {
 	    std::wcerr << "OCRCorrection::CorrectionSystem::newDocument: This signature is only for filetype ABBYY_XML and ABBY_XML_DIR" << std::endl;
 	    exit( 1 );
 	}
-	
+
 	// std::wcerr << "Run profiler" << std::endl;
 	// runProfiler();
 	// std::wcerr << "done" << std::endl;
@@ -80,7 +80,7 @@ namespace OCRCorrection {
 
     void CorrectionSystem::runProfiler() {
 	Profiler profiler;
-	
+
 	std::wcerr << "runProfiler::readConfig" << std::endl;
 
 	try {
@@ -89,7 +89,7 @@ namespace OCRCorrection {
 	    std::wcout << exc.what() << std::endl;
 	    throw exc;
 	}
-	
+
 	std::wcerr << "Create Profile" << std::endl;
 	// createProfile adds candidates to the document object
 	profiler.createProfile( document_ );

@@ -13,7 +13,7 @@
 #include <AltoXML/AltoXMLReader.h>
 
 #include<IBMGroundtruth/IBMGTReader.h>
-#include<csl/Getopt/Getopt.h>
+#include<Getopt/Getopt.h>
 
 
 void printHelp() {
@@ -66,7 +66,7 @@ int main( int argc, char const** argv ) {
 
 	std::wcerr << "OCRC::profiler: Syntax error in command line call." << std::endl
 		   << "Message from the command line parser:" << std::endl
-		   << csl::CSLLocale::string2wstring( exc.what() ) << std::endl
+               << OCRCorrection::Utils::utf8(exc.what()) << std::endl
 		   << std::endl
 		   << "Use: profiler --help" << std::endl
 	    ;
@@ -122,12 +122,12 @@ int main( int argc, char const** argv ) {
     std::wstring wideConfigFile;
 
     try {
-	std::wcerr << "Read config from " << csl::CSLLocale::string2wstring( options.getOption( "config" ) ) << std::endl;
+            std::wcerr << "Read config from " << OCRCorrection::Utils::utf8(options.getOption( "config" ) ) << std::endl;
 	profiler.readConfiguration( options.getOption( "config" ).c_str() );
     }
     catch( std::exception const& exc ) {
-	std::wstring wideWhat;
-	csl::CSLLocale::string2wstring( exc.what(), wideWhat );
+            std::wstring wideWhat(OCRCorrection::Utils::utf8(exc.what()));;
+            //csl::CSLLocale::string2wstring( exc.what(), wideWhat );
 	std::wcerr << "Error while readConfiguration: " << wideWhat << std::endl;
 	return EXIT_FAILURE;
     }
@@ -192,7 +192,7 @@ int main( int argc, char const** argv ) {
 
     if( options.hasOption( "out_xml" ) ) {
 	std::wofstream os( options.getOption( "out_xml" ).c_str() );
-	os.imbue( csl::CSLLocale::Instance() );
+	//os.imbue( csl::CSLLocale::Instance() );
 	if( ! os.good() ) {
 	    std::wcerr << L"OCRC::profiler: Could not open file for xml output" << std::endl;
 	    throw std::runtime_error( "OCRC::profiler: Could not open file for xml output" );
@@ -212,10 +212,10 @@ int main( int argc, char const** argv ) {
 
 
     } catch ( OCRCorrection::OCRCException& exc ) {
-    	std::wcerr << "OCRC::Profiler: Caught OCRCException:" << csl::CSLLocale::string2wstring( exc.what() ) << std::endl;
+            std::wcerr << "OCRC::Profiler: Caught OCRCException:" << OCRCorrection::Utils::utf8(exc.what()) << std::endl;
         return EXIT_FAILURE;
     } catch ( csl::exceptions::cslException& exc ) {
-    	std::wcerr << "OCRC::Profiler: Caught cslException: " << csl::CSLLocale::string2wstring( exc.what() ) << std::endl;
+            std::wcerr << "OCRC::Profiler: Caught cslException: " << OCRCorrection::Utils::utf8(exc.what()) << std::endl;
         return EXIT_FAILURE;
     }
     catch( std::exception& exc ) {

@@ -91,9 +91,10 @@ namespace OCRCorrection {
 	    imageDir.replace( 0, 1, getenv( "HOME" ) );
 	}
 
-	std::wstring wideXmlDir, wideImageDir;
-	csl::CSLLocale::CSLLocale::string2wstring( xmlDir, wideXmlDir );
-	csl::CSLLocale::CSLLocale::string2wstring( imageDir, wideImageDir );
+	std::wstring wideXmlDir = Utils::utf8(xmlDir);
+    std::wstring wideImageDir = Utils::utf8(imageDir);
+	// csl::CSLLocale::CSLLocale::string2wstring( xmlDir, wideXmlDir );
+	// csl::CSLLocale::CSLLocale::string2wstring( imageDir, wideImageDir );
 	std::wcerr << "OCRC::AbbyyXmlParser::parseDirToDocument: Parse " << wideXmlDir << ", images in " << wideImageDir << std::endl;
 
 	DIR *pDIR = opendir( xmlDir.c_str() );
@@ -108,8 +109,8 @@ namespace OCRCorrection {
 
 	}
 
-	std::wstring wide_xmlDir;
-	csl::CSLLocale::string2wstring( xmlDir, wide_xmlDir );
+	std::wstring wide_xmlDir = Utils::utf8(xmlDir);
+	//csl::CSLLocale::string2wstring( xmlDir, wide_xmlDir );
 
 
 	struct dirent *pDirEnt;
@@ -145,8 +146,8 @@ namespace OCRCorrection {
 		parseToDocument( inFile.c_str(), doc );
 	    }
 	    else { // no "xml" extension
-		std::wstring wideEntry;
-		csl::CSLLocale::string2wstring( *entry, wideEntry );
+                std::wstring wideEntry = Utils::utf8(*entry);
+                //csl::CSLLocale::string2wstring( *entry, wideEntry );
 		std::wcerr << "OCRC::AbbyyXmlParser::parseDirToDocument: Ignored non-xml file " << wideEntry << std::endl;
 	    }
 	}
@@ -434,8 +435,8 @@ namespace OCRCorrection {
 	int offset = 0;
 	int utf8offset = 0;
 
-	std::wstring wideInput;
-	csl::CSLLocale::string2wstring( input, wideInput );
+	std::wstring wideInput = Utils::utf8(input);
+	//csl::CSLLocale::string2wstring( input, wideInput );
 	// 	int test = GetUtf8( eingabe, offset, utf8offset );
 // 	tempchar_ = test;
 	if( wideInput.length() != 1 ) {

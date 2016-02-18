@@ -2,16 +2,13 @@
 #define OCRC_UTILS_CXX OCRC_UTILS_CXX
 
 #include <unistd.h>
+#include <cstdlib>
 #include "Utils.h"
-#include <csl/CSLLocale/CSLLocale.h>
 
 namespace OCRCorrection {
 
     std::string Utils::getOCRCBase() {
 	std::string ret = __FILE__;
-	std::wstring wide_ret;
-	csl::CSLLocale::string2wstring( ret, wide_ret );
-
 	size_t pos = ret.find( "cxx/Utils/Utils.cxx" );
 	if( pos == std::string::npos ) {
 	    throw OCRCException( "OCRC::utils::getOCRCBase: could not create OCRCBase " );
@@ -42,8 +39,26 @@ namespace OCRCorrection {
     }
 
 
+        std::string Utils::utf8(std::wstring const& wstr)
+        {
+                std::string out;
+                out.reserve(wstr.size());
+                bool shifts = std::wctomb(NULL, 0);
+                char buffer[MB_CUR_MAX];
+                for (size_t i = 0; i < wstr.size(); ++i) {
+                        int ret = std::wctomb(buffer, wstr[i]);
+                        out.append(buffer, ret);
+                }
+                return out;
+        }
 
-
+        std::wstring Utils::utf8(std::string const& str)
+        {
+                const size_t n = str.size();
+                std::wstring out(n + 1, 0);
+                std::mbstowcs(&out[0], str.data(), n + 1);
+                return out;
+        }
 }
 
 #endif

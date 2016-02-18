@@ -2,17 +2,14 @@
 #define OCRCORRECTION_DOCUMENT_TCC OCRCORRECTION_DOCUMENT_TCC
 
 #include "Document.h"
-#include <csl/CSLLocale/CSLLocale.h>
-
-
 
 namespace OCRCorrection {
- 
-    Document::Document() 
+
+    Document::Document()
     //locale_( std::locale( "" ), new Ctype_OldGerman( std::locale( "" ) ) )
 	//compareOperator_
     {
-	
+
 	tokens_.reserve( 500 );
 
     }
@@ -22,11 +19,11 @@ namespace OCRCorrection {
 	clear();
     }
 
-    
+
     void Document::pushBackToken( const wchar_t* token, size_t length, bool isNormal ) {
 	pushBackToken( new Token( *this, tokens_.size(), token, length, isNormal ) );
     }
-    
+
     void Document::pushBackToken( std::wstring const& token, bool isNormal ) {
 	pushBackToken( new Token( *this, tokens_.size(), token, isNormal ) );
     }
@@ -37,17 +34,17 @@ namespace OCRCorrection {
 	    throw OCRCException( "OCRC::Document::pushBackToken: Tried to add 0-Pointer as new token." );
 	}
 	// std::wcout << "Document::pushBackToken: " << newToken->getWOCR() << std::endl;
-	
+
 	if( tokens_.capacity() == tokens_.size() ) {
 	    // anything to take care of before vector is going to realloc???
 	}
 
-	
+
 
 	tokens_.push_back( newToken );
 	if( hasPages() ) {
 	    tokens_.back()->setPageIndex( pages_.size() - 1 );
-	    pages_.back()->offsetEnd_ += 1; 
+	    pages_.back()->offsetEnd_ += 1;
 	    assert( pages_.back()->offsetEnd_ == tokens_.size() );
 	}
     }
@@ -82,7 +79,7 @@ namespace OCRCorrection {
 	    ++count;
 	}
     }
-    
+
 
     void Document::eraseToken( size_t beg, size_t end  ) {
 	if( (end < beg) || (end == 0) ||  (end > getNrOfTokens()) ) {
@@ -93,14 +90,14 @@ namespace OCRCorrection {
 	    return;
 	}
 
-       
+
         // make sure all erased tokens are on one page
         if( this->at( beg ).getPageIndex() != this->at( end - 1 ).getPageIndex() ) {
             throw OCRCException( "OCRC::Document::eraseToken: cannot erase across page borders" );
         }
 
         size_t currentPage = this->at(beg ).getPageIndex();
-	
+
         // delete the distinct token objects on the heap
 	for( std::vector< Token* >::iterator it = tokens_.begin() + beg; it != tokens_.begin() + end; ++it ) {
 	    delete( *it );
@@ -134,9 +131,9 @@ namespace OCRCorrection {
 	    it->setIndexInDocument( count );
 	    ++count;
 	}
-	
+
     }
-    
+
     void Document::clear() {
         // delete Token-objects on heap
         // std::wcerr << "OCRC::Document::clear: tokens_.size() == " << tokens_.size() << std::endl;
@@ -173,10 +170,10 @@ namespace OCRCorrection {
     void Document::findHyphenation() {
 	std::wstring hyphenationMarks = std::wstring( L"-\u00AC" );
 	std::wstring mergedWord;
-	
-	
+
+
 	if( getNrOfTokens() < 4 ) return;
-	
+
 	/*
 	 *  hyphe       ¬          \n         nation
 	 *   i -2      i-1         i           i+1
@@ -184,11 +181,11 @@ namespace OCRCorrection {
 	 */
         for( size_t i = 2; i < getNrOfTokens()-1 ; ++i ) {
 	    if( this->at( i ).getWOCR() == L"\n" ) {
-		if( ( this->at( i - 1 ).getWOCR().size() == 1 ) && 
+		if( ( this->at( i - 1 ).getWOCR().size() == 1 ) &&
 		    ( hyphenationMarks.find( this->at( i - 1 ).getWOCR().at( 0 ) ) != std::wstring::npos ) ) {
 
 		    mergedWord = this->at( i - 2 ).getWOCR() + this->at( i + 1 ).getWOCR();
-		
+
 		    this->at( i - 2 ).setProperty( Token::HYPHENATION_1ST, true );
 		    this->at( i - 2 ).setHyphenationMerged( mergedWord );
 		    this->at( i - 1 ).setProperty( Token::HYPHENATION_MARK, true );
@@ -197,11 +194,11 @@ namespace OCRCorrection {
 
 		}
 	    }
-	    
+
 	}
     }
 
-    
+
 
     void Document::dumpOCRToPlaintext( std::wostream& fo ) {
 	for( iterator it = begin(); it != end(); ++it ) {
@@ -218,7 +215,6 @@ namespace OCRCorrection {
     void Document::dumpToPlaintext( const char* filename ) {
 	std::cerr << "Dump to:" <<filename << std::endl;
 	std::wofstream fo( filename );
-	fo.imbue( csl::CSLLocale::Instance() );
 	dumpToPlaintext( fo );
 	fo.close();
     }
@@ -233,13 +229,12 @@ namespace OCRCorrection {
 
 	 std::string filename = pageIt->imageFile_.substr(from , length );
 	 filename = "/" + filename + ".txt";
-	 
+
 	 char* buffer = new char[strlen(directory_to)+strlen(filename.c_str())];
 	 strcpy(buffer, directory_to);
 	 strcat(buffer, filename.c_str());
 
 	 std::wofstream fo( buffer );
-	 fo.imbue( csl::CSLLocale::Instance() );
 	 for( iterator it = pageIt->begin(); it != pageIt->end(); ++it) {
 	   fo << (*it).getWDisplay();
 	 }
@@ -257,10 +252,11 @@ namespace OCRCorrection {
 	}
 	else {
 	    for( PageIterator pageIt= pagesBegin(); pageIt != pagesEnd(); ++pageIt ) {
-		std::wstring wide_imageFile;
-		csl::CSLLocale::string2wstring( pageIt->imageFile_, wide_imageFile );
+		std::wstring wide_imageFile = Utils::utf8(pageIt->imageFile_);
+
+		// csl::CSLLocale::string2wstring( pageIt->imageFile_, wide_imageFile );
 		stream << "PAGE: image=" << wide_imageFile << std::endl;
-		
+
 		for( iterator it = pageIt->begin(); it != pageIt->end(); ++it ) {
 		    (*it).print( stream );
 		}
@@ -269,7 +265,7 @@ namespace OCRCorrection {
 	}
     }
 
-    
+
     bool Document::integrityCheck() const {
 
 	// // check for consistency of page assignment
@@ -277,7 +273,7 @@ namespace OCRCorrection {
 	// for( PageIterator pageIt= pagesBegin(); pageIt != pagesEnd(); ++pageIt ) {
 	//     for( iterator it = pageIt->begin(); it != pageIt->end(); ++it ) {
 	// 	if( pageCount != it->getPageIndex() ) {
-	// 	    std::wcout << "Token: '" << it->getWOCR() << "' has pageIndex " << it->getPageIndex() 
+	// 	    std::wcout << "Token: '" << it->getWOCR() << "' has pageIndex " << it->getPageIndex()
 	// 		       << ", pageCount says " << pageCount << std::endl;
 	// 	}
 	//     }

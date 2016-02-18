@@ -8,8 +8,6 @@
 #include<Profiler/Profiler.h>
 #include<Utils/XMLReaderHelper.h>
 
-#include<csl/CSLLocale/CSLLocale.h>
-
 #include <xercesc/sax/HandlerBase.hpp>
 
 
@@ -35,14 +33,14 @@ namespace OCRCorrection {
 	 * @param altoDir A directory containing alto xml files.
 	 * @param configFile A config file for teh profiling.
 	 * @param outDir The output directory
-	 * 
+	 *
 	 */
 	void addProfilerData( std::string const& altoDir, std::string const& configFile, std::string const&  outDir );
-	
+
     private:
-	
+
 	void parseDir( std::string const& xmlDir );
-	
+
 	/**
 	 * @brief implements the HandlerBase interface from the xerces-c parser
 	 */
@@ -72,7 +70,7 @@ namespace OCRCorrection {
 	 * @brief implements the HandlerBase interface from the xerces-c parser
 	 */
 	void endDocument();
-	
+
 	// -----------------------------------------------------------------------
 	//  Handlers for the SAX ErrorHandler interface
 	// -----------------------------------------------------------------------
@@ -91,7 +89,7 @@ namespace OCRCorrection {
 	 * @brief implements the HandlerBase interface from the xerces-c parser
 	 */
 	void fatalError(const xercesc::SAXParseException& exc);
-	
+
 	static std::wstring xml_escape( std::wstring const& input );
 
 
@@ -100,7 +98,7 @@ namespace OCRCorrection {
 	Document slaveDocument_;
 	Document::iterator slaveIterator_;
 	Document::PageIterator slavePageIterator_;
-	
+
 	std::string outputDir_;
 
 	/**

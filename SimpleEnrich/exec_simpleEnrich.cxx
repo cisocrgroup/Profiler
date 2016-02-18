@@ -4,7 +4,7 @@
 #include<Exceptions.h>
 #include<DocXML/DocXMLReader.h>
 #include<DocXML/DocXMLWriter.h>
-#include<csl/Getopt/Getopt.h>
+#include<Getopt/Getopt.h>
 
 int main( int argc, char const** argv ) {
     std::locale::global( std::locale( "" ) );
@@ -28,16 +28,16 @@ int main( int argc, char const** argv ) {
     OCRCorrection::DocXMLReader docReader;
     docReader.parse( options.getArgument( 0 ), &document );
 
-    
+
     OCRCorrection::SimpleEnrich enricher( options.getOption( "config" ) );
-    
+
     enricher.enrichDocument( &document );
-    
+
     OCRCorrection::DocXMLWriter writer;
 
     if( options.hasOption( "out" ) ) {
 	std::wofstream outstream;
-	outstream.imbue( csl::CSLLocale::Instance() );
+	//outstream.imbue( csl::CSLLocale::Instance() );
 	outstream.open( options.getOption( "out" ).c_str() );
 	writer.writeXML( document, outstream );
     }

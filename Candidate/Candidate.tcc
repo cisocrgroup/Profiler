@@ -49,13 +49,22 @@ namespace OCRCorrection {
 	    setVoteWeight( 0 );
 	}
 	else {
-	    setVoteWeight( csl::CSLLocale::string2number< float >( voteWeightString ) );
+                float f;
+             std::wstringstream wstr(voteWeightString);
+             wstr >> f;
+             setVoteWeight(f);
+	    //setVoteWeight( csl::CSLLocale::string2number< float >( voteWeightString ) );
 	}
 
 	offset = levDistancePos + 13;
 	size_t end = str.find_first_not_of( L"0123456789.+-e", offset );
 	if( end == str.npos ) end = str.size();
-	setLevDistance( csl::CSLLocale::string2number< float >( str.substr( offset, end - offset ) ) );
+
+        float f;
+        std::wstringstream wstr(str.substr(offset, end - offset));
+        wstr >> f;
+        setLevDistance(f);
+	//setLevDistance( csl::CSLLocale::string2number< float >( str.substr( offset, end - offset ) ) );
 
 	setBaseWordScore( -1 );
 

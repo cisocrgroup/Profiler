@@ -162,12 +162,12 @@ namespace OCRCorrection {
 	}
 
 	else if( xmlReaderHelper_.name() == "coord" ) {
-	    tok_->setCoordinates(
-		csl::CSLLocale::string2number< float >( XMLReaderHelper::getAttributeValue( attrs, "l" ) ),
-		csl::CSLLocale::string2number< float >( XMLReaderHelper::getAttributeValue( attrs, "t" ) ),
-		csl::CSLLocale::string2number< float >( XMLReaderHelper::getAttributeValue( attrs, "r" ) ),
-		csl::CSLLocale::string2number< float >( XMLReaderHelper::getAttributeValue( attrs, "b" ) )
-		);
+            tok_->setCoordinates(
+                    Utils::toNum<float>(XMLReaderHelper::getAttributeValue(attrs, "l")),
+                    Utils::toNum<float>(XMLReaderHelper::getAttributeValue(attrs, "t")),
+                    Utils::toNum<float>(XMLReaderHelper::getAttributeValue(attrs, "r")),
+                    Utils::toNum<float>(XMLReaderHelper::getAttributeValue(attrs, "b"))
+                    );
 	}
 	else if( xmlReaderHelper_.name() == "abbyy_suspicious" ) {
 	    if( xmlReaderHelper_.getAttributeValue( attrs, "value")  == "true"  ) {
@@ -311,7 +311,8 @@ namespace OCRCorrection {
 
 	eingabe = eingabe_cstr;
 
-	csl::CSLLocale::string2wstring( eingabe, eingabe_wide );
+    eingabe_wide = Utils::utf8(eingabe);
+	//csl::CSLLocale::string2wstring( eingabe, eingabe_wide );
 
 
 	content_ += eingabe_wide;
@@ -342,8 +343,8 @@ namespace OCRCorrection {
 	my_message += message;
 	throw OCRCException( my_message );
 
-	std::wstring wideMessage;
-	csl::CSLLocale::string2wstring( std::string( message), wideMessage );
+	std::wstring wideMessage = Utils::utf8(message);
+	//csl::CSLLocale::string2wstring( std::string( message), wideMessage );
 	std::wcerr << wideMessage << std::endl;
 	XMLString::release(&message);
     }
@@ -356,8 +357,8 @@ namespace OCRCorrection {
 
 	throw OCRCException( my_message );
 
-	std::wstring wideMessage;
-	csl::CSLLocale::string2wstring( std::string( message), wideMessage );
+	std::wstring wideMessage = Utils::utf8(message);
+	//csl::CSLLocale::string2wstring( std::string( message), wideMessage );
 	std::wcerr << wideMessage << std::endl;
 
 	XMLString::release(&message);
@@ -370,8 +371,8 @@ namespace OCRCorrection {
 
 	throw OCRCException( my_message );
 
-	std::wstring wideMessage;
-	csl::CSLLocale::string2wstring( std::string( message), wideMessage );
+	std::wstring wideMessage = Utils::utf8(message);
+	//csl::CSLLocale::string2wstring( std::string( message), wideMessage );
 	std::wcerr << wideMessage << std::endl;
 	XMLString::release(&message);
     }

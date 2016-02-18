@@ -25,7 +25,7 @@ namespace OCRCorrection {
     const std::wstring& Token::getWCorr() const {
 	return wCorr_;
     }
-    
+
     const std::wstring& Token::getWDisplay() const {
 	if( isCorrected() ) {
 	    return wCorr_;
@@ -34,11 +34,11 @@ namespace OCRCorrection {
 	    return wOCR_;
 	}
     }
-    
+
     inline bool Token::hasTopCandidate() const {
 	return ( candidates_ != 0 );
     }
-    
+
     inline Candidate const& Token::getTopCandidate() const {
 	return candidates_->getCandidate();
     }
@@ -110,12 +110,12 @@ namespace OCRCorrection {
     std::wstring const& Token::Groundtruth::getHistTrace() const {
 	return histTrace_;
     }
-    
+
     void Token::Groundtruth::setWOrig( std::wstring const& wOrig ) {
 	wOrig_ = wOrig;
 	wOrig_lc_ = wOrig_;
 	for( std::wstring::iterator c = wOrig_lc_.begin(); c != wOrig_lc_.end(); ++c ) {
-	    *c = std::tolower( *c, csl::CSLLocale::Instance() );
+             *c = towlower(*c);
 	}
     }
 
@@ -126,7 +126,7 @@ namespace OCRCorrection {
     void Token::Groundtruth::setOCRTrace( std::wstring const& instr ) {
 	ocrTrace_ = instr;
     }
-    
+
     void Token::Groundtruth::setHistTrace( std::wstring const& instr ) {
 	histTrace_ = instr;
     }
@@ -138,7 +138,7 @@ namespace OCRCorrection {
     void Token::Groundtruth::setVerified( VerifiedStatus v ) {
 	verified_ = v;
     }
-    
+
     void Token::Groundtruth::setClassified( std::wstring const& str ) {
 	classified_ = str;
     }
@@ -146,7 +146,7 @@ namespace OCRCorrection {
     Token::VerifiedStatus Token::Groundtruth::getVerified() const {
 	return verified_;
     }
-    
+
     std::wstring const& Token::Groundtruth::getClassified() const {
 	return classified_;
     }
@@ -238,7 +238,7 @@ namespace OCRCorrection {
     Token::AbbyySpecifics& Token::getAbbyySpecifics() {
 	return abbyySpecifics_;
     }
-    
+
     Token::AbbyySpecifics const& Token::getAbbyySpecifics() const {
 	return abbyySpecifics_;
     }
@@ -257,6 +257,5 @@ namespace OCRCorrection {
 	externalId_ = id;
     }
 
-    
-}
 
+}

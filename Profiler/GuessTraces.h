@@ -1,8 +1,8 @@
 #include<string>
 #include<sstream>
-#include<csl/TransTable/TransTable.h>
-#include<csl/DictSearch/DictSearch.h>
-#include<csl/Pattern/ComputeInstruction.h>
+#include<TransTable/TransTable.h>
+#include<DictSearch/DictSearch.h>
+#include<Pattern/ComputeInstruction.h>
 #include<Document/Document.h>
 #include<Exceptions.h>
 #include <time.h>
@@ -31,14 +31,14 @@ namespace OCRCorrection {
 	void setInteractive( Interactive i ) {
 	    interactive_ = i;
 	}
-    
+
 	csl::DictSearch& getDictSearch() {
 	    return dictSearch_;
 	}
-    
+
 	void processDocument( Document* document ) {
-	    
-	
+
+
 	    csl::DictSearch::CandidateSet cands;
 
 	    csl::PatternWeights patternProbabilities;
@@ -55,9 +55,9 @@ namespace OCRCorrection {
 	    instructionComputer.connectPatternProbabilities( patternProbabilities );
 	    instructionComputer.setMaxNumberOfInstructions( 10 );
 	    std::vector< csl::Instruction > ocrInstructions; // is filled later in the document loop
-	
 
-	
+
+
 	    for( OCRCorrection::Document::iterator token = document->begin(); // for all tokens
 		 token != document->end();
 		 ++token ) {
@@ -69,7 +69,7 @@ namespace OCRCorrection {
 		for( std::wstring::iterator c = wOCR_lc.begin(); c != wOCR_lc.end(); ++c ) {
 		    *c = std::tolower( *c );
 		}
-	    
+
 		if( ! token->hasGroundtruth() ) {
 		    std::wcerr << "ALARM: " << token->getWOCR() << " hat kein GT" << std::endl;
 		}
@@ -81,17 +81,17 @@ namespace OCRCorrection {
 		}
 
 		//std::wcout << "Worig=" << wOrig <<", wOCR=" << wOCR <<  std::endl;
-	
+
 		// OCRCorrection::Document does not distinguish between short words and non-words. They are all "not normal"
-		bool is_a_word = 
-		    //token->isNormal() || 
+		bool is_a_word =
+		    //token->isNormal() ||
 		    ( wOrig_lc.find_first_of( L"abcdefghijklmnopqrstuvwxyzäöüß" ) != std::wstring::npos );
-	    
-	    
-	    
+
+
+
 		cands.reset();
 		if( is_a_word ) dictSearch_.query( wOrig_lc, &cands );
-	    
+
 		// here, a custom-made sort-operator can be passed as 3rd argument
 		std::sort( cands.begin(), cands.end() );
 
@@ -125,9 +125,9 @@ namespace OCRCorrection {
 			token->getGroundtruth().setBaseWord( cands.at( 0 ).getBaseWord() );
 			token->getGroundtruth().setHistTrace( cands.at( 0 ).getHistInstruction().toString() );
 		    }
-		
+
 		    ocrInstructions.clear();
-		
+
 		    try {
 			instructionComputer.computeInstruction( wOrig_lc, wOCR_lc, &ocrInstructions );
 
@@ -140,12 +140,12 @@ namespace OCRCorrection {
 			    token->getGroundtruth().setOCRTrace( ocrInstructions.at(0).toString() );
 			}
 		    } catch( std::exception& exc ) {
-			
-			std::wcerr << "Dirk_groundtruth: caught exception in csl::...::computeInstruction.: " << csl::CSLLocale::string2wstring( exc.what() ) << std::endl
+
+                            std::wcerr << "Dirk_groundtruth: caught exception in csl::...::computeInstruction.: " << Utils::utf8(exc.what()) << std::endl
 				   << "wOrig=" << wOrig_lc << ", wOCR=" <<  wOCR_lc << std::endl
 				   << "  Will ignore it" << std::endl;
 			token->getGroundtruth().setOCRTrace( L"*DESTROYED*" );
-			
+
 		    }
 
 		    enum GuessOCR { NONE, FIRST, DESTROYED };
@@ -153,20 +153,20 @@ namespace OCRCorrection {
 
 
 		    token->getGroundtruth().setVerified( Token::VERIFIED_GUESSED );
-		
+
 
 		} // all words but newlines and spaces
-	    
+
 	    } // for each token
-	
-	
+
+
 	}
-    
+
 
     private:
-    
-	csl::DictSearch dictSearch_; 
-    
+
+	csl::DictSearch dictSearch_;
+
 	int verbose_;
 	Interactive interactive_;
 
