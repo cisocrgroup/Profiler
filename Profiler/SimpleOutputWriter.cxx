@@ -27,10 +27,18 @@ OCRCorrection::SimpleOutputWriter::write() const
 void
 OCRCorrection::SimpleOutputWriter::writeNormalToken(const Token& token) const
 {
-        std::wcout << token.getWOCR() << std::endl;
+        bool somethingWasPrinted = false;
         const Token::CandidateIterator cbeg = token.candidatesBegin();
         const Token::CandidateIterator cend = token.candidatesEnd();
         for (Token::CandidateIterator c = cbeg; c != cend; ++c) {
-                std::wcout << "&" << c->toString() << std::endl;
+                // skip these: sogleich:{sogleich+[]}+ocr[],voteWeight=1,levDistance=0
+                if (c->getDlev() and c->getString() != token.getWOCR()) {
+                        somethingWasPrinted = true;
+                        std::wcout << "@" << token.getWOCR() << "/"
+                                   << c->toString() << std::endl;
+                }
+        }
+        if (not somethingWasPrinted) {
+                std::wcout << token.getWOCR() << std::endl;
         }
 }
