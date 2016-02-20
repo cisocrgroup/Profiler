@@ -11,7 +11,7 @@
 #include <DocXML/DocXMLWriter.h>
 #include <DocXML/DocXMLReader.h>
 #include <AltoXML/AltoXMLReader.h>
-
+#include "SimpleOutputWriter.h"
 #include<IBMGroundtruth/IBMGTReader.h>
 #include<Getopt/Getopt.h>
 
@@ -35,7 +35,9 @@ void printHelp() {
 	       << std::endl
 	       << "[--out_gtxml <outputFile>]  Prints xml containing the GROUNDTRUTH lists of hist. variants and ocr errors. (if available)" << std::endl
 	       << "                            (Only for evaluation with groundtruth documents.)"
-	       << std::endl
+           << std::endl
+           << "[--simpleOutput]            Print simple text output to stdout"
+           << std::endl
 	;
 }
 
@@ -59,6 +61,7 @@ int main( int argc, char const** argv ) {
     options.specifyOption( "out_none", csl::Getopt::VOID );
     options.specifyOption( "imageDir", csl::Getopt::STRING, "_NO_IMAGE_DIR_" );
     options.specifyOption( "createConfigFile", csl::Getopt::VOID );
+    options.specifyOption( "simpleOutput", csl::Getopt::VOID );
 
     try {
 	options.getOptionsAsSpecified( argc, argv );
@@ -188,6 +191,9 @@ int main( int argc, char const** argv ) {
     }
 
 
+    if (options.hasOption("simpleOutput")) {
+            OCRCorrection::SimpleOutputWriter(document).write();
+    }
 
 
     if( options.hasOption( "out_xml" ) ) {
