@@ -210,13 +210,13 @@ namespace OCRCorrection {
 
 
     void Token::setWOCR( std::wstring const& w ) {
-	wOCR_ = w;
-	if ((not wOCR_.empty()) and iswupper(wOCR_[0])) {
-                setCapitalized();
-	}
-        if (wOCR_lc_.empty()) {
-                setWOCR_lc(w);
-        }
+            wOCR_ = w;
+            if ((not wOCR_.empty()) and iswupper(wOCR_[0])) {
+                    setCapitalized();
+            }
+            if (wOCR_lc_.empty()) {
+                    setWOCR_lc(w);
+            }
     }
 
         void Token::setWOCR_lc(std::wstring const& wlc) {

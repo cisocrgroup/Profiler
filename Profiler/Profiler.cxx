@@ -195,30 +195,29 @@ namespace OCRCorrection {
 	    //////////////// //////////////// //////////////// ////////////////
 
 	    if( ! token->isNormal() ) {
-		++counter[L"notNormal"];
-		token->setSuspicious( token->getAbbyySpecifics().isSuspicious() );
-		htmlWriter_.registerToken( *token, evalToken, candidates_ );
+                ++counter[L"notNormal"];
+                token->setSuspicious( token->getAbbyySpecifics().isSuspicious() );
+                htmlWriter_.registerToken( *token, evalToken, candidates_ );
 	    }
 	    else if( token->isShort() ) {
-		++counter[L"short"];
-		token->setSuspicious( token->getAbbyySpecifics().isSuspicious() );
-		htmlWriter_.registerToken( *token, evalToken, candidates_ );
+                ++counter[L"short"];
+                token->setSuspicious( token->getAbbyySpecifics().isSuspicious() );
+                htmlWriter_.registerToken( *token, evalToken, candidates_ );
 	    }
 	    else if( token->isDontTouch() ) {
-	    	++counter[L"dont_touch"];
-	    	token->setSuspicious( token->getAbbyySpecifics().isSuspicious() );
-	    	htmlWriter_.registerToken( *token, evalToken, candidates_ );
-
-		evalToken.registerNoCandidates(); // this class of tokens is included in evaluation
+                ++counter[L"dont_touch"];
+                token->setSuspicious( token->getAbbyySpecifics().isSuspicious() );
+                htmlWriter_.registerToken( *token, evalToken, candidates_ );
+                evalToken.registerNoCandidates(); // this class of tokens is included in evaluation
 	    }
 	    else { // normal
-		++counter[L"normalAndLongTokens"];
-		token->setTokenNr( static_cast< size_t >( counter[L"normalAndLongTokens"] ) );
-		if( (int)counter[L"normalAndLongTokens"] % 1000 == 0 ) {
-		    std::wcerr << counter[L"normalAndLongTokens"] / 1000  << "k tokens processed in " << stopwatch.readMilliseconds() << "ms" << std::endl;
-		    stopwatch.start();
-		}
-
+                ++counter[L"normalAndLongTokens"];
+                token->setTokenNr( static_cast< size_t >( counter[L"normalAndLongTokens"] ) );
+                if( (int)counter[L"normalAndLongTokens"] % 1000 == 0 ) {
+                        std::wcerr << counter[L"normalAndLongTokens"] / 1000
+                                   << "k tokens processed in " << stopwatch.readMilliseconds() << "ms" << std::endl;
+                        stopwatch.start();
+                }
 		tempCands.reset();
 		//std::wcout << "Profiler:: process Token " << token->getWOCR_lc() << std::endl;
 		dictSearch_.query( token->getWOCR_lc(), &tempCands );

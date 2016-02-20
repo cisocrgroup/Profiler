@@ -177,8 +177,8 @@ namespace csl {
     }
 
 
-    bool DictSearch::query( std::wstring const& query, iResultReceiver* answers ) {
-	bool foundAnswers = false;
+        bool DictSearch::query( std::wstring const& query, iResultReceiver* answers ) {
+                bool foundAnswers = false;
 
 	size_t cascadeRank = 0;
 	for( std::multimap< size_t, iDictModule* >::const_iterator dm = allDictModules_.begin();
