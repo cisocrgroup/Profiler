@@ -52,11 +52,10 @@ namespace OCRCorrection {
                 return out;
         }
 
-        std::wstring Utils::utf8(std::string const& str)
+        std::wstring Utils::utf8(const char *str, size_t n)
         {
-                const size_t n = str.size();
-                std::wstring out(n + 1, 0);
-                std::mbstowcs(&out[0], str.data(), n + 1);
+                std::wstring out(n, 0);
+                std::mbstowcs(&out[0], str, n);
                 return out;
         }
 }

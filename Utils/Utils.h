@@ -41,7 +41,13 @@ namespace OCRCorrection {
                 /**
                  * convert a utf8 encoded multibyte string to a wide string
                  */
-                static std::wstring utf8(std::string const& str);
+                static std::wstring utf8(std::string const& str) {
+                        return utf8(str.data(), str.size());
+                }
+                static std::wstring utf8(const char *str) {
+                        return utf8(str, strlen(str));
+                }
+                static std::wstring utf8(const char *str, size_t n);
 
                 /**
                  * convert string to num
