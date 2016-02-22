@@ -83,14 +83,14 @@ int main( int argc, char const** argv ) {
 	options.setOption( "out_html", options.getOption( "htmlOut") );
     }
 
-    
+
     //////// print help
     if( options.hasOption( "help" ) ) {
 	printHelp();
 	exit( EXIT_SUCCESS );
     }
 
- 
+
     /////// create config file
     if( options.hasOption( "createConfigFile" ) ) {
 	OCRCorrection::Profiler::printConfigTemplate( std::wcout );
@@ -104,21 +104,21 @@ int main( int argc, char const** argv ) {
 	exit( EXIT_FAILURE );
     }
 
-    if( ! ( options.hasOption( "out_xml" ) || 
-	    options.hasOption( "out_html" ) || 
-	    options.hasOption( "out_doc" ) || 
+    if( ! ( options.hasOption( "out_xml" ) ||
+	    options.hasOption( "out_html" ) ||
+	    options.hasOption( "out_doc" ) ||
 	    options.hasOption( "out_none" ) ) ) {
 	std::wcerr << "Specify some output." << std::endl
 		   << "If you really want to run without any output, say this explicitly using --out_none" << std::endl
 		   << "Use --help to learn about output options." << std::endl;
 	exit( EXIT_FAILURE );
     }
-    
-    
-    
+
+
+
 
     OCRCorrection::Profiler profiler;
-    
+
     std::wstring wideConfigFile;
 
     try {
@@ -131,7 +131,7 @@ int main( int argc, char const** argv ) {
 	std::wcerr << "Error while readConfiguration: " << wideWhat << std::endl;
 	return EXIT_FAILURE;
     }
-    
+
     /**
      * @todo catch conversion errors string-->integer
      */
@@ -148,7 +148,7 @@ int main( int argc, char const** argv ) {
     if( options.hasOption( "out_html" ) ) {
 	profiler.setHTMLOutFile( options.getOption( "out_html" ) );
     }
-    
+
     OCRCorrection::Document document;
 
     if( options.hasOption( "sourceFormat" ) ) {
@@ -189,7 +189,7 @@ int main( int argc, char const** argv ) {
 
 
 
-   
+
     if( options.hasOption( "out_xml" ) ) {
 	std::wofstream os( options.getOption( "out_xml" ).c_str() );
 	os.imbue( csl::CSLLocale::Instance() );
@@ -209,7 +209,7 @@ int main( int argc, char const** argv ) {
     }
 
 
-    
+
 
     } catch ( OCRCorrection::OCRCException& exc ) {
     	std::wcerr << "OCRC::Profiler: Caught OCRCException:" << csl::CSLLocale::string2wstring( exc.what() ) << std::endl;
@@ -217,11 +217,10 @@ int main( int argc, char const** argv ) {
     } catch ( csl::exceptions::cslException& exc ) {
     	std::wcerr << "OCRC::Profiler: Caught cslException: " << csl::CSLLocale::string2wstring( exc.what() ) << std::endl;
         return EXIT_FAILURE;
-    } 
+    }
     catch( std::exception& exc ) {
     	wprintf( L"profiler: caught exception: %s\n", exc.what() );
         return EXIT_FAILURE;
      }
 
 }
-

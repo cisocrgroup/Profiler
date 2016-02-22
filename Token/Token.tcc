@@ -42,7 +42,7 @@ namespace OCRCorrection {
 	groundtruth_( 0 ),
 	tokenImageInfoBox_( 0 ),
 	candidates_( 0 ),
-	nrOfCandidates_( 0 ) 
+	nrOfCandidates_( 0 )
 
 
     {
@@ -61,7 +61,7 @@ namespace OCRCorrection {
 	groundtruth_( 0 ),
 	tokenImageInfoBox_( 0 ),
 	candidates_( 0 ),
-	nrOfCandidates_( 0 ) 
+	nrOfCandidates_( 0 )
 
 
     {
@@ -79,7 +79,7 @@ namespace OCRCorrection {
 	groundtruth_( 0 ),
 	tokenImageInfoBox_( 0 ),
 	candidates_( 0 ),
-	nrOfCandidates_( 0 ) 
+	nrOfCandidates_( 0 )
 
     {
 	setNormal( other.isNormal() );
@@ -107,7 +107,7 @@ namespace OCRCorrection {
 	removeCandidates();
     }
 
-    
+
     // void Token::cutCandidates( size_t newSize ) {
     // 	if( candidates_ ) {
     // 	    CandidateChain* c = candidates_;
@@ -116,12 +116,12 @@ namespace OCRCorrection {
     // 	    size_t count = 0;
     // 	    // iterate newSize candidates, do NOT delete
     // 	    while( c != 0 && ( count+1 < newSize ) ) {
-    // 		c = c->getNext(); 
+    // 		c = c->getNext();
     // 		++count;
     // 	    }
     // 	    // delete the rest of the candidates
     // 	    while( c != 0 ) {
-    // 		nextC = c->getNext(); 
+    // 		nextC = c->getNext();
     // 		delete( c );
     // 		c = nextC;
     // 	    }
@@ -135,14 +135,14 @@ namespace OCRCorrection {
 	    CandidateChain* c = candidates_;
 	    CandidateChain* nextC = 0;
 	    while( c != 0 ) {
-		nextC = c->getNext(); 
+		nextC = c->getNext();
 		delete( c );
 		c = nextC;
 	    }
 	    candidates_ = 0;
 	    nrOfCandidates_ = 0;
 	}
-	
+
     }
 
 
@@ -153,10 +153,10 @@ namespace OCRCorrection {
 	tokenImageInfoBox_->setCoordinate_Left( l );
 	tokenImageInfoBox_->setCoordinate_Top( t );
 	tokenImageInfoBox_->setCoordinate_Right( r );
-	tokenImageInfoBox_->setCoordinate_Bottom( b ); 
+	tokenImageInfoBox_->setCoordinate_Bottom( b );
     }
-    
-    
+
+
 
     void Token::addCharacter( Character const& c ) {
 	//std::wcout << c.getChar() << std::endl;
@@ -167,16 +167,16 @@ namespace OCRCorrection {
 	    std::use_facet< std::ctype< wchar_t > >( csl::CSLLocale::Instance() ).is( std::ctype_base::upper, c.getChar() ) ) {
 	    setCapitalized();
 	}
-	
+
 
 	wOCR_ += c.getChar();
 	wOCR_lc_ += std::tolower( c.getChar(), csl::CSLLocale::Instance() );
-	
+
 	// if the new character is suspicious, this makes the whole word suspicious
 	if( c.isAbbyySuspicious() ) {
 	  abbyySpecifics_.setSuspicious( true );
 	}
-	
+
  	size_t templeft = c.getLeft();
  	size_t tempright = c.getRight();
  	size_t temptop = c.getTop();
@@ -189,7 +189,7 @@ namespace OCRCorrection {
 		tokenImageInfoBox_->setCoordinate_Right( tempright );
 		tokenImageInfoBox_->setCoordinate_Left( templeft );
 		tokenImageInfoBox_->setCoordinate_Top( temptop );
-		tokenImageInfoBox_->setCoordinate_Bottom( tempbottom ); 
+		tokenImageInfoBox_->setCoordinate_Bottom( tempbottom );
 	    } else {
 		if( temptop < tokenImageInfoBox_->getCoordinate_Top()) {
 		    tokenImageInfoBox_->setCoordinate_Top( temptop );
@@ -211,28 +211,29 @@ namespace OCRCorrection {
 
     void Token::setWOCR( std::wstring const& w ) {
 	wOCR_ = w;
-	
-	if( ( !wOCR_.empty() ) && std::use_facet< std::ctype< wchar_t > >( csl::CSLLocale::Instance() ).is( std::ctype_base::upper, wOCR_.at( 0 ) ) ) {
-	    setCapitalized();
+	if ((not wOCR_.empty()) and iswupper(wOCR_[0])) {
+                setCapitalized();
 	}
-	
-	wOCR_lc_ = wOCR_;
-	for( std::wstring::iterator c = wOCR_lc_.begin(); c != wOCR_lc_.end(); ++c ) {
-	    
-            *c = std::tolower( *c, csl::CSLLocale::Instance() );
-            
-	}
+        if (wOCR_lc_.empty()) {
+                setWOCR_lc(w);
+        }
     }
-    
+
+        void Token::setWOCR_lc(std::wstring const& wlc) {
+                wOCR_lc_.clear();
+                for (std::wstring::const_iterator i = wlc.begin(); i != wlc.end(); ++i) {
+                        wOCR_lc_.push_back(towlower(*i));
+                }
+        }
 
     size_t Token::mergeRight() {
 	if( indexInDocument_ + 1 >= myDocument_.getNrOfTokens() ) {
 	    return 0;
 	}
-	
+
 //	Token* rightToken = &( myDocument_.at( indexInDocument_ + 1 ) );
 	bool skipSpace = false;
-	// decide if immediate neighbour should be skipped, 
+	// decide if immediate neighbour should be skipped,
 	// e.g. if it contains just whitespace
 	if( myDocument_.at( indexInDocument_ + 1 ).getWDisplay() == L" " ) {
 	    if( indexInDocument_ + 2 >= myDocument_.getNrOfTokens() ) {
@@ -241,8 +242,8 @@ namespace OCRCorrection {
 	    skipSpace = true;
 	}
 
-	
-	size_t merged = mergeRight( (skipSpace ? 2 : 1 ) ); 
+
+	size_t merged = mergeRight( (skipSpace ? 2 : 1 ) );
 
 	return merged;
     }
@@ -261,9 +262,9 @@ namespace OCRCorrection {
 	    if( rightToken->getWDisplay() == L"\n" ) {
 		break;
 	    }
-	    
+
 	    if( getTokenImageInfoBox() && rightToken->getTokenImageInfoBox() ) {
-		// this might maybe not be the case for linebreaks 
+		// this might maybe not be the case for linebreaks
 		if( getTokenImageInfoBox()->getCoordinate_Right() < rightToken->getTokenImageInfoBox()->getCoordinate_Left() ) {
 		    tokenImageInfoBox_->setCoordinate_Right( rightToken->getTokenImageInfoBox()->getCoordinate_Right() );
 		}
@@ -276,15 +277,15 @@ namespace OCRCorrection {
 	    else {
 		setWCorr( getWDisplay() );
 	    }
-	    
+
 
 	    wOCR_ += rightToken->getWOCR();
 	    wOCR_lc_ += rightToken->getWOCR_lc();
-	    
+
 	} // for all tokens to be merged
 
 	/// @todo Find a way to decide if the merged token is normal, and to compute new candidates
-	setNormal( true ); 
+	setNormal( true );
 
 	myDocument_.eraseToken( indexInDocument_ + 1, indexInDocument_ + 1 + i );
 
@@ -340,7 +341,7 @@ namespace OCRCorrection {
         size_t size = myDocument_.getBorder( str.c_str(), &isNormal );
 	setWCorr( str.substr( start, size ) ); // start is always 0 here.
         start += size;
-	
+
         size_t addedWords = 0;
         while( ( size = Document::getBorder( str.c_str() + start, &isNormal ) ) != 0 ) {
             /// @todo Find a way to decide if the split tokens are normal, and to compute new candidates
@@ -359,12 +360,12 @@ namespace OCRCorrection {
 
     void Token::addCandidate( Candidate const& initCand ) {
 	CandidateChain* candItem = new CandidateChain( initCand );
-	
+
 	// if token is capitalized, also capitalize the candidate
 	if( this->isCapitalized() && !candItem->getCandidate().getString().empty() ) {
-	    candItem->getCandidate().getString().at( 0 ) =
-		std::use_facet< std::ctype< wchar_t > >( csl::CSLLocale::Instance() ).toupper( candItem->getCandidate().getString().at( 0 ));
-	}
+                wchar_t firstCharToUpperCase = towupper(candItem->getCandidate().getString()[0]);
+                candItem->getCandidate().getString()[0] = firstCharToUpperCase;
+        }
 	if( candidates_ == 0 ) {
 	    candidates_ = candItem;
 	}
@@ -374,11 +375,11 @@ namespace OCRCorrection {
 	    c->setNext( candItem );
 	}
 	++nrOfCandidates_;
-	
+
     }
 
     void Token::print( std::wostream& stream ) {
-	if( isNormal() ) 
+	if( isNormal() )
 	    stream<< "("<<getIndexInDocument()<<")["<< wOCR_.c_str()<<"]";
 	else
 	    stream<< "("<<getIndexInDocument()<<"){"<< wOCR_.c_str()<<"}";

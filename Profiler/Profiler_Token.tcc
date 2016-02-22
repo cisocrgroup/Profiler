@@ -10,7 +10,7 @@ namespace OCRCorrection {
     // 	probNormalizationFactor_( 0 ),
     // 	tokenNr_( 0 )
     // {
-	
+
     // }
 
     Profiler::Profiler_Token::Profiler_Token( Token& originalToken ) :
@@ -45,7 +45,7 @@ namespace OCRCorrection {
 	}
 	return *originalToken_;
     }
-    
+
 
     const std::wstring& Profiler::Profiler_Token::getWOCR() const {
 	return wOCR_;
@@ -106,10 +106,11 @@ namespace OCRCorrection {
 	     */
 	    setNormal( true );
 	    for( std::wstring::const_iterator c = wOCR_lc_.begin(); c != wOCR_lc_.end(); ++c ) {
-		if( ! std::isalnum( *c, csl::CSLLocale::Instance() ) ) {
+		if(!Document::isWord(*c)) {
 		    setNormal( false );
+                    break;
 		}
-		break;
+
 	    }
 	}
     }
@@ -122,7 +123,7 @@ namespace OCRCorrection {
     void Profiler::Profiler_Token::setProbNormalizationFactor( double f ) {
 	probNormalizationFactor_ = f;
     }
-    
+
     double Profiler::Profiler_Token::getProbNormalizationFactor() const {
 	return probNormalizationFactor_;
     }
@@ -158,11 +159,11 @@ namespace OCRCorrection {
     std::wstring const& Profiler::Profiler_Token::Groundtruth::getHistTrace() const {
 	return histTrace_;
     }
-    
+
     std::wstring const& Profiler::Profiler_Token::Groundtruth::getBaseWord() const {
 	return baseWord_;
     }
-    
+
     void Profiler::Profiler_Token::Groundtruth::setWOrig( std::wstring const& wOrig ) {
 	wOrig_ = wOrig;
     }
@@ -186,11 +187,11 @@ namespace OCRCorrection {
     void Profiler::Profiler_Token::Groundtruth::setNormal( bool n ) {
 	isNormal_ = n;
     }
-    
+
     void Profiler::Profiler_Token::Groundtruth::setVerified( VerifiedStatus v ) {
 	verified_ = v;
     }
-    
+
     void Profiler::Profiler_Token::Groundtruth::setVerified( Token::VerifiedStatus v ) {
 	switch( v ) {
 	    case Token::VERIFIED_FALSE: verified_ = VERIFIED_FALSE; break;
@@ -198,7 +199,7 @@ namespace OCRCorrection {
 	    case Token::VERIFIED_GUESSED: verified_ = VERIFIED_GUESSED; break;
 	}
     }
-    
+
     void Profiler::Profiler_Token::Groundtruth::setClassified( std::wstring const& str ) {
 	classified_ = str;
     }
@@ -206,12 +207,12 @@ namespace OCRCorrection {
     Profiler::Profiler_Token::VerifiedStatus Profiler::Profiler_Token::Groundtruth::getVerified() const {
 	return verified_;
     }
-    
+
     std::wstring const& Profiler::Profiler_Token::Groundtruth::getClassified() const {
 	return classified_;
     }
-    
-    
+
+
 
 }
 

@@ -17,9 +17,9 @@ target_link_libraries (createHistoricLexicon OCRCorrection )
 add_executable(guessTraces exec_guessTraces.cxx)
 target_link_libraries (guessTraces OCRCorrection )
 
-install( 
+install(
   TARGETS profiler
   DESTINATION bin
   )
 
-add_subdirectory ( Test ) 
+add_subdirectory ( Test )
