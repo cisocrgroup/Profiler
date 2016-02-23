@@ -54,9 +54,11 @@ namespace OCRCorrection {
 
         std::wstring Utils::utf8(const char *str, size_t n)
         {
-                std::wstring out(n, 0);
-                std::mbstowcs(&out[0], str, n);
-                return out;
+                wchar_t buffer[n];
+                const size_t len = std::mbstowcs(buffer, str, n);//&out[0], str, n);
+                return std::wstring(buffer, len);
+                //out[len] = 0;
+                //return out;
         }
 }
 
