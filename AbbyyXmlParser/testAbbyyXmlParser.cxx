@@ -1,11 +1,11 @@
 #include "./AbbyyXmlParser.h"
-#include<csl/Getopt/Getopt.h>
+#include <Getopt/Getopt.h>
 
 
 int main( int argc, char const** argv ) {
 
     csl::Getopt options( argc, argv );
-    
+
     std::locale::global( std::locale( "" ) );
 
     OCRCorrection::AbbyyXmlParser p;
@@ -24,8 +24,8 @@ int main( int argc, char const** argv ) {
 		  << std::endl;
 	exit( 1 );
     }
-    
+
     doc.print();
-    
+
     return 0;
 };

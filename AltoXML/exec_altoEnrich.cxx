@@ -2,8 +2,9 @@
 #include<fstream>
 
 
-#include<csl/Getopt/Getopt.h>
+#include<Getopt/Getopt.h>
 #include<AltoXML/AltoEnrich.h>
+#include "Utils/Utils.h"
 
 void printHelp() {
     std::wcerr << "Use like: altoEnrich <alto-source-dir> <output-dir>" << std::endl
@@ -20,8 +21,8 @@ void printHelp() {
 
 int main( int argc, char const** argv ) {
     std::locale::global( std::locale( "" ) );
-    
-    
+
+
     csl::Getopt options;
     options.specifyOption( "help",      csl::Getopt::VOID   );
     options.specifyOption( "config",  csl::Getopt::STRING     );
@@ -35,7 +36,7 @@ int main( int argc, char const** argv ) {
 	return EXIT_SUCCESS;
     }
 
-    if( ! ( ( options.getArgumentCount() == 2 )  && 
+    if( ! ( ( options.getArgumentCount() == 2 )  &&
 	    options.hasOption( "config" ) ) ) {
 	printHelp();
 	return EXIT_FAILURE;
@@ -43,7 +44,7 @@ int main( int argc, char const** argv ) {
 
     std::string sourceDir = options.getArgument( 0 );
     std::string outputDir = options.getArgument( 1 );
-    
+
 
 
     OCRCorrection::AltoEnrich enrich;
@@ -56,11 +57,12 @@ int main( int argc, char const** argv ) {
 	enrich.addProfilerData( sourceDir, options.getOption( "config" ), outputDir );
     }
     catch( std::exception const& exc ) {
-	std::wcerr << "altoEnrich: Caught: " << csl::CSLLocale::string2wstring( exc.what() ) << std::endl;
+            std::wcerr << "altoEnrich: Caught: "
+                       << OCRCorrection::Utils::utf8(exc.what()) << std::endl;
     }
-    
-    
-    
+
+
+
 
     return EXIT_SUCCESS;
 }

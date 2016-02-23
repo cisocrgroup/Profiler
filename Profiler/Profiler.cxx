@@ -140,7 +140,7 @@ namespace OCRCorrection {
     }
 
     void Profiler::doIteration( size_t iterationNumber, bool lastIteration ) {
-	Stopwatch iterationTime;
+            csl::Stopwatch iterationTime;
 
 	std::wcout << "*** Iteration " << iterationNumber << " ***" << std::endl;
 
@@ -164,7 +164,7 @@ namespace OCRCorrection {
 
 	std::map< std::wstring, double > counter;
 
-	Stopwatch stopwatch;
+	csl::Stopwatch stopwatch;
 
 	histCounter_.clear();
 	ocrCounter_.clear();
@@ -172,7 +172,7 @@ namespace OCRCorrection {
 	for( Document_t::iterator token = document_.begin(); // for all tokens
 	     token != document_.end();
 	     ++token ) {
-
+                //std::wcout << "TOKEN: " << token->getWOCR() << std::endl;
 	    if( ( config_.pageRestriction_ != (size_t)-1 ) &&
                 token->getOriginalToken().getPageIndex()  >= config_.pageRestriction_ ) {
                 break;
@@ -195,30 +195,31 @@ namespace OCRCorrection {
 	    //////////////// //////////////// //////////////// ////////////////
 
 	    if( ! token->isNormal() ) {
-		++counter[L"notNormal"];
-		token->setSuspicious( token->getAbbyySpecifics().isSuspicious() );
-		htmlWriter_.registerToken( *token, evalToken, candidates_ );
+                ++counter[L"notNormal"];
+                token->setSuspicious( token->getAbbyySpecifics().isSuspicious() );
+                htmlWriter_.registerToken( *token, evalToken, candidates_ );
 	    }
 	    else if( token->isShort() ) {
-		++counter[L"short"];
-		token->setSuspicious( token->getAbbyySpecifics().isSuspicious() );
-		htmlWriter_.registerToken( *token, evalToken, candidates_ );
+                ++counter[L"short"];
+                token->setSuspicious( token->getAbbyySpecifics().isSuspicious() );
+                htmlWriter_.registerToken( *token, evalToken, candidates_ );
 	    }
 	    else if( token->isDontTouch() ) {
-	    	++counter[L"dont_touch"];
-	    	token->setSuspicious( token->getAbbyySpecifics().isSuspicious() );
-	    	htmlWriter_.registerToken( *token, evalToken, candidates_ );
-
-		evalToken.registerNoCandidates(); // this class of tokens is included in evaluation
+                ++counter[L"dont_touch"];
+                token->setSuspicious( token->getAbbyySpecifics().isSuspicious() );
+                htmlWriter_.registerToken( *token, evalToken, candidates_ );
+                evalToken.registerNoCandidates(); // this class of tokens is included in evaluation
 	    }
 	    else { // normal
-		++counter[L"normalAndLongTokens"];
-		token->setTokenNr( static_cast< size_t >( counter[L"normalAndLongTokens"] ) );
-		if( (int)counter[L"normalAndLongTokens"] % 1000 == 0 ) {
-		    std::wcerr << counter[L"normalAndLongTokens"] / 1000  << "k tokens processed in " << stopwatch.readMilliseconds() << "ms" << std::endl;
-		    stopwatch.start();
-		}
-
+                ++counter[L"normalAndLongTokens"];
+                token->setTokenNr( static_cast< size_t >( counter[L"normalAndLongTokens"] ) );
+                if( (int)counter[L"normalAndLongTokens"] % 1000 == 0 ) {
+                        std::wcerr << counter[L"normalAndLongTokens"] / 1000
+                                   << "k/" << document_.size() / 1000
+                                   << "k tokens processed in "
+                                   << stopwatch.readMilliseconds() << "ms" << std::endl;
+                        stopwatch.start();
+                }
 		tempCands.reset();
 		//std::wcout << "Profiler:: process Token " << token->getWOCR_lc() << std::endl;
 		dictSearch_.query( token->getWOCR_lc(), &tempCands );
@@ -623,7 +624,7 @@ namespace OCRCorrection {
     void Profiler::profile2xml( char const* filename ) const {
 	std::wofstream fo( filename );
 	if( ! fo.good() ) throw OCRCException( std::string( "OCRC::Profiler::profile2xml: Can not open file for writing: " ) + filename );
-	fo.imbue( csl::CSLLocale::Instance() );
+//	fo.imbue( csl::CSLLocale::Instance() );
 	profile2xml( fo );
     }
 
@@ -634,8 +635,8 @@ namespace OCRCorrection {
 	time_t t = time(NULL);
 	std::string timeString( asctime(localtime(&t)) );
 	timeString.resize( timeString.size() - 1 ); // remove newline
-	std::wstring wide_timeString;
-	csl::CSLLocale::string2wstring( timeString, wide_timeString );
+	std::wstring wide_timeString = Utils::utf8(timeString);
+	//csl::CSLLocale::string2wstring( timeString, wide_timeString );
 
 	os << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl
 	   << "<profile>" << std::endl

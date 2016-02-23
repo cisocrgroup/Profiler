@@ -1,8 +1,8 @@
 #include<AbbyyXmlParser/AbbyyXmlParser.h>
 #include<DocXML/DocXMLWriter.h>
 #include<Document/Document.h>
-#include<csl/Getopt/Getopt.h>
-
+#include<Getopt/Getopt.h>
+#include "Utils/Utils.h"
 
 void printHelp() {
     std::wcerr << "Use like: abbyy_transform --file=<abbyy_xml_file>" << std::endl
@@ -32,8 +32,8 @@ int main( int argc, char const** argv ) {
     try {
         options.getOptionsAsSpecified( argc, argv );
     } catch( std::exception& exc ) {
-        std::wstring wideWhat;
-        csl::CSLLocale::string2wstring( exc.what(), wideWhat );
+            std::wstring wideWhat(OCRCorrection::Utils::utf8(exc.what()));;
+            //csl::CSLLocale::string2wstring( exc.what(), wideWhat );
         std::wcerr << "Command line parsing failed: " << wideWhat << std::endl;
         return EXIT_FAILURE;
     }
@@ -63,15 +63,15 @@ int main( int argc, char const** argv ) {
 	    return 1;
 	}
     } catch( std::exception const& ex ) {
-	std::wstring wideWhat;
-	csl::CSLLocale::string2wstring( ex.what(), wideWhat );
+            std::wstring wideWhat(OCRCorrection::Utils::utf8(ex.what()));
+            //csl::CSLLocale::string2wstring( ex.what(), wideWhat );
 	std::wcerr << "Parsing of abbyy xml failed: " << wideWhat << std::endl;
 	std::wcerr << "Abort." << std::endl;
 	return EXIT_FAILURE;
     }
 
 
-    try { 
+    try {
 	if( options.getOption( "outFormat" ) == "TXT" ) {
 	    d.dumpOCRToPlaintext( std::wcout );
 	}
@@ -84,7 +84,7 @@ int main( int argc, char const** argv ) {
 	    return 1;
 	}
     } catch( std::exception const& ex ) {
-	std::wcerr << "Output failed: " << csl::CSLLocale::string2wstring( ex.what() ) << std::endl;
+            std::wcerr << "Output failed: " << OCRCorrection::Utils::utf8(ex.what()) << std::endl;
 	std::wcerr << "Abort." << std::endl;
 	return EXIT_FAILURE;
     }

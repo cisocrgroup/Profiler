@@ -5,10 +5,10 @@
 #include<algorithm>
 #include<stdexcept>
 
-#include<csl/DictSearch/DictSearch.h>
+#include<DictSearch/DictSearch.h>
 #include<Stopwatch.h>
-#include<csl/MinDic/MinDic.h>
-#include<csl/Pattern/PatternProbabilities.h>
+#include<MinDic/MinDic.h>
+#include<Pattern/PatternProbabilities.h>
 
 #include <TXTReader/TXTReader.h>
 #include<Document/Document.h>
@@ -27,9 +27,9 @@ namespace OCRCorrection {
 	 * @name Constructors/ Destructor
 	 */
 	//@{
-	
-	
-	inline FrequencyList( char const* freqFile = 0, char const* weightFile = 0 ) : 
+
+
+	inline FrequencyList( char const* freqFile = 0, char const* weightFile = 0 ) :
 	    interpFrequency_( 0 ),
 	    baseWordFrequency_( 0 ),
 	    patternWeights_( 0 ),
@@ -39,14 +39,14 @@ namespace OCRCorrection {
 	    applyStaticFreqs_( true ) {
 
 	    //std::wcerr << "OCRC::Profiler::FrequencyList::Constructor: Enter" << std::endl;
-	    
+
 	    if( freqFile ) {
 		if( ! weightFile ) {
 		    throw std::runtime_error( "OCRC::FrequencyList: For initialisation, give a freqFile and a weightFile" );
 		}
 		loadFromFile( freqFile, weightFile );
 	    }
-	    
+
 	    //std::wcerr << "OCRC::Profiler::FrequencyList::Constructor: Bye" << std::endl;
 	}
 
@@ -56,10 +56,10 @@ namespace OCRCorrection {
 	    if( patternWeights_ && myOwnPatternWeights_ ) delete( patternWeights_ );
 	}
 
-	
+
 	// @}
 	/**
-	 * 
+	 *
 	 * @name Initialization/ Configuration
 	 */
 	//@{
@@ -67,19 +67,19 @@ namespace OCRCorrection {
 	/**
 	 * @brief Let the frequencyList use pattern probabilities you computed somewhere else.
 	 *
-	 * Note that FrequencyList will NOT delete this data structure in the destructor. 
+	 * Note that FrequencyList will NOT delete this data structure in the destructor.
 	 */
 	void connectPatternProbabilities( csl::PatternWeights* pw ) {
 	    if( patternWeights_ && myOwnPatternWeights_ ) delete( patternWeights_ );
 	    myOwnPatternWeights_ = false;
 	    patternWeights_ = pw;
 	}
-	
-	
+
+
 	/**
 	 * @brief Let the frequencyList use baseWord frequencies you computed somewhere else.
 	 *
-	 * Note that FrequencyList will NOT delete this data structure in the destructor. 
+	 * Note that FrequencyList will NOT delete this data structure in the destructor.
 	 */
 	void connectBaseWordFrequency( csl::MinDic< float >* bwf ) {
 	    if( baseWordFrequency_ && myOwnBaseWordFrequency_ ) {
@@ -95,7 +95,7 @@ namespace OCRCorrection {
 
 	void setHistPatternSmoothingProb( float p ) {
 	    if( ( p != OCRCorrection::LevenshteinWeights::UNDEF ) &&
-		( ( p < 0 ) || ( p > 1 ) ) 
+		( ( p < 0 ) || ( p > 1 ) )
 		) throw OCRCException( "ORC::Profiler::FrequencyList::setHistPatternSmoothingProb: out of range" );
 	    histPatternSmoothingProb_ = p;
 	}
@@ -104,10 +104,10 @@ namespace OCRCorrection {
 	    applyStaticFreqs_ = b;
 	}
 
-	
+
 	// @}
 	/**
-	 * 
+	 *
 	 * @name Lookup methods
 	 */
 	//@{
@@ -135,11 +135,11 @@ namespace OCRCorrection {
 // 		       << " = " << getInterpretationFrequency( interp ) / getNrOfTrainingTokens() << std::endl;
 	    return getInterpretationFrequency( interp ) / getNrOfTrainingTokens();
 	}
-	
 
 
 
-	
+
+
 	float getBaseWordFrequency( std::wstring const& word ) const {
 	    float f = 0;
 	    if( baseWordFrequency_->lookup( word, &f) ) {
@@ -166,21 +166,21 @@ namespace OCRCorrection {
 	}
 
 	/**
-	 * @brief returns the pattern probability as given by the patternWeights_-object, but 
+	 * @brief returns the pattern probability as given by the patternWeights_-object, but
 	 *        performs smoothing if necessary
 	 */
 	float getPatternProb( csl::Pattern const& pattern ) const {
-	    
+
 	    float prob = patternWeights_->getWeight( pattern );
-	    
+
 	    // VERY RUDIMENTARY SMOOTHING HERE !!!!!!!!!!!!!!!!!!
 	    return ( prob != csl::PatternProbabilities::UNDEF ) ? prob : histPatternSmoothingProb_;
 	}
 
 	/**
-	 * @brief returns the product of all pattern probabilities of the instruction. 
+	 * @brief returns the product of all pattern probabilities of the instruction.
 	 *        Returns 0 if for at least one of the patterns no probability exists.
-	 *        
+	 *
 	 */
 	float getInstructionProb( csl::Instruction const& instruction ) const {
 	    float prob = 1;
@@ -192,7 +192,7 @@ namespace OCRCorrection {
 		if( patternProb == csl::PatternProbabilities::UNDEF ) return 0;
 		prob *= getPatternProb( *it );
 	    }
-	    
+
 	    return prob;
 	}
 
@@ -204,28 +204,28 @@ namespace OCRCorrection {
 
 	// @}
 	/**
-	 * 
+	 *
 	 * @name File load/ dump
 	 */
 	//@{
 
-	
+
 	void loadFromFile( char const* freqFile, char const* patternWeightFile ) {
 	    if( interpFrequency_ || baseWordFrequency_ || patternWeights_ ) {
 		throw OCRCException( "OCRC::FrequencyList::loadFromFile: FrequencyList seems to have been loaded before." );
 	    }
-	    
+
 	    FILE* fi = fopen( freqFile, "rb" );
-	    
+
 	    if( ! fi ) {
 		throw OCRCException( std::string( "OCRC::FrequencyList: Couldn't open file '" ) +
 					  std::string( freqFile ) +
 					  std::string( "' for reading." ) );
 	    }
-	    
+
 	    // read the Header
 	    if( fread( &header_, sizeof( Header ), 1, fi ) != 1 ) {
-		throw OCRCException( "OCRC::FrequencyList: Error while reading header" );	      
+		throw OCRCException( "OCRC::FrequencyList: Error while reading header" );
 	    }
 
 	    if( header_.getMagicNumber() != magicNumber_ ) {
@@ -234,20 +234,20 @@ namespace OCRCorrection {
 
 	    nrOfTrainingTokens_ = header_.getNrOfTrainingTokens();
 
-	    
+
 	    interpFrequency_ = new csl::MinDic<>;
 	    interpFrequency_->loadFromStream( fi );
-	    
+
 	    baseWordFrequency_ = new csl::MinDic< float >;
 	    baseWordFrequency_->loadFromStream( fi );
 
 
 	    fclose( fi );
-	    
+
 	    patternWeights_ = new csl::PatternWeights;
 	    patternWeights_->loadFromFile( patternWeightFile );
 	}
-	
+
 	void writeToFile( char const* freqFile, char const* patternWeightFile ) {
 	    FILE* fo = fopen( freqFile, "wb" );
 	    if( ! fo ) {
@@ -259,28 +259,28 @@ namespace OCRCorrection {
 	    // write the header
 	    header_.set( *this );
 	    fwrite( &header_, sizeof( Header ), 1, fo );
-	    
+
 	    interpFrequency_->writeToStream( fo );
-	    
+
 	    baseWordFrequency_->writeToStream( fo );
-	    
+
 	    fclose( fo );
 
 	    patternWeights_->writeToFile( patternWeightFile );
 
-	    
-	};
-	
-	// @}
-	
 
-	class Trainer;    
+	};
+
+	// @}
+
+
+	class Trainer;
 
     private:
 	static std::wstring interpretation2String( csl::Interpretation const& interp ) {
 	    return interp.getWord() + L":" + interp.getBaseWord() + L"+" + interp.getInstruction().toString();
 	}
-	
+
 	/**
 	 * @brief stores the frequencies of interpretations as seen in the training
 	 */
@@ -317,16 +317,16 @@ namespace OCRCorrection {
 
 
 	bool applyStaticFreqs_;
-	
-	
+
+
 	static const bits64 magicNumber_ = 54543616;
-	
+
 	class Header {
 	public:
 	    bits64 getMagicNumber() const {
 		return magicNumber_;
 	    }
-	    
+
 	    void set( FrequencyList const& freqlist ) {
 		magicNumber_ = freqlist.magicNumber_;
 		nrOfTrainingTokens_ = freqlist.nrOfTrainingTokens_;
@@ -343,12 +343,12 @@ namespace OCRCorrection {
 	    bits64 maxFrequency_; // obsolete !!!
 	    bits64 nrOfTrainingTokens_;
 	}; // class Header
-	
+
 	Header header_;
 
     }; // class FrequencyList
-    
-    
+
+
 
 } // eon
 

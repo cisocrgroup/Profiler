@@ -17,7 +17,7 @@ namespace OCRCorrection {
 	CPPUNIT_TEST_SUITE_END();
     public:
 	TestAltoXML();
-	
+
 	void run();
 	void testReaderBasics();
 	void testDirMode();
@@ -28,16 +28,16 @@ namespace OCRCorrection {
     CPPUNIT_TEST_SUITE_REGISTRATION( TestAltoXML );
 
     TestAltoXML::TestAltoXML() {
-	
+
     }
 
     void TestAltoXML::run() {
 	//testReaderBasics();
 	testDirMode();
 	//testAltoEnrich();
-	
+
     }
-    
+
 
     /**
      * test the basic methods
@@ -48,20 +48,20 @@ namespace OCRCorrection {
 	try {
 	    reader.parse( Utils::getOCRCBase() + "/cxx/AltoXML/Test/bsb00001830_00035.trans.jpg.ocr.ALTO-Char.xml" , &doc );
 	} catch( std::exception& exc ) {
-	    std::wstring wide_what;
-	    csl::CSLLocale::string2wstring( exc.what(), wide_what );
+                std::wstring wide_what(Utils::utf8(exc.what()));
+                //csl::CSLLocale::string2wstring( exc.what(), wide_what );
 	    std::wcerr << "CAUGHT:" << wide_what << std::endl;
 	}
 	doc.print();
     }
-    
+
     void TestAltoXML::testDirMode() {
 	AltoXMLReader reader;
 	Document doc;
 	try {
 	    reader.parseDir( Utils::getOCRCBase() + "/cxx/AltoXML/Test/alto_dir" , "_NO_IMAGE_DIR_", &doc );
 	} catch( std::exception& exc ) {
-	    std::wcerr << "CAUGHT:" << csl::CSLLocale::string2wstring( exc.what() ) << std::endl;
+                std::wcerr << "CAUGHT:" << Utils::utf8(exc.what()) << std::endl;
 	    CPPUNIT_FAIL( "TEST" );
 	}
 	std::wstringstream sstr;
@@ -69,12 +69,12 @@ namespace OCRCorrection {
 	std::wstring str =  sstr.str();
 	std::wcout << str << std::endl;
 	// DOESNT WORK! CPPUNIT_ASSERT( str == L"4 Wachs zerschmilzt beym Feuer, und d" );
-	
+
     }
 
     void TestAltoXML::testAltoEnrich() {
 	AltoEnrich altoEnrich;
-	
+
 	std::wofstream ofs( "/dev/null" );
 	altoEnrich.addProfilerData( Utils::getOCRCBase() + "/cxx/AltoXML/Test/bsb00001830_00035.trans.jpg.ocr.ALTO-Char.xml" , "/mounts/Users/student/uli/implement/OCRC_trunk/dictionaries/ocrc.ini", "/tmp" );
 

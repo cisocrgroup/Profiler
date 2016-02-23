@@ -1,12 +1,12 @@
 #include<map>
-#include<csl/Pattern/Pattern.h>
+#include<Pattern/Pattern.h>
 
 
 namespace OCRCorrection {
 
 
     /**
-     * @brief This class is used during the profiling process to add up 
+     * @brief This class is used during the profiling process to add up
      *        frequencies for patterns and character n-grams.
      */
     class PatternCounter {
@@ -20,7 +20,7 @@ namespace OCRCorrection {
 	 */
 	PatternCounter() :
 	    maxNGramSize_( 5 ) {
-	    
+
 	}
 
 	void clear() {
@@ -32,10 +32,10 @@ namespace OCRCorrection {
 	void registerPattern( const csl::Pattern& pattern, float addValue = 1 ) {
 	    patternCount_[pattern] += addValue;
 	}
-	
+
 
 	/**
-	 * @brief 
+	 * @brief
 	 */
 	void registerNGrams(const std::wstring& correct, float addValue = 1 ) {
 
@@ -56,7 +56,7 @@ namespace OCRCorrection {
 		return it->second;
 	    else return 0;
 	}
-	
+
 	float getNGramCount( std::wstring const& nGram ) const {
 	    std::map< std::wstring, float >::const_iterator it = nGramCount_.find( nGram );
 	    if( it != nGramCount_.end() )
@@ -72,24 +72,24 @@ namespace OCRCorrection {
 	    return patternCount_.end();
 	}
 
-	
+
 	/////////  P R I V A T E  /////////////////
     private:
 	typedef float count_t;
-	
+
 	size_t maxNGramSize_;
-	
+
 	/**
-	 * @brief This data structure maps the frequencies of the known patterns 
+	 * @brief This data structure maps the frequencies of the known patterns
 	 */
 	std::map< csl::Pattern, count_t > patternCount_;
-	
+
 	/**
 	 * @brief This data structure maps the frequencies of the correct words
 	 */
 	std::map< std::wstring, count_t > nGramCount_;
-	
-	
+
+
     };
 
 } // eon

@@ -164,13 +164,13 @@ namespace OCRCorrection {
 	if( c.getChar() == 0 ) throw OCRCException( "OCRC::Token::addChar: Do not insert \\0 char" );
 
 	if( wOCR_.empty() && // first char of the Token
-	    std::use_facet< std::ctype< wchar_t > >( csl::CSLLocale::Instance() ).is( std::ctype_base::upper, c.getChar() ) ) {
+            iswupper(c.getChar())) {
 	    setCapitalized();
 	}
 
 
 	wOCR_ += c.getChar();
-	wOCR_lc_ += std::tolower( c.getChar(), csl::CSLLocale::Instance() );
+	wOCR_lc_ += towlower(c.getChar());
 
 	// if the new character is suspicious, this makes the whole word suspicious
 	if( c.isAbbyySuspicious() ) {
@@ -210,13 +210,13 @@ namespace OCRCorrection {
 
 
     void Token::setWOCR( std::wstring const& w ) {
-	wOCR_ = w;
-	if ((not wOCR_.empty()) and iswupper(wOCR_[0])) {
-                setCapitalized();
-	}
-        if (wOCR_lc_.empty()) {
-                setWOCR_lc(w);
-        }
+            wOCR_ = w;
+            if ((not wOCR_.empty()) and iswupper(wOCR_[0])) {
+                    setCapitalized();
+            }
+            if (wOCR_lc_.empty()) {
+                    setWOCR_lc(w);
+            }
     }
 
         void Token::setWOCR_lc(std::wstring const& wlc) {

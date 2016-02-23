@@ -2,13 +2,13 @@
 #define OCRC_PROFILER_PATTERNCONTAINER_H OCRC_PROFILER_PATTERNCONTAINER_H
 
 #include<map>
-#include<csl/Pattern/Pattern.h>
-#include<csl/Pattern/PatternProbabilities.h>
+#include<Pattern/Pattern.h>
+#include<Pattern/PatternProbabilities.h>
 
 #include<Exceptions.h>
 
 namespace OCRCorrection {
-    
+
     /**
      * @brief This class extends csl::PatternProbabilities in order to additionally store
      *        an absolute frequency for each pattern (apart from the probability value
@@ -18,14 +18,14 @@ namespace OCRCorrection {
      * defined in csl, so that we could here provide the functionality of PatternSet and
      * still choose our own way to store the data appropriately. The way it is now we are bound
      * to inherit the std::map< csl::pattern, double > from csl::PatternSet and have to set up an
-     * additional container for the absolute frequencies. 
+     * additional container for the absolute frequencies.
      *
      * @author Ulrich Reffle<uli@cis.uni-muenchen.de>
      * @year 2009
      */
     class PatternContainer : public csl::PatternProbabilities {
     public:
-	
+
 	/**
 	 * overrides method in csl::PatternProbabilities
 	 */
@@ -34,7 +34,7 @@ namespace OCRCorrection {
 	    absoluteFreqs_.clear();
 	}
 
-	
+
 	/**
 	 * overrides method in csl::PatternProbabilities
 	 */
@@ -60,14 +60,13 @@ namespace OCRCorrection {
 	 */
 	std::map< csl::Pattern, double > const& getAbsoluteFreqs() const {
 	    return absoluteFreqs_;
-	}	
+	}
 
 	/**
 	 * @brief writes xml output to the specified file
 	 */
 	void writeToXML( char const* xmlFile ) const {
 	    std::wofstream fo;
-	    fo.imbue( csl::CSLLocale::Instance() );
 	    fo.open( xmlFile );
 	    if( ! fo ) {
 		throw OCRCException( "OCRC::PatternContainer::writeToXML: Could not open pattern file for writing" );
@@ -83,18 +82,18 @@ namespace OCRCorrection {
 	 */
 	void writeToXML( std::wostream& os = std::wcout ) const {
 	    time_t t = time(NULL);
-	    
+
 	    os << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl
 	       << "<patternProbabilities>" << std::endl
 	       << "<head>" << std::endl
 	       << "<created_at>" << asctime(localtime(&t)) << "</created_at>" << std::endl
 	       << "</head>" << std::endl;
-	    
+
 	    writeToXML_patternsOnly( os );
 
 	    os << "</patternProbabilities>" << std::endl;
 	}
-	
+
 	/**
 	 * @brief Writes only the <pattern ... /> containers. This can be used if the patterns
 	 *        are to be included in some other xml format.
@@ -105,14 +104,14 @@ namespace OCRCorrection {
 	    std::vector< std::pair< csl::Pattern, double > > patternsSorted;
 	    sortToVector( &patternsSorted );
 
-	    for( std::vector< std::pair< csl::Pattern, double > >::const_iterator it = patternsSorted.begin(); 
+	    for( std::vector< std::pair< csl::Pattern, double > >::const_iterator it = patternsSorted.begin();
 		 it != patternsSorted.end();
 		 ++it ) {
 		os << "<pattern left=\"" << it->first.getLeft() << "\" right=\"" << it->first.getRight() << "\""
 		   << " pat_string=\"" << it->first.getLeft() << "_" << it->first.getRight() << "\""
 		   << " relFreq=\"" << getWeight( it->first )  << "\""
 		   << " absFreq=\"" << ( absoluteFreqs_.find( it->first ) )->second << "\""
-		   << "/>" 
+		   << "/>"
 		   << std::endl;
 	    }
 	}
@@ -123,14 +122,14 @@ namespace OCRCorrection {
 	 */
 	void print( std::wostream& os ) const {
 	    time_t t = time(NULL);
-	    
+
 	    std::vector< std::pair< csl::Pattern, double > > patternsSorted;
 	    sortToVector( &patternsSorted );
 
-	    for( std::vector< std::pair< csl::Pattern, double > >::const_iterator it = patternsSorted.begin(); 
+	    for( std::vector< std::pair< csl::Pattern, double > >::const_iterator it = patternsSorted.begin();
 		 it != patternsSorted.end();
 		 ++it ) {
-		os << it->first.getLeft() << "_" << it->first.getRight() 
+		os << it->first.getLeft() << "_" << it->first.getRight()
 		   << "#" << getWeight( it->first )
 		   << "#" << ( absoluteFreqs_.find( it->first ) )->second
 		   << std::endl;
@@ -158,7 +157,7 @@ namespace OCRCorrection {
 	static bool sortByAbsolute( std::pair< csl::Pattern, double > const& a, std::pair< csl::Pattern, double > const& b ) {
 	    return ( a.second > b.second ); // reverse ordering
 	}
-	
+
     private:
 	/**
 	 * @brief An additiomal data member storing the absolute frequencies.

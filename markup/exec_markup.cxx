@@ -1,6 +1,6 @@
 
-#include<csl/DictSearch/DictSearch.h>
-#include<csl/INIConfig/INIConfig.h>
+#include<DictSearch/DictSearch.h>
+#include<INIConfig/INIConfig.h>
 
 #include<Document/Document.h>
 #include<Stopwatch.h>
@@ -24,9 +24,9 @@ int main( int argc, char const** argv ) {
     csl::Getopt options;
     options.specifyOption( "help", csl::Getopt::VOID );
     options.specifyOption( "config", csl::Getopt::STRING );
-    
+
     options.getOptionsAsSpecified( argc, argv );
-    
+
 
     if( ! options.hasOption( "config" ) ) {
 	printHelp();
@@ -39,8 +39,8 @@ int main( int argc, char const** argv ) {
 	csl::DictSearch dictSearch;
 	dictSearch.readConfiguration( iniConfig );
 	dictSearch.initHypothetic( iniConfig.getstring( "language_model:patternFile" ) );
-	
-	    
+
+
 	csl::DictSearch::CandidateSet candSet;
 
 	OCRCorrection::Document document; // this is created only to make use of getBorder!!!
@@ -50,15 +50,15 @@ int main( int argc, char const** argv ) {
 	std::wstring line;
 	size_t lineCount = 0;
 	size_t wordCount = 0;
-	OCRCorrection::Stopwatch timeAll;
-	OCRCorrection::Stopwatch timeInterval;
+	csl::Stopwatch timeAll;
+	csl::Stopwatch timeInterval;
 	while( std::getline( std::wcin, line ).good() ) {
 	    if( lineCount == 0 ) { // search for utf8 byte-order marks!
 		if( !line.empty() && line.at( 0 ) == 65279 ) {
 		    line.erase( 0, 1 );
 		}
 	    }
-	    
+
 	    const wchar_t* pos = line.c_str();
 	    size_t length = 0;
 	    bool isNormal;
@@ -73,7 +73,7 @@ int main( int argc, char const** argv ) {
 		    candSet.clear();
 		    dictSearch.query( w, &candSet );
 		    std::sort( candSet.begin(), candSet.end() );
-		    
+
 		    if( !candSet.empty() ) {
 			csl::DictSearch::Interpretation topcand = candSet.at( 0 );
 			if( ! topcand.getHistInstruction().empty() ) style += L"color:red;";
@@ -86,7 +86,7 @@ int main( int argc, char const** argv ) {
 		    }
 		    ++wordCount;
 		    if( wordCount % 100000 == 0 ) {
-			std::wcerr << wordCount / 1000 << "k words processed. 100k words in " 
+			std::wcerr << wordCount / 1000 << "k words processed. 100k words in "
 				   << timeInterval.readMilliseconds() << " ms." << std::endl;
 			timeInterval.start();
 		    }
@@ -97,9 +97,9 @@ int main( int argc, char const** argv ) {
 
 	    }
 	    std::wcout << "<br>" << std::endl;
-	    
+
 	    ++lineCount;
-	    
+
 	}
 	if( errno == EILSEQ ) {
 	    throw OCRCorrection::OCRCException( "OCRC markup: Input encoding error" );
@@ -115,8 +115,7 @@ int main( int argc, char const** argv ) {
 	return EXIT_FAILURE;
     }
 
-    
+
 
 
 }
-

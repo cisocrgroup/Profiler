@@ -1,10 +1,10 @@
 add_executable( altoEnrich exec_altoEnrich.cxx)
-target_link_libraries ( altoEnrich OCRCorrection )
+target_link_libraries ( altoEnrich OCRCorrection Pattern INIConfig Pattern LevDEA DictSearch LevDEA )
 
 
 add_subdirectory( Test )
 
-install( 
+install(
   TARGETS altoEnrich
   DESTINATION bin
   )

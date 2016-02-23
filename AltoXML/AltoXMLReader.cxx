@@ -23,17 +23,17 @@ namespace OCRCorrection {
 
 	doc_ = document;
 
-    
+
 	xercesc::SAXParser parser;
-    
+
 	parser.setDocumentHandler( this );
 	parser.setErrorHandler( this );
 
 	parser.parse( xmlFile.c_str() );
-    
-    
+
+
 	//xercesc::XMLPlatformUtils::Terminate();
-    
+
     }
 
     void AltoXMLReader::parseDir( std::string const& init_xmlDir, std::string const& init_imageDir, OCRCorrection::Document* doc ) {
@@ -43,19 +43,20 @@ namespace OCRCorrection {
 	}
 	if( init_imageDir.empty() ) {
 	    throw OCRCException( "OCRC::AltoXMLReader::parseDirToDocument: imageDir is empty string." );
-	} 
-	
+	}
+
 	std::string xmlDir = Utils::normalizeFilePath( init_xmlDir );
-	
+
 	std::string imageDir = Utils::normalizeFilePath( init_imageDir );
-	
-	std::wstring wideXmlDir, wideImageDir;
-	csl::CSLLocale::string2wstring( xmlDir, wideXmlDir );
-	csl::CSLLocale::string2wstring( imageDir, wideImageDir );
+
+	std::wstring wideXmlDir(Utils::utf8(xmlDir));
+    std::wstring wideImageDir(Utils::utf8(imageDir));;
+	//csl::CSLLocale::string2wstring( xmlDir, wideXmlDir );
+	//csl::CSLLocale::string2wstring( imageDir, wideImageDir );
 	std::wcerr << "OCRC::AltoXMLReader::parseDirToDocument: Parse " << wideXmlDir << ", images in " << wideImageDir << std::endl;
-	
+
 	DIR *pDIR = opendir( xmlDir.c_str() );
-	
+
 	if( ! pDIR ) {
 	    if( errno == ENOENT ) {
 		throw OCRCException( "OCRC::AltoXMLReader::parseDirToDocument: No such directory." );
@@ -64,15 +65,15 @@ namespace OCRCorrection {
 		throw OCRCException( "OCRC::AltoXMLReader::parseDirToDocument: access to directory failed." );
 	    }
 	}
-	
-	std::wstring wide_xmlDir;
-	csl::CSLLocale::string2wstring( xmlDir, wide_xmlDir );
+
+	std::wstring wide_xmlDir(Utils::utf8(xmlDir));
+	//csl::CSLLocale::string2wstring( xmlDir, wide_xmlDir );
 
 
 	struct dirent *pDirEnt;
 
 	std::vector< std::string > dirEntries;
-    
+
 	/* Get each directory entry */
 	pDirEnt = readdir( pDIR );
 	while ( pDirEnt != NULL ) {
@@ -97,7 +98,7 @@ namespace OCRCorrection {
 
 		// create the image path
 		std::string imageFile = imageDir + std::string( "/" ) +  entry->substr( 0, (entry->size() - 4 ) ) + std::string( ".tif" );
-	    
+
 		doc->newPage()
 		    .setSourceFile( inFile )
 		    .setImageFile( imageFile );
@@ -105,18 +106,18 @@ namespace OCRCorrection {
 		parse( inFile.c_str(), doc );
 	    }
 	    else { // no "xml" extension
-		std::wstring wideEntry;
-		csl::CSLLocale::string2wstring( *entry, wideEntry );
+                std::wstring wideEntry(Utils::utf8(*entry));
+                //csl::CSLLocale::string2wstring( *entry, wideEntry );
 		std::wcerr << "OCRC::AltoXMLReader::parseDirToDocument: Ignored non-xml file " << wideEntry << std::endl;
 	    }
 	}
 
-	std::wcerr << "OCRC::AltoXMLReader::parseDirToDocument: parsed directory " << wide_xmlDir << ", " 
-		   << doc->getNrOfTokens() << " tokens, " 
+	std::wcerr << "OCRC::AltoXMLReader::parseDirToDocument: parsed directory " << wide_xmlDir << ", "
+		   << doc->getNrOfTokens() << " tokens, "
 		   << doc->getNrOfPages() << " pages."
 		   << std::endl;
-        
-    
+
+
     }
 
 
@@ -131,7 +132,7 @@ namespace OCRCorrection {
 	xmlReaderHelper_.enter( name );
 
 	content_.clear();
-	
+
 	if( xmlReaderHelper_.name() == "Page" ) {
 	    ++pagesPerFile_;
 	}
@@ -140,16 +141,18 @@ namespace OCRCorrection {
 	else if( xmlReaderHelper_.name() == "String" ) {
 	    std::wstring content = XMLReaderHelper::getAttributeWideValue( attrs, "CONTENT" );
 	    bool isNormal;
-	    
-	    size_t left = csl::CSLLocale::string2number< int >( XMLReaderHelper::getAttributeValue( attrs, "HPOS" ) );
-	    size_t top = csl::CSLLocale::string2number< int >( XMLReaderHelper::getAttributeValue( attrs, "VPOS" ) );
 
-	    std::wstring coord_id = 
-		XMLReaderHelper::getAttributeWideValue( attrs, "HPOS" ) + L"_" + 
-		XMLReaderHelper::getAttributeWideValue( attrs, "WIDTH" ) + L"_" + 
-		XMLReaderHelper::getAttributeWideValue( attrs, "VPOS" ) + L"_" + 
+	    size_t left = Utils::toNum<int>(XMLReaderHelper::getAttributeWideValue(attrs, "HPOS"));
+        //csl::CSLLocale::string2number< int >( XMLReaderHelper::getAttributeValue( attrs, "HPOS" ) );
+	    size_t top = Utils::toNum<int>(XMLReaderHelper::getAttributeValue(attrs, "VPOS"));
+        //csl::CSLLocale::string2number< int >( XMLReaderHelper::getAttributeValue( attrs, "VPOS" ) );
+
+	    std::wstring coord_id =
+		XMLReaderHelper::getAttributeWideValue( attrs, "HPOS" ) + L"_" +
+		XMLReaderHelper::getAttributeWideValue( attrs, "WIDTH" ) + L"_" +
+		XMLReaderHelper::getAttributeWideValue( attrs, "VPOS" ) + L"_" +
 		XMLReaderHelper::getAttributeWideValue( attrs, "HEIGHT" );
-            
+
             size_t tokenCount = 0;
             size_t normalCount = 0;
 	    size_t beginOfToken = 0;
@@ -159,17 +162,17 @@ namespace OCRCorrection {
                 if( isNormal ) ++normalCount;
                 tok_ = new Token( *doc_, doc_->getNrOfTokens(), isNormal );
                 tok_->setWOCR( content.substr( beginOfToken, border - beginOfToken ) );
-		beginOfToken = border;
-                
-                tok_->setCoordinates( 
-		    left,
-		    top,
-		    left + csl::CSLLocale::string2number< int >( XMLReaderHelper::getAttributeValue( attrs, "WIDTH" ) ),
-		    top + csl::CSLLocale::string2number< int >( XMLReaderHelper::getAttributeValue( attrs, "HEIGHT" ) )
-		    );
-		
-                tok_->setExternalId( coord_id );              
-	    
+                beginOfToken = border;
+                int width = Utils::toNum<int>(XMLReaderHelper::getAttributeValue(attrs, "WIDTH"));
+                int height = Utils::toNum<int>(XMLReaderHelper::getAttributeValue(attrs, "HEIGHT"));
+                tok_->setCoordinates(
+                        left,
+                        top,
+                        left + width,
+                        top + height
+                        );
+                tok_->setExternalId( coord_id );
+
                 doc_->pushBackToken( tok_ );
                 tok_ = 0;
             }
@@ -198,14 +201,14 @@ namespace OCRCorrection {
 	    // The hyphenation info should be used better.
 	    doc_->pushBackToken( XMLReaderHelper::getAttributeWideValue( attrs, "CONTENT" ), false );
 	}
-  
+
     }
 
 
 
     void AltoXMLReader::endElement(const XMLCh* const initName) {
 
-	std::string name( xmlReaderHelper_.name() ); 
+	std::string name( xmlReaderHelper_.name() );
 	xmlReaderHelper_.leave( initName );
 
 	if( name == "TextLine" ) {
@@ -220,17 +223,17 @@ namespace OCRCorrection {
 	static std::wstring eingabe_wide;
 
 	eingabe = eingabe_cstr;
-    
-	csl::CSLLocale::string2wstring( eingabe, eingabe_wide );
+    eingabe_wide = Utils::utf8(eingabe);
+	//csl::CSLLocale::string2wstring( eingabe, eingabe_wide );
 
 
 	content_ += eingabe_wide;
-    
-	xercesc::XMLString::release( &eingabe_cstr ); 
+
+	xercesc::XMLString::release( &eingabe_cstr );
     }
 
     void AltoXMLReader::ignorableWhitespace(const XMLCh* const chars, const XMLSize_t length) {
-    
+
     }
 
     void AltoXMLReader::startDocument() {
@@ -240,7 +243,7 @@ namespace OCRCorrection {
 
     void AltoXMLReader::endDocument() {
 	if( pagesPerFile_ > 1 ) {
-	    std::wcerr << "OCRC::AltoXMLReader::endDocument: Warning: alto file contains more than one page." << std::endl; 
+	    std::wcerr << "OCRC::AltoXMLReader::endDocument: Warning: alto file contains more than one page." << std::endl;
 	}
     }
 
@@ -256,8 +259,8 @@ namespace OCRCorrection {
 	my_message += message;
 	throw OCRCException( my_message );
 
-	std::wstring wideMessage;
-	csl::CSLLocale::string2wstring( std::string( message), wideMessage );
+	std::wstring wideMessage(Utils::utf8(message));
+	//csl::CSLLocale::string2wstring( std::string( message), wideMessage );
 	std::wcerr << wideMessage << std::endl;
 	xercesc::XMLString::release(&message);
     }
@@ -270,8 +273,8 @@ namespace OCRCorrection {
 
 	throw OCRCException( my_message );
 
-	std::wstring wideMessage;
-	csl::CSLLocale::string2wstring( std::string( message), wideMessage );
+	std::wstring wideMessage(Utils::utf8(message));
+	//csl::CSLLocale::string2wstring( std::string( message), wideMessage );
 	std::wcerr << wideMessage << std::endl;
 
 	xercesc::XMLString::release(&message);
@@ -284,8 +287,8 @@ namespace OCRCorrection {
 
 	throw OCRCException( my_message );
 
-	std::wstring wideMessage;
-	csl::CSLLocale::string2wstring( std::string( message), wideMessage );
+	std::wstring wideMessage(Utils::utf8(message));
+	//csl::CSLLocale::string2wstring( std::string( message), wideMessage );
 	std::wcerr << wideMessage << std::endl;
 	xercesc::XMLString::release(&message);
     }

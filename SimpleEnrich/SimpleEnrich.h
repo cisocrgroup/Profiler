@@ -2,8 +2,8 @@
 #define OCRC_SIMPLEENRICH_H OCRC_SIMPLEENRICH_H
 
 #include<string>
-#include<csl/DictSearch/DictSearch.h>
-#include<csl/INIConfig/INIConfig.h>
+#include<DictSearch/DictSearch.h>
+#include<INIConfig/INIConfig.h>
 #include<Document/Document.h>
 
 namespace OCRCorrection {
@@ -18,7 +18,7 @@ namespace OCRCorrection {
 	SimpleEnrich( csl::INIConfig const& iniConf ) :
 	    limitNrOfCandidates_( -1 ) {
 	    dictSearch_.readConfiguration( iniConf );
-	    
+
 	}
 
 	void limitNrOfCandidates( size_t l ) {
@@ -28,7 +28,7 @@ namespace OCRCorrection {
 	/**
 	 * @brief Pass a pointer to a document object, and correction suggestions will be added
 	 *        to the tokens of your document.
-	 * 
+	 *
 	 */
 	void enrichDocument( Document* doc ) {
 	    csl::DictSearch::CandidateSet candset;
@@ -63,7 +63,7 @@ namespace OCRCorrection {
 			     cand != candset.end();
 			     ++cand ) {
 			    if( ( limitNrOfCandidates_ != (size_t)-1 ) && ( candCount > limitNrOfCandidates_  ) ) break;
-			    
+
 			    // candidate string not suggested before
 			    if( ( seen.insert( cand->getWord() ).second == true ) ) {
 				token->addCandidate( *cand );
@@ -75,10 +75,10 @@ namespace OCRCorrection {
 	    }
 
 
-	    
+
 	}
 
-	    
+
     private:
 
 	csl::DictSearch dictSearch_;

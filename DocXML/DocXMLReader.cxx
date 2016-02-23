@@ -128,14 +128,13 @@ namespace OCRCorrection {
 		.setImageFile ( XMLReaderHelper::getAttributeValue( attrs, "imageFile" ) )
 		;
 
-	    if( verbose_ ) std::wcerr << "Page " << doc_->getNrOfPages() << std::endl;
+	    //if( verbose_ ) std::wcerr << "Page " << doc_->getNrOfPages() << std::endl;
 	}
 
 	else if( xmlReaderHelper_.name() == "token" ) {
 
 	    tok_ = new Token( *doc_, doc_->getNrOfTokens(), true );
 	    tok_->initGroundtruth();
-
 	    tok_->getGroundtruth().setNormal( xmlReaderHelper_.getAttributeValue( attrs, "isNormal" ) == "true" );
 
 
@@ -162,12 +161,12 @@ namespace OCRCorrection {
 	}
 
 	else if( xmlReaderHelper_.name() == "coord" ) {
-	    tok_->setCoordinates(
-		csl::CSLLocale::string2number< float >( XMLReaderHelper::getAttributeValue( attrs, "l" ) ),
-		csl::CSLLocale::string2number< float >( XMLReaderHelper::getAttributeValue( attrs, "t" ) ),
-		csl::CSLLocale::string2number< float >( XMLReaderHelper::getAttributeValue( attrs, "r" ) ),
-		csl::CSLLocale::string2number< float >( XMLReaderHelper::getAttributeValue( attrs, "b" ) )
-		);
+            tok_->setCoordinates(
+                    Utils::toNum<float>(XMLReaderHelper::getAttributeValue(attrs, "l")),
+                    Utils::toNum<float>(XMLReaderHelper::getAttributeValue(attrs, "t")),
+                    Utils::toNum<float>(XMLReaderHelper::getAttributeValue(attrs, "r")),
+                    Utils::toNum<float>(XMLReaderHelper::getAttributeValue(attrs, "b"))
+                    );
 	}
 	else if( xmlReaderHelper_.name() == "abbyy_suspicious" ) {
 	    if( xmlReaderHelper_.getAttributeValue( attrs, "value")  == "true"  ) {
@@ -210,20 +209,19 @@ namespace OCRCorrection {
 	}
 
 	else if(strcmp(message, "wOCR") == 0) {
-	    tok_->setWOCR( content_ );
+            tok_->setWOCR( content_ );
 	    // find out if wOCR is normal
 	    if( tok_->getWOCR().empty() ) {
-		tok_->setNormal( false );
+                tok_->setNormal( false );
 	    }
 	    else {
-		tok_->setNormal( true );
-		for( std::wstring::const_iterator c = tok_->getWOCR().begin(); c != tok_->getWOCR().end(); ++c ) {
-                        //if( ! std::isalnum( *c, csl::CSLLocale::Instance() ) ) {
+                tok_->setNormal( true );
+                for( std::wstring::const_iterator c = tok_->getWOCR().begin(); c != tok_->getWOCR().end(); ++c ) {
                         if(!Document::isWord(*c)) {
                                 tok_->setNormal( false );
                                 break;
                         }
-		}
+                }
 	    }
 	}
 
@@ -304,18 +302,8 @@ namespace OCRCorrection {
     }
 
     void DocXMLReader::characters(const XMLCh* chars, XMLSize_t length) {
-
 	char* eingabe_cstr = XMLString::transcode( chars );
-	static std::string eingabe;
-	static std::wstring eingabe_wide;
-
-	eingabe = eingabe_cstr;
-
-	csl::CSLLocale::string2wstring( eingabe, eingabe_wide );
-
-
-	content_ += eingabe_wide;
-
+	content_ += Utils::utf8(eingabe_cstr);
 	XMLString::release( &eingabe_cstr );
     }
 
@@ -342,8 +330,8 @@ namespace OCRCorrection {
 	my_message += message;
 	throw OCRCException( my_message );
 
-	std::wstring wideMessage;
-	csl::CSLLocale::string2wstring( std::string( message), wideMessage );
+	std::wstring wideMessage = Utils::utf8(message);
+	//csl::CSLLocale::string2wstring( std::string( message), wideMessage );
 	std::wcerr << wideMessage << std::endl;
 	XMLString::release(&message);
     }
@@ -356,8 +344,8 @@ namespace OCRCorrection {
 
 	throw OCRCException( my_message );
 
-	std::wstring wideMessage;
-	csl::CSLLocale::string2wstring( std::string( message), wideMessage );
+	std::wstring wideMessage = Utils::utf8(message);
+	//csl::CSLLocale::string2wstring( std::string( message), wideMessage );
 	std::wcerr << wideMessage << std::endl;
 
 	XMLString::release(&message);
@@ -370,8 +358,8 @@ namespace OCRCorrection {
 
 	throw OCRCException( my_message );
 
-	std::wstring wideMessage;
-	csl::CSLLocale::string2wstring( std::string( message), wideMessage );
+	std::wstring wideMessage = Utils::utf8(message);
+	//csl::CSLLocale::string2wstring( std::string( message), wideMessage );
 	std::wcerr << wideMessage << std::endl;
 	XMLString::release(&message);
     }

@@ -6,8 +6,8 @@
 #include<TXTReader/AlignedTXTReader.h>
 #include<IBMGroundtruth/IBMGTReader.h>
 #include<Document/Document.h>
-#include<csl/Getopt/Getopt.h>
-
+#include<Getopt/Getopt.h>
+#include "Utils/Utils.h"
 
 void printHelp() {
     std::wcerr << "Use like: ocrc_transform " << std::endl
@@ -65,7 +65,7 @@ int main( int argc, char const** argv ) {
 		reader.parse( options.getOption( "source" ), &document );
 	    }
 	    catch( std::exception& exc ) {
-		std::wcerr << "ocrc_transform: Reading DocXML failed: " << csl::CSLLocale::string2wstring( exc.what() ) << std::endl;
+                std::wcerr << "ocrc_transform: Reading DocXML failed: " << OCRCorrection::Utils::utf8(exc.what()) << std::endl;
 		return EXIT_FAILURE;
 	    }
 	}
@@ -88,10 +88,10 @@ int main( int argc, char const** argv ) {
 		reader.parsePageToDocument( options.getOption( "source" ), options.getOption( "imageDir" ), &document );
 	      }
 	    } catch( std::exception& exc ) {
-	      std::wcerr << "ocrc_transform: Reading AbbyyXML failed: " << csl::CSLLocale::string2wstring( exc.what() ) << std::endl;
+                std::wcerr << "ocrc_transform: Reading AbbyyXML failed: " << OCRCorrection::Utils::utf8(exc.what()) << std::endl;
 	      return EXIT_FAILURE;
 	    }
-	    
+
 	}
 	else if( options.getOption( "inFormat" ) == "IBM_GROUNDTRUTH" ) {
 	    OCRCorrection::IBMGTReader r;
@@ -109,7 +109,7 @@ int main( int argc, char const** argv ) {
 		}
 	    }
 	    catch( std::exception& exc ) {
-		std::wcerr << "ocrc_transform: Reading AlignTXT failed: " << csl::CSLLocale::string2wstring( exc.what() ) << std::endl;
+                std::wcerr << "ocrc_transform: Reading AlignTXT failed: " << OCRCorrection::Utils::utf8(exc.what()) << std::endl;
 		return EXIT_FAILURE;
 	    }
 	}
@@ -132,9 +132,9 @@ int main( int argc, char const** argv ) {
     std::wostream* os = &std::wcout;
     if( options.hasOption( "outFile" ) ) {
       os = new std::wofstream( options.getOption( "outFile" ).c_str() ); // is not deleted at the moment, as the program ends anyway
-      os->imbue( csl::CSLLocale::Instance() );
+      //os->imbue( csl::CSLLocale::Instance() );
     }
-    
+
 
     if( options.getOption( "outFormat" ) == "DocXML" ) {
       try {
@@ -145,8 +145,8 @@ int main( int argc, char const** argv ) {
 	  OCRCorrection::DocXMLWriter writer;
 	  writer.writeXML( document, *os );
       } catch( std::exception const& exc ) {
-	  std::wstring wideWhat;
-	  csl::CSLLocale::string2wstring( exc.what(), wideWhat );
+              std::wstring wideWhat(OCRCorrection::Utils::utf8(exc.what()));
+              //csl::CSLLocale::string2wstring( exc.what(), wideWhat );
 	  std::wcerr << "transform_docXML: error while writing: " << wideWhat;
 	  return EXIT_FAILURE;
       }

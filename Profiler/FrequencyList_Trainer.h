@@ -2,6 +2,7 @@
  * DO NOT INCLUDE THIS HEADER ANYWHERE - INCLUDE FrequencyList.h INSTEAD !!!!!!
  */
 
+#include "Utils/Utils.h"
 
 namespace OCRCorrection {
 
@@ -83,7 +84,7 @@ namespace OCRCorrection {
 		throw OCRCException( std::string( "OCRC::FrequencyList_Trainer::doTrainingOnFreqlist: Could not open freqlist: " ) + freqlistFile );
 	    }
 
-	    freqlist_in.imbue( csl::CSLLocale::Instance() );
+	    //freqlist_in.imbue( csl::CSLLocale::Instance() );
 
 	  std::wstring line;
 	  csl::DictSearch::CandidateSet cands;
@@ -103,7 +104,8 @@ namespace OCRCorrection {
 		throw OCRCException( "OCRC::FrequencyList_Trainer::doTrainingOnFreqlist: Invalid line in input file" );
 	    }
 	    std::wstring word = line.substr( 0, delimPos );
-	    size_t freq = csl::CSLLocale::string2number< size_t >( line.substr( delimPos + 1 ) );
+            size_t freq = Utils::toNum<size_t>(word);
+	    //size_t freq = csl::CSLLocale::string2number< size_t >( line.substr( delimPos + 1 ) );
 
 	    if( word.length() < 4 ) {
 		++skippedCount;
@@ -116,7 +118,7 @@ namespace OCRCorrection {
 
 	    std::wstring lowercased = word;
 	    for( std::wstring::iterator c = lowercased.begin(); c != lowercased.end(); ++c ) {
-		*c = std::tolower( *c, csl::CSLLocale::Instance() );
+                    *c = towlower(*c);
 	    }
 
 	    // std::wcout << lowercased << std::endl; // DEBUG
@@ -172,7 +174,7 @@ namespace OCRCorrection {
 	void doTraining( Document_t const& document ) {
 	    csl::DictSearch::CandidateSet cands;
 
-	    Stopwatch stopwatch;
+            csl::Stopwatch stopwatch;
 
 	    // iterate over all tokens of the given text
 	    size_t tokenCount = 0;
@@ -187,7 +189,7 @@ namespace OCRCorrection {
 
 		std::wstring lowercased = token->getWOCR();
 		for( std::wstring::iterator c = lowercased.begin(); c != lowercased.end(); ++c ) {
-		    *c = std::tolower( *c, csl::CSLLocale::Instance() );
+                        *c = towlower(*c);
 		}
 
 		// std::wcout << lowercased << std::endl; // DEBUG
@@ -289,7 +291,6 @@ namespace OCRCorrection {
 
 	void writeCorpusLexicon( char const* corpusLexFile ) const {
 	    std::wofstream os( corpusLexFile );
-	    os.imbue( csl::CSLLocale::Instance() );
 	    for( std::map< std::wstring, std::wstring >::const_iterator it = corpusLexicon_.begin();
 		 it != corpusLexicon_.end();
 		 ++it ) {

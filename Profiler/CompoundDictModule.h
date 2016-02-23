@@ -1,6 +1,6 @@
-#include<csl/TransTable/TransTable.h>
-#include<csl/Vaam/Vaam.h>
-#include<csl/DictSearch/DictSearch.h>
+#include<TransTable/TransTable.h>
+#include<Vaam/Vaam.h>
+#include<DictSearch/DictSearch.h>
 
 
 class CompoundDictModule : public csl::DictSearch::iDictModule {
@@ -11,17 +11,17 @@ public:
     CompoundDictModule( std::string const& dicFile ) :
 	name_( L"compound" ),
 	compoundVaam_( 0 ),
-	priority_( 1 ) {    
-	
+	priority_( 1 ) {
+
 	compoundDic_.loadFromFile( dicFile.c_str() );
-	
+
 	compoundVaam_ = new csl::Vaam< TransTable_t >( compoundDic_, "/mounts/data/proj/impact/software/Vaam/patterns.lexgui.txt" );
 	compoundVaam_->setMaxNrOfPatterns( 0 );
 	compoundVaam_->setDistance( 0 );
     }
 
     void query( std::wstring const& query, csl::DictSearch::CandidateSet* answers ) {
-	
+
 	// query the compound dictionary including variants
 	compoundVaam_->query( query, answers );
     }
@@ -29,11 +29,11 @@ public:
     std::wstring const& getName() const {
 	return name_;
     }
-    
+
     int getPriority() const {
 	return priority_;
     }
-    
+
     void setPriority( int p ) {
 	priority_ = p;
     }

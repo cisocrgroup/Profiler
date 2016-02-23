@@ -4,13 +4,11 @@
 #include<iostream>
 
 #include<Document/Document.h>
-
-#include<csl/LevDistance/LevDistance.h>
-
+#include "LevDistance/LevDistance.h"
 #include"./Counter.h"
 
 namespace OCRCorrection {
-    
+
     class DocEvaluation {
     public:
 	DocEvaluation();
@@ -40,7 +38,7 @@ namespace OCRCorrection {
 
     };
 
-   
+
     DocEvaluation::DocEvaluation() :
 	verbose_( true ) {
     }
@@ -64,7 +62,7 @@ namespace OCRCorrection {
     void DocEvaluation::setVerbose( bool b ) {
 	verbose_ = b;
     }
-    
+
 
     void DocEvaluation::analyzeDocument( Document& doc ) {
 	counter_.clear();
@@ -86,7 +84,7 @@ namespace OCRCorrection {
 
 	    //////////////////////////////////////
 
-	    
+
 	    if( ! tok->hasGroundtruth() ) {
 		throw OCRCException( (*tok).getWOCR_lc() + L" has no groundtruth" );
 	    }
@@ -101,14 +99,14 @@ namespace OCRCorrection {
 		if( tok->isSuspicious() ) {
 		    ++counter_( Counter::error_suspicious );
 		}
-		
+
 		bool destroyed = false;
 		std::wstring destroyed_comment;
 
 		// if( tok->getGroundtruth().getOCRTrace() == L"*DESTROYED*"
-		//     || tok->getGroundtruth().getClassified() == L"unknown" 
+		//     || tok->getGroundtruth().getClassified() == L"unknown"
 		//     ) {
-		    
+
 		//     destroyed = true;
 		// }
 		// else {
@@ -118,7 +116,7 @@ namespace OCRCorrection {
 		//     }
 		// }
 
-		
+
 		if( ( tok->getGroundtruth().getWOrig_lc().find( L" " ) != std::wstring::npos )
 		    || ( tok->getWOCR_lc().find( L" " ) != std::wstring::npos ) ) {
 		    destroyed_comment = L"SPACE FOUND";
@@ -138,7 +136,7 @@ namespace OCRCorrection {
 		if( destroyed ) {
 		    ++counter_( Counter::error_destroyed );
 		    // if( verbose_ ) {
-		    // 	std::wcout << "[error_destroyed][" << destroyed_comment << "] " 
+		    // 	std::wcout << "[error_destroyed][" << destroyed_comment << "] "
 		    // 		   << tok->getGroundtruth().getWOrig_lc() << " - " << tok->getWOCR_lc() << std::endl;
 		    // 	std::wcout << "GT ocrTrace=" << tok->getGroundtruth().getOCRTrace() << std::endl;
 		    // }
@@ -146,13 +144,13 @@ namespace OCRCorrection {
 		    continue;
 		}
 
-		
+
 		++counter_( Counter::error_correctable );
 		if( verbose_ ) {
 		    std::wcout << "[error_correctable] " << tok->getGroundtruth().getWOrig_lc() << " - " << tok->getWOCR_lc() << std::endl;
 		    std::wcout << "ocrTrace=" << tok->getGroundtruth().getOCRTrace() << std::endl;
 		}
-		
+
 
 		if( tok->getNrOfCandidates() != 0 ) {
 		    ++counter_( Counter::error_correctable_hasCandidates );
@@ -161,8 +159,8 @@ namespace OCRCorrection {
 
 		    // pos counts in an intuitive (not IT-like) style: the 1st candidate has pos 1.
 		    // pos==0 means the cand was not found (yet)
-		    size_t pos = 0; 
-		    size_t i = 0; 
+		    size_t pos = 0;
+		    size_t i = 0;
 		    for( Token::CandidateIterator cand = tok->candidatesBegin(); cand != tok->candidatesEnd() && (pos == 0); ++cand ) {
 			++i;
 
@@ -172,9 +170,9 @@ namespace OCRCorrection {
 
 			std::wstring cand_lc = cand->getWord();
 			for( std::wstring::iterator c = cand_lc.begin(); c != cand_lc.end(); ++c ) {
-			    *c = std::tolower( *c, csl::CSLLocale::Instance() );
+                                *c = towlower(*c);
 			}
-			
+
 			if( cand_lc == tok->getGroundtruth().getWOrig_lc() ) {
 			    pos = i;
 			}
@@ -206,21 +204,21 @@ namespace OCRCorrection {
 			    ++counter_( Counter::error_correctable_hasCandidates_50best );
 			}
 		    }
-		    
+
 		}
 		else {
 		    ++counter_( Counter::error_correctable_hasNoCandidates );
 		    if( verbose_ ) std::wcout << "no cands" << std::endl;
 		}
-		
+
 		if( verbose_ ) std::wcout << std::endl << std::endl << std::endl;
 	    }
-	    
-	    
+
+
 
 
 	}
-	std::wcout 
+	std::wcout
 	    << "not_long                                " << counter_( Counter::not_long ) << std::endl
 	    << "normal_and_long                         " << counter_( Counter::normal_and_long ) << std::endl
 	    << "correct                                 " << counter_( Counter::correct ) << std::endl
@@ -238,7 +236,7 @@ namespace OCRCorrection {
 	    << std::endl
 	    << "avg nr of candidates on errors          " << (float)counter_( Counter::error_correctable_hasCandidates_candidateSum ) / counter_( Counter::error_correctable_hasCandidates ) << std::endl
 	    << std::endl
-	    << "Error Detection Recall                  " << counter_( Counter::error_suspicious ) << " / " << counter_( Counter::error ) 
+	    << "Error Detection Recall                  " << counter_( Counter::error_suspicious ) << " / " << counter_( Counter::error )
 	    << " = " <<  (float)counter_( Counter::error_suspicious ) / counter_( Counter::error )  << std::endl
 	    ;
     }
@@ -250,10 +248,10 @@ namespace OCRCorrection {
     void DocEvaluation::findHyphenation( Document& doc ) {
 	std::wstring hyphenationMarks = std::wstring( L"\u00AC" );
 	std::wstring mergedWord;
-	
-	
+
+
 	if( doc.getNrOfTokens() < 4 ) return;
-	
+
 	/*
 	 *  hyphe       ¬          \n         nation
 	 *   i -2      i-1         i           i+1
@@ -261,11 +259,11 @@ namespace OCRCorrection {
 	 */
         for( size_t i = 2; i < doc.getNrOfTokens()-1 ; ++i ) {
 	    if( doc.at( i ).getGroundtruth().getWOrig() == L"\n" ) {
-		if( ( doc.at( i - 1 ).getGroundtruth().getWOrig().size() == 1 ) && 
+		if( ( doc.at( i - 1 ).getGroundtruth().getWOrig().size() == 1 ) &&
 		    ( hyphenationMarks.find( doc.at( i - 1 ).getGroundtruth().getWOrig().at( 0 ) ) != std::wstring::npos ) ) {
 
 		    mergedWord = doc.at( i - 2 ).getWOCR() + doc.at( i + 1 ).getWOCR();
-		
+
 		    doc.at( i - 2 ).setProperty( Token::HYPHENATION_1ST, true );
 		    doc.at( i - 2 ).setHyphenationMerged( mergedWord );
 		    doc.at( i - 1 ).setProperty( Token::HYPHENATION_MARK, true );
@@ -274,11 +272,11 @@ namespace OCRCorrection {
 
 		}
 	    }
-	    
+
 	}
     }
 
-    
+
 
 } // ns
 

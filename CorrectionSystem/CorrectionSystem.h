@@ -12,10 +12,8 @@
 #include <Utils/Utils.h>
 #include <Profiler/Profiler.h>
 #include <SimpleEnrich/SimpleEnrich.h>
-#include <csl/DictSearch/DictSearch.h>
-#include <csl/INIConfig/INIConfig.h>
-#include <csl/CSLLocale/CSLLocale.h>
-
+#include <DictSearch/DictSearch.h>
+#include <INIConfig/INIConfig.h>
 
 namespace OCRCorrection {
 
@@ -25,7 +23,7 @@ namespace OCRCorrection {
      * It initialises the Document object and applies a number of utilities to add correction candidates,
      * scores etc.
      *
-     * 
+     *
      */
     class CorrectionSystem {
     public:
@@ -58,9 +56,9 @@ namespace OCRCorrection {
 	 *
 	 */
 	void loadDocument( char const* docFile );
-	
+
 	/**
-	 * @brief Create a new document object from the given text file 
+	 * @brief Create a new document object from the given text file
 	 */
 	void newDocument( const char* dirName, const char* imageDirName, InputMode inputMode );
 
@@ -72,7 +70,7 @@ namespace OCRCorrection {
 	 */
 
 	/**
-	 * @brief returns a refernce to the document object 
+	 * @brief returns a refernce to the document object
 	 *
 	 * @return a refernce to the document object
 	 */
@@ -83,7 +81,7 @@ namespace OCRCorrection {
 	 */
 	Document* getDocumentPointer();
 
-	
+
     private:
         /**
          * @brief The document currently processed
@@ -100,5 +98,3 @@ namespace OCRCorrection {
 } // ns OCRCorrection
 
 #endif
-
-

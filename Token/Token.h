@@ -5,9 +5,8 @@
 #include<string>
 #include<algorithm>
 
-#include <csl/LevFilter/LevFilter.h>
-#include <csl/Vaam/Vaam.h>
-#include <csl/CSLLocale/CSLLocale.h>
+#include <LevFilter/LevFilter.h>
+#include <Vaam/Vaam.h>
 #include <Exceptions.h>
 #include <Candidate/Candidate.h>
 #include "./Character.h"

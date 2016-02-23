@@ -14,17 +14,17 @@ namespace OCRCorrection {
 	gp_ = gp;
 
 	xercesc::XMLPlatformUtils::Initialize();
-    
+
 	xercesc::SAXParser parser_;
-    
+
 	parser_.setDocumentHandler( this );
 	parser_.setErrorHandler( this );
 
 	parser_.parse( xmlFile.c_str() );
-    
-    
+
+
 	//  xercesc::XMLPlatformUtils::Terminate();
-    
+
     }
 
 
@@ -37,7 +37,7 @@ namespace OCRCorrection {
     void GlobalProfileXMLReader::startElement(
 	const XMLCh* const initName,
 	AttributeList& attrs ) {
-	
+
 	xmlReaderHelper_.enter( initName );
 
 	if( xmlReaderHelper_.getExternalHandler() ) {
@@ -46,10 +46,10 @@ namespace OCRCorrection {
 	}
 
 
-	
+
 
 	content_.clear();
-	
+
 	if( xmlReaderHelper_.name() == "spelling_variants" ) {
 	    xmlReaderHelper_.setExternalHandler( new PatternContainerXMLReader( &( gp_->histPatternProbabilities_ ) ) );
 	    xmlReaderHelper_.getExternalHandler()->startElement( initName, attrs );
@@ -59,12 +59,13 @@ namespace OCRCorrection {
 	    xmlReaderHelper_.getExternalHandler()->startElement( initName, attrs );
 	}
 	else if( xmlReaderHelper_.name() == "item" && xmlReaderHelper_.hasParent( "dictionary_distribution" ) ) {
-	    
-	    
-	    gp_->dictDistribution_[XMLReaderHelper::getAttributeWideValue( attrs, "dict" )].frequency = 
-		csl::CSLLocale::string2number< float >( XMLReaderHelper::getAttributeValue( attrs, "frequency" ) );
-	    gp_->dictDistribution_[XMLReaderHelper::getAttributeWideValue( attrs, "dict" )].proportion = 
-		csl::CSLLocale::string2number< float >( XMLReaderHelper::getAttributeValue( attrs, "proportion" ) );
+
+
+	    gp_->dictDistribution_[XMLReaderHelper::getAttributeWideValue( attrs, "dict" )].frequency =
+                Utils::toNum<float>(XMLReaderHelper::getAttributeValue(attrs, "frequency"));
+        //csl::CSLLocale::string2number< float >( XMLReaderHelper::getAttributeValue( attrs, "frequency" ) );
+	    gp_->dictDistribution_[XMLReaderHelper::getAttributeWideValue( attrs, "dict" )].proportion =
+                Utils::toNum<float>(XMLReaderHelper::getAttributeValue( attrs, "proportion" ) );
 	}
     }
 
@@ -73,7 +74,7 @@ namespace OCRCorrection {
 // schliessende Tags, Tagname in Anführungszeichen
     void GlobalProfileXMLReader::endElement( const XMLCh* const initName ) {
 	xmlReaderHelper_.leave( initName );
-	
+
 	if( xmlReaderHelper_.getExternalHandler() ) {
 	    xmlReaderHelper_.getExternalHandler()->endElement( initName );
 	    return;
@@ -86,19 +87,20 @@ namespace OCRCorrection {
 	    xmlReaderHelper_.getExternalHandler()->characters( chars, length );
 	    return;
 	}
-	
+
 	char* eingabe_cstr = XMLString::transcode( chars );
 	static std::string eingabe;
 	static std::wstring eingabe_wide;
-	
-	eingabe = eingabe_cstr;
-	
-	csl::CSLLocale::string2wstring( eingabe, eingabe_wide );
 
-	
+	eingabe = eingabe_cstr;
+
+    eingabe_wide = Utils::utf8(eingabe);
+	//csl::CSLLocale::string2wstring( eingabe, eingabe_wide );
+
+
 	content_ += eingabe_wide;
-    
-	XMLString::release( &eingabe_cstr ); 
+
+	XMLString::release( &eingabe_cstr );
     }
 
     void GlobalProfileXMLReader::ignorableWhitespace(const XMLCh* const chars, const XMLSize_t length) {
@@ -128,8 +130,8 @@ namespace OCRCorrection {
 	my_message += message;
 	throw OCRCException( my_message );
 
-	std::wstring wideMessage;
-	csl::CSLLocale::string2wstring( std::string( message), wideMessage );
+	std::wstring wideMessage(Utils::utf8(message));
+	//csl::CSLLocale::string2wstring( std::string( message), wideMessage );
 	std::wcerr << wideMessage << std::endl;
 	XMLString::release(&message);
     }
@@ -142,8 +144,8 @@ namespace OCRCorrection {
 
 	throw OCRCException( my_message );
 
-	std::wstring wideMessage;
-	csl::CSLLocale::string2wstring( std::string( message), wideMessage );
+	std::wstring wideMessage(Utils::utf8(message));
+	//csl::CSLLocale::string2wstring( std::string( message), wideMessage );
 	std::wcerr << wideMessage << std::endl;
 
 	XMLString::release(&message);
@@ -156,8 +158,8 @@ namespace OCRCorrection {
 
 	throw OCRCException( my_message );
 
-	std::wstring wideMessage;
-	csl::CSLLocale::string2wstring( std::string( message), wideMessage );
+	std::wstring wideMessage = Utils::utf8(message);
+	//csl::CSLLocale::string2wstring( std::string( message), wideMessage );
 	std::wcerr << wideMessage << std::endl;
 	XMLString::release(&message);
     }
