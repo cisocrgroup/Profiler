@@ -10,7 +10,7 @@ namespace csl {
 #include "lev1data.cxx"
 #include "lev2data.cxx"
 #include "lev3data.cxx"
-    
+
     LevDEA::LevDEA( int init_k ) : k_( 0 ),
 				   charvecs_( Global::maxNrOfChars, 0 )
     {
@@ -18,7 +18,7 @@ namespace csl {
 	tabsLoaded_ = 0;
 	setDistance( init_k );
     }
-    
+
     LevDEA::~LevDEA() {
 	delete( tab );
 	delete( fin );
@@ -82,12 +82,17 @@ namespace csl {
     }
 
     void LevDEA::loadPattern( const wchar_t* p ) {
+        if (not p) {
+           std::wcerr << "[warning] LevDEA::loadPattern: null" << std::endl;
+           return;
+        }
+        std::wcout << "loadPattern: " << p << std::endl;
 	cleanCharvecs(); // do this while the old pattern is still loaded!
 	patLength_ = wcslen( p );
 	if( patLength_ > Global::lengthOfWord ) {
 	    throw exceptions::badInput( "csl::LevDEA::loadPattern: Maximum Pattern length (as specified by Global::lengthOfWord) violated." );
 	}
-	wcscpy( pattern_, p );
+	wcsncpy( pattern_, p, patLength_);
 	calcCharvec();
     }
 
@@ -96,7 +101,7 @@ namespace csl {
 	    charvecs_.at( *pat ) = 0;
 	}
     }
-    
+
     void LevDEA::calcCharvec() {
 	bits64 c;
 	const wchar_t* pat;
@@ -104,7 +109,7 @@ namespace csl {
 	    charvecs_[*pat] |= c;
 	}
     }
-    
+
     bits32 LevDEA::calc_k_charvec( wchar_t c, size_t i ) const {
 	bits64 r;
 	// after the next line, the bits i,i+1,i+2 of chv are the lowest bits of r. All other bits of r are 0
@@ -133,7 +138,7 @@ namespace csl {
 	}
 	std::cout << "-------------" << std::endl;
     }
-    
+
     void LevDEA::printBits( const bits64& n ) const {
 	int i;
 	for( i = 63;i >= 0;--i ) {

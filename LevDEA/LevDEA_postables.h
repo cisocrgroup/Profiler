@@ -6,6 +6,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include "Charvec.h"
 #include <stdio.h>
 
 #include "../Global.h"
@@ -24,7 +25,7 @@ namespace csl {
      * "S. Mihov and K. Schulz. Fast approximate search in large dictionaries. Computational Linguistics, 30, 2004."
      * *** Honestly, a somewhat older approach is used, not exactly the one described in the paper ***
      * Basically the implementation is derived from a C-implementation of Stoyan Mihov.
-     * 
+     *
      * @caution This class is one huge memory leak!!!
      *
      * @author Ulrich Reffle, <uli@cis.uni-muenchen.de>
@@ -76,7 +77,7 @@ namespace csl {
 
 
 	/**
-	 * Follow a transition in the automaton. Input-char c is translated into 
+	 * Follow a transition in the automaton. Input-char c is translated into
 	 * a bit-vector which then is used as "input symbol" for the automaton.
 	 *
 	 * @param p a start position in the automaton
@@ -93,7 +94,7 @@ namespace csl {
 	 * @return the new position
 	 */
 	inline Pos walkStr( const Pos& p, const wchar_t* str ) const;
-	
+
 
 	/**
 	 * Returns true iff state p is a position standing for a final state
@@ -103,7 +104,7 @@ namespace csl {
 	inline bool isFinal( const Pos& p ) const;
 
 	/**
-	 * 
+	 *
 	 */
 	inline int getDistance( const Pos& p ) const;
 
@@ -156,7 +157,10 @@ namespace csl {
 	/// coresets is the number of distinct configurations of a triangular region (depends on k)
 	size_t coresets;
 
-	std::vector< unsigned long long > charvecs_;
+	//std::vector< unsigned long long > charvecs_;
+        //typedef std::map<wchar_t, unsigned long long> Charvecs;
+        Charvec charvecs_;
+
 
 	void cleanCharvecs();
 	void calcCharvec();

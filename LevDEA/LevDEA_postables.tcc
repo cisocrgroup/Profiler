@@ -11,15 +11,15 @@ namespace csl {
 #include "lev1data.tcc"
 #include "lev2data.tcc"
 #include "lev3data.tcc"
-    
-    LevDEA::LevDEA( int init_k ) : k_( init_k ),
-				   charvecs_( Global::maxNrOfChars, 0 )
+
+    LevDEA::LevDEA( int init_k ) : k_( init_k ), charvecs_()
+//				   charvecs_( Global::maxNrOfChars, 0 )
     {
 	*pattern_ = 0; // set pattern to empty word
 	tabsLoaded_ = 0;
 	setDistance( init_k );
     }
-    
+
     LevDEA::~LevDEA() {
 	delete( tab );
 	delete( fin );
@@ -93,11 +93,17 @@ namespace csl {
     }
 
     void LevDEA::cleanCharvecs() {
-	for( const wchar_t* pat = pattern_; *pat; ++pat ) {
-	    charvecs_.at( *pat ) = 0;
-	}
+            charvecs_.clear();
+            // for (Charvecs::iterator i = charvecs_.begin();
+            //      i != charvecs_.end();
+            //      ++i) {
+            //         i->second = 0;
+            // }
+	// for( const wchar_t* pat = pattern_; *pat; ++pat ) {
+	//     charvecs_.at( *pat ) = 0;
+	// }
     }
-    
+
     void LevDEA::calcCharvec() {
 	bits64 c;
 	const wchar_t* pat;
@@ -105,11 +111,11 @@ namespace csl {
 	    charvecs_[*pat] |= c;
 	}
     }
-    
+
     bits32 LevDEA::calc_k_charvec( wchar_t c, size_t i ) const {
 	bits64 r;
 	// after the next line, the bits i,i+1,i+2 of chv are the lowest bits of r. All other bits of r are 0
-	r = ( charvecs_[c] >> ( 64 - ( 2 * k_ + 1 + i ) ) ) & z2k1;
+	r = ( charvecs_[c]/*at(c)*/ >> ( 64 - ( 2 * k_ + 1 + i ) ) ) & z2k1;
 	if ( patLength_ - i < 2 * k_ + 1 ) // the last few chars of the word
 	    r = ( ( r >> ( 2 * k_ + 1 - ( patLength_ - i ) ) ) | ( zff << ( ( patLength_ - i ) + 1 ) ) ) & z2k2;
 	return ( (bits32) r );
@@ -130,11 +136,11 @@ namespace csl {
 	std::cout << "-------------" << std::endl;
 	for( const wchar_t* c = pattern_; *c; ++c ) {
 	    printf( "%lc\n", *c );
-	    printBits( charvecs_[*c] );
+	    printBits(charvecs_[*c]);
 	}
 	std::cout << "-------------" << std::endl;
     }
-    
+
     void LevDEA::printBits( const bits64& n ) const {
 	int i;
 	for( i = 63;i >= 0;--i ) {
