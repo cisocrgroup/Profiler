@@ -172,7 +172,7 @@ namespace OCRCorrection {
 	for( Document_t::iterator token = document_.begin(); // for all tokens
 	     token != document_.end();
 	     ++token ) {
-
+                //std::wcout << "TOKEN: " << token->getWOCR() << std::endl;
 	    if( ( config_.pageRestriction_ != (size_t)-1 ) &&
                 token->getOriginalToken().getPageIndex()  >= config_.pageRestriction_ ) {
                 break;
@@ -215,7 +215,9 @@ namespace OCRCorrection {
                 token->setTokenNr( static_cast< size_t >( counter[L"normalAndLongTokens"] ) );
                 if( (int)counter[L"normalAndLongTokens"] % 1000 == 0 ) {
                         std::wcerr << counter[L"normalAndLongTokens"] / 1000
-                                   << "k tokens processed in " << stopwatch.readMilliseconds() << "ms" << std::endl;
+                                   << "k/" << document_.size() / 1000
+                                   << "k tokens processed in "
+                                   << stopwatch.readMilliseconds() << "ms" << std::endl;
                         stopwatch.start();
                 }
 		tempCands.reset();
