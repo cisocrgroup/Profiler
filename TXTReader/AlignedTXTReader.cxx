@@ -6,20 +6,17 @@
 
 namespace OCRCorrection {
 
-    AlignedTXTReader::AlignedTXTReader() :
-	locale_( CSL_UTF8_LOCALE ) {
-
-    }
+        AlignedTXTReader::AlignedTXTReader() : locale_() {}
 
     void AlignedTXTReader::parse( std::string const& inFile, Document* document ) {
 
 	std::wifstream fi;
 	fi.open( inFile.c_str() );
-	
+
 	if( ! fi ) {
 	    throw OCRCException( "OCRC::Document::parseAlignedTXT::Could not open input file" );
 	}
-	
+
 	std::wstring line;
 
 	std::wstring wOrig;
@@ -28,7 +25,7 @@ namespace OCRCorrection {
 
 	size_t lineCount = 0;
 	while( getline( fi, line).good() ) {
-	    
+
 	    if( lineCount == 0 ) { // search for utf8 byte-order marks!
 		size_t pos = 0;
 		while( ( pos = line.find_first_of( 65279, pos ) ) != std::wstring::npos ) {
@@ -40,7 +37,7 @@ namespace OCRCorrection {
 	    if( delimPos == std::wstring::npos ) {
 		throw OCRCException( "OCRC::AlignedTXTReader::parse::No separator found in input file" );
 	    }
-	    
+
 	    wOrig = line.substr( 0, delimPos );
 	    wOCR  = line.substr( delimPos + 1 );
 
@@ -70,25 +67,25 @@ namespace OCRCorrection {
 
 //	    std::wcout << "line=" << line <<  std::endl; // DEBUG
 //	    std::wcout << "Worig='" << wOrig <<"', wOCR='" << wOCR <<  "'" << std::endl; // DEBUG
-	    
-	    
+
+
 		document->cleanupWord( &wOrig, &preOrig, &postOrig );
 		document->cleanupWord( &wOCR, &preOCR, &postOCR );
-	    
+
 		// std::wcout << "Worig='" << wOrig <<"', wOCR='" << wOCR <<  "'" << std::endl; // DEBUG
-	    
+
 		// NOTE: not-normal prefixes of wOrig are thrown away if there's no such prefix in wOCR
 		if( ! preOCR.empty()  ) {
 		    Token* tok = new Token( *document, document->getNrOfTokens(), preOCR, false );
 		    tok->initGroundtruth();
 		    tok->getGroundtruth().setWOrig( preOrig );
 		    document->pushBackToken( tok );
-		
+
 		}
 
-	    
+
 		Token* tok = 0;
-	    
+
 		size_t length_ocr = 0;
 		wchar_t const* pos_ocr = wOCR.c_str();
 		bool isNormal_ocr = false;
@@ -108,7 +105,7 @@ namespace OCRCorrection {
 		    else {
 			subOCR = L"";
 		    }
-		    
+
 		    if( *pos_orig != 0 ) {
 			length_orig = Document::getBorder( pos_orig, &isNormal_orig );
 			subOrig = wOrig.substr( pos_orig - wOrig.c_str(), length_orig );
@@ -117,29 +114,29 @@ namespace OCRCorrection {
 		    else {
 			subOrig = L"";
 		    }
-		    
+
 		    tok = new Token( *document, document->getNrOfTokens(), subOCR, isNormal_ocr );
 		    tok->initGroundtruth();
 		    tok->getGroundtruth().setWOrig( subOrig );
 		    //tok->setSplitMerge( true );
 		    document->pushBackToken( tok );
-		    
+
 		}
 
 		if( postOCR.empty() ) postOCR = L" ";
 		if( postOrig.empty() ) postOrig = L" ";
-	    
+
 		tok = new Token( *document, document->getNrOfTokens(), postOCR, false );
 		tok->initGroundtruth();
 		tok->getGroundtruth().setWOrig( postOrig );
 		document->pushBackToken( tok );
-	    } // not a ###NEWLINE###	    
+	    } // not a ###NEWLINE###
 
 	    ++lineCount;
 
 	} // while( getline )
 	document->pushBackToken( L"\n", 1, false );
-	
+
 	std::wcerr<<"OCRC::AlignedTXTReader::parse: Finished, "<< document->getNrOfTokens() << " tokens." << std::endl;
     }
 
@@ -156,16 +153,16 @@ namespace OCRCorrection {
 	if( xmlDir.at( 0 ) == '~' ) {
 	    xmlDir.replace( 0, 1, getenv( "HOME" ) );
 	}
-	
-	std::wstring wide_xmlDir;
-	csl::CSLLocale::string2wstring( xmlDir, wide_xmlDir );
+
+	std::wstring wide_xmlDir(Utils::utf8(xmlDir));
+	//csl::CSLLocale::string2wstring( xmlDir, wide_xmlDir );
 
 
 	DIR *pDIR = opendir( xmlDir.c_str() );
 	struct dirent *pDirEnt;
-	
+
 	std::vector< std::string > dirEntries;
-	
+
 	/* Get each directory entry */
 	pDirEnt = readdir( pDIR );
 	while ( pDirEnt != NULL ) {
@@ -185,23 +182,23 @@ namespace OCRCorrection {
 	    size_t pos = entry->rfind( ".txt" );
 	    // only .xml files
 	    if( ( pos != std::string::npos ) && ( pos == (entry->size() - 4 ) )  ) {
-		
+
 		std::string inFile = xmlDir + std::string( "/" ) +  *entry;
-		
+
 		// create the image path
 		std::string imageFile = imageDir + std::string( "/" ) +  entry->substr( 0, (entry->size() - 4 ) ) + std::string( ".tif" );
-		
+
 		doc->newPage( imageFile );
 		parse( inFile.c_str(), doc );
 	    }
 	}
 
-	std::wcerr << "OCRC::AlignedTXTReader::parseDir parsed directory " << wide_xmlDir << ", " 
-		   << doc->getNrOfTokens() << " tokens, " 
+	std::wcerr << "OCRC::AlignedTXTReader::parseDir parsed directory " << wide_xmlDir << ", "
+		   << doc->getNrOfTokens() << " tokens, "
 		   << doc->getNrOfPages() << " pages."
 		   << std::endl;
-        
-    
+
+
     }
 
 

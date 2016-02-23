@@ -1,13 +1,13 @@
-#include<csl/Getopt/Getopt.h>
-#include<csl/LevDistance/LevDistance.h>
+#include<Getopt/Getopt.h>
+#include<LevDistance/LevDistance.h>
 #include<DocXML/DocXMLReader.h>
-    
+
 int main( int argc, char const** argv ) {
     std::locale::global( std::locale( "" ) );
 
     csl::Getopt options;
     options.getOptionsAsSpecified( argc, argv );
-    
+
     OCRCorrection::DocXMLReader reader;
     csl::LevDistance distComputer;
     OCRCorrection::Document doc;
@@ -26,4 +26,3 @@ int main( int argc, char const** argv ) {
     std::wcout << (float)countLev / countChars << " operations per GT character" << std::endl;
 
 }
-    

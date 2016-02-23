@@ -2,8 +2,8 @@
 #define OCRCORRECTION_CANDIDATE_H OCRCORRECTION_CANDIDATE_H
 
 #include<string>
-#include<csl/DictSearch/DictSearch.h>
-#include<csl/Pattern/Trace.h>
+#include<DictSearch/DictSearch.h>
+#include<Pattern/Trace.h>
 
 /******************************************************/
 /***********  IMPORTANT *******************************/
@@ -17,7 +17,7 @@ namespace OCRCorrection {
 
     /**
      * @brief Represents one candidate for a token.
-     * 
+     *
      * In the 2010 version it inherits from csl::DictSearch::Interpretation.
      */
     class Candidate :
@@ -36,7 +36,7 @@ namespace OCRCorrection {
 	inline Candidate( csl::DictSearch::Interpretation const& interpretation );
 
 	inline Candidate( csl::Interpretation const& interpretation, csl::DictSearch::iDictModule const& dm );
-	
+
 	// @}
 
 	/******************** GETTERS ************************/
@@ -47,10 +47,10 @@ namespace OCRCorrection {
 
         /**
          * @brief returns a read/write reference of the candidate string
-         * @return 
+         * @return
          */
         inline std::wstring&  getString();
-        
+
         inline const std::wstring&  getString() const;
 
         inline size_t getFrequency() const;
@@ -78,7 +78,7 @@ namespace OCRCorrection {
 	 */
 	//@{
 	inline void setOCRTrace( csl::Trace const& ocri );
-	
+
 	inline void setVoteWeight( float w );
 	//@}
 
@@ -91,10 +91,10 @@ namespace OCRCorrection {
 	//@{
 
 	void print( std::wostream& os = std::wcout ) const;
-	
+
 	inline std::wstring toString() const;
 
-	size_t parseFromString( std::wstring const& str, size_t offset );	
+	size_t parseFromString( std::wstring const& str, size_t offset );
 
 	//@}
 
@@ -104,7 +104,7 @@ namespace OCRCorrection {
     private:
 	csl::Trace ocrTrace_;
 	float voteWeight_;
-	
+
     }; // class Candidate
 
 } // ns OCRCorrection

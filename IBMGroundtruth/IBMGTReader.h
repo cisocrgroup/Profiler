@@ -18,12 +18,12 @@ namespace OCRCorrection {
 
     private:
 	void parseLine( std::wstring const& line );
-	
+
 	Document* doc_;
 	size_t lineCount_;
     };
 
-    
+
     IBMGTReader::IBMGTReader() :
 	doc_( 0 ) {
     }
@@ -31,11 +31,11 @@ namespace OCRCorrection {
     void IBMGTReader::parse( char const* csvFile, Document* document ) {
 	doc_ = document;
 	std::wifstream fileIn( csvFile );
-	fileIn.imbue( csl::CSLLocale::Instance() );
+	//fileIn.imbue( csl::CSLLocale::Instance() );
 	if( ! fileIn.good() ) {
 	    throw OCRCException( "OCRC::IBMGTReader::parse: Could not open input file for reading." );
 	}
-	
+
 	std::wstring line;
 
 	getline( fileIn, line );
@@ -73,10 +73,10 @@ namespace OCRCorrection {
 // 	    std::wcout << *it << std::endl;
 // 	}
 // 	std::wcout << "-------" << std::endl;
-	
+
 	//   0           1          2            3           4            5               6             7
 	//FileName, Ascii-Truth, Hex-Truth, ABBYY-Dict, ABBYY-Valid, ABBYY-OCR-Hex, ABBYY-OCR-Ascii, OCR-Status
-	    
+
 	std::wstring wOrig;
 	std::wstring wOCR;
 	std::wstring preOrig, postOrig, preOCR, postOCR;
@@ -102,19 +102,19 @@ namespace OCRCorrection {
 	    tok->setDontTouch( true );
 	}
 	doc_->pushBackToken( tok );
-	
+
 	if( ! postOCR.empty() ) {
 	    tok = new Token(*doc_, doc_->getNrOfTokens(), false );
 	    tok->setWOCR( postOCR );
 	    tok->getGroundtruth().setWOrig( postOrig );
 	    doc_->pushBackToken( tok );
 	}
-	
+
 
 	doc_->pushBackToken( L" ",  false );
 
     }
-    
+
 
 }
 

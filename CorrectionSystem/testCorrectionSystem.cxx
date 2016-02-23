@@ -2,7 +2,7 @@
 #include<string>
 #include "../CorrectionSystem/CorrectionSystem.h"
 #include<DocXML/DocXMLWriter.h>
-#include<csl/Getopt/Getopt.h>
+#include<Getopt/Getopt.h>
 #include<Stopwatch.h>
 
 
@@ -25,16 +25,16 @@ int main( int argc, char const** argv ) {
     options.specifyOption( "imageDir", csl::Getopt::STRING );
     options.specifyOption( "xmlOut", csl::Getopt::STRING );
     options.getOptionsAsSpecified( argc, argv );
-    
-    
+
+
     OCRCorrection::CorrectionSystem corrSys;
-    
+
     if( ! options.hasOption( "config" ) ) {
 	std::wcout << L"Use like: testCorrectionSystem --config=<configFile> --dir=<xmlDir>" << std::endl;
 	std::wcout << L"xmlDir contains abbyy xml output files" << std::endl;
 	exit( EXIT_FAILURE );
     }
-    
+
     corrSys.readConfiguration( options.getOption( "config" ).c_str() );
 
     if( options.hasOption( "file" ) ) {
@@ -54,13 +54,13 @@ int main( int argc, char const** argv ) {
 	OCRCorrection::DocXMLWriter writer;
 	std::wofstream of( options.getOption( "xmlOut" ).c_str() );
 	// make sure that stream writes utf8 and that no thousands separators are printed
-	of.imbue( std::locale( CSL_UTF8_LOCALE, new std::numpunct< wchar_t >() ) );
+	//of.imbue( std::locale( CSL_UTF8_LOCALE, new std::numpunct< wchar_t >() ) );
 	if( ! of.good() ) {
 	    throw OCRCorrection::OCRCException( "testCorrectionSystem: Could not open xmlOut file" );
 	}
 	writer.writeXML( corrSys.getDocument(), of );
     }
-	
+
     /**
      * Use Document's print method to dump doc to stdout
      */

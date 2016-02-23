@@ -5,9 +5,8 @@
 #include<string>
 #include<algorithm>
 
-#include <csl/LevFilter/LevFilter.h>
-#include <csl/Vaam/Vaam.h>
-#include <csl/CSLLocale/CSLLocale.h>
+#include <LevFilter/LevFilter.h>
+#include <Vaam/Vaam.h>
 #include <Exceptions.h>
 #include <Candidate/Candidate.h>
 #include "./Character.h"
@@ -27,15 +26,15 @@ namespace OCRCorrection {
 
     /**
      * @brief Represents one token of a document and holds an array of correction candidates for the token.
-     * 
+     *
      *
      * @author Uli Reffle
      */
     class Token {
-	
+
     public:
 	/**
-	 * @brief An enum type that encodes a number of properties for Tokens. Each property is assigned a bit in the 
+	 * @brief An enum type that encodes a number of properties for Tokens. Each property is assigned a bit in the
 	 *        variable bitProperties_ of class Token.
 	 *
 	 * NORMAL       Token consists of alphabetical symbols and should be processed. NOT normal are e.g. numbers, punctuation marks etc.
@@ -43,12 +42,12 @@ namespace OCRCorrection {
 	 * CORRECTED    Token was corrected manually by the user
 	 * SPLIT_MERGE  Token is considered to be part of some word-level split/merge mess.
 	 * DONT_TOUCH   This property was added mainly for the profiler. If this flag is set, the profiler should not process this token.
-	 * 
+	 *
 	 */
-	enum TokenProperties { 
-	    NORMAL               = 0x1, 
+	enum TokenProperties {
+	    NORMAL               = 0x1,
 	    SUSPICIOUS           = 0x2, // obsolete
-	    CORRECTED            = 0x4, 
+	    CORRECTED            = 0x4,
 	    SPLIT_MERGE          = 0x8, // obsolete
 	    DONT_TOUCH           = 0x10,
 	    CAPITALIZED          = 0x20,
@@ -57,7 +56,7 @@ namespace OCRCorrection {
 	    HYPHENATION_2ND      = 0x100,
 	    LINE_BEGIN           = 0x200,
 	    LINE_END             = 0x400
-	};  
+	};
 
 
 	enum VerifiedStatus {VERIFIED_FALSE, VERIFIED_TRUE, VERIFIED_GUESSED};
@@ -87,7 +86,7 @@ namespace OCRCorrection {
 
 	/**
 	 * @brief Copy constructor: ATTENTION! This does, at the moment, NOT copy the candidate and the character arrays
-	 *        
+	 *
 	 */
 	Token( Token const& other );
 
@@ -149,7 +148,7 @@ namespace OCRCorrection {
 	 * @return a reference to wCorr, the current correction suggestion for the token
 	 */
 	inline const std::wstring& getWCorr() const;
-	
+
 	inline const std::wstring& getWDisplay() const;
 
 
@@ -191,7 +190,7 @@ namespace OCRCorrection {
 
 	inline bool hasTopCandidate() const;
 	inline Candidate const& getTopCandidate() const;
-	
+
 	//@}
 
 	/****************************** SETTERS ************************************/
@@ -206,12 +205,16 @@ namespace OCRCorrection {
 	inline void setIndexInDocument( size_t index ) {
 	    indexInDocument_ = index;
 	}
-	
+
 	/**
-	 * This also set wOCR_lc_
+	 * This also set wOCR_lc_ if wOCR_lc is empty.
 	 */
 	void setWOCR( std::wstring const& w );
 
+        /**
+         * Explicitly sets the lowercase version of the token
+         */
+        void setWOCR_lc(std::wstring const& w);
 
 	/**
 	 * @brief set a new correction for the Token
@@ -257,7 +260,7 @@ namespace OCRCorrection {
 	void addCharacter( Character const& c );
 
 	/**
-	 * @brief This flag indicates that wOCR was found in the dictionary 
+	 * @brief This flag indicates that wOCR was found in the dictionary
 	 */
 	inline void setSuspicious( bool b = true );
 
@@ -270,8 +273,8 @@ namespace OCRCorrection {
 
 	/**
 	 * @brief sets the page for this token.
-	 * 
-	 * @param page 
+	 *
+	 * @param page
 	 *
 	 */
 	inline void setPageIndex( size_t pageIndex ) {
@@ -297,7 +300,7 @@ namespace OCRCorrection {
 	 * checks if the following token is a space - in that case, the token after that is
 	 * merged as well.
 	 *
-	 * @return the number of following tokens that were swallowed by the merge 
+	 * @return the number of following tokens that were swallowed by the merge
 	 */
 	size_t mergeRight();
 
@@ -306,7 +309,7 @@ namespace OCRCorrection {
 	 *
 	 * This method merges this token with the following n ones. Only spaces are swallowed.
 	 *
-	 * @return the number of following tokens that were swallowed by the merge 
+	 * @return the number of following tokens that were swallowed by the merge
 	 */
 	size_t mergeRight( size_t n );
 
@@ -395,7 +398,7 @@ namespace OCRCorrection {
 
 		return *this;
 	    }
-	    
+
 
 	    inline std::wstring const& getWOrig() const;
 	    inline std::wstring const& getWOrig_lc() const;
@@ -405,7 +408,7 @@ namespace OCRCorrection {
 	    inline std::wstring const& getBaseWord() const;
 	    inline VerifiedStatus getVerified() const;
 	    inline std::wstring const& getClassified() const;
-	    
+
 	    inline void setWOrig( std::wstring const& );
 	    inline void setNormal( bool n );
 	    inline void setOCRTrace( std::wstring const& );
@@ -413,7 +416,7 @@ namespace OCRCorrection {
 	    inline void setBaseWord( std::wstring const& );
 	    inline void setVerified( VerifiedStatus v );
 	    inline void setClassified( std::wstring const& str );
-	    
+
 	private:
 	    Token* myToken_;
 	    std::wstring wOrig_;
@@ -423,7 +426,7 @@ namespace OCRCorrection {
 	    std::wstring baseWord_;
 
 	    /**
-	     * @brief 
+	     * @brief
 	     */
 	    std::wstring classified_;
 
@@ -453,7 +456,7 @@ namespace OCRCorrection {
 	Groundtruth const& getGroundtruth() const {
 	    return *groundtruth_;
 	}
-	
+
 
 	/**
 	 * @brief A group of data members that are specific to the Abbyy ocr output
@@ -463,32 +466,32 @@ namespace OCRCorrection {
 	    AbbyySpecifics() :
 		isSuspicious_( false ) {
 	    }
-	    
+
 	    inline void setSuspicious( bool b ) {
 		isSuspicious_ = b;
 	    }
-	    
+
 	    inline bool isSuspicious() const {
 		return isSuspicious_;
 	    }
-	    
+
 	private:
 	    /**
 	     * @brief A token is suspicious if it contains at least one suspicous char in the ABBYY sense.
 	     */
 	    bool isSuspicious_;
 
-	    
+
 	}; // class AbbyySpecifics
 
 	/**
-	 * @brief returns a reference to a data-structure containing information specificalyy provided by abbyy xml 
+	 * @brief returns a reference to a data-structure containing information specificalyy provided by abbyy xml
 	 *        output
 	 */
 	inline AbbyySpecifics& getAbbyySpecifics();
 
 	/**
-	 * @brief returns a const reference to a data-structure containing information specifically 
+	 * @brief returns a const reference to a data-structure containing information specifically
 	 *        provided by abbyy xml output
 	 */
 	inline AbbyySpecifics const& getAbbyySpecifics() const;
@@ -496,7 +499,7 @@ namespace OCRCorrection {
 	class CandidateChain {
 	public:
 	    CandidateChain( Candidate const& cand ) :
-		candidate_( cand ), 
+		candidate_( cand ),
 		next_( 0 ) {
 	    }
 	    Candidate& getCandidate() {
@@ -518,7 +521,7 @@ namespace OCRCorrection {
 	public:
 	    CandidateIterator( CandidateChain* pos ) :
 		pos_( pos ) {
-		
+
 	    }
 
 	    CandidateIterator& operator++() {
@@ -538,8 +541,8 @@ namespace OCRCorrection {
 		return pos_->getCandidate();
 	    }
 
-	    
-	    
+
+
 
 
 	private:
@@ -549,7 +552,7 @@ namespace OCRCorrection {
 	CandidateIterator candidatesBegin() const {
 	    return CandidateIterator( candidates_ );
 	}
-	
+
 	CandidateIterator candidatesEnd() const {
 	    return CandidateIterator( 0 );
 	}
@@ -561,10 +564,10 @@ namespace OCRCorrection {
 	CandidateChain* getCandItem() {
 	    return candidates_;
 	}
-	
+
 
 	void addCandidate( Candidate const& initCand );
-	
+
 	inline size_t getNrOfCandidates() const;
 
 	/**
@@ -577,7 +580,7 @@ namespace OCRCorrection {
 	 * @brief returns a const reference to the external id property
 	 */
 	inline std::wstring const& getExternalId() const;
-	
+
 	/**
 	 * @brief sets the external id property
 	 */
@@ -588,7 +591,7 @@ namespace OCRCorrection {
 	inline Document& getMyDocument() {
 	    return myDocument_;
 	}
-	
+
     protected:
 	/************************** PROTECTED **********************************/
 
@@ -596,7 +599,7 @@ namespace OCRCorrection {
 	 * @brief A reference to the Document object which the Token is part of.
 	 */
 	Document& myDocument_;
-	
+
 	/**
 	 * @brief The token as it appears in the ocr-ed document
 	 */
@@ -610,7 +613,7 @@ namespace OCRCorrection {
 
 	/**
 	 * @brief In case the token is part (1st or 2nd) of a hyphenation, this string
-	 *        holds the merged string. The token properties specify if the current 
+	 *        holds the merged string. The token properties specify if the current
 	 *        token is part of such a hyphenation.
 	 *
 	 * If the Token is not part of a hyphenation, this string remains empty.
@@ -619,14 +622,14 @@ namespace OCRCorrection {
 	 */
 	std::wstring hyphenationMerged_;
 
-	
+
 	/**
-	 * @brief 
+	 * @brief
 	 */
 	std::wstring wCorr_;
-	
+
 	std::vector< Character > characters_;
-	
+
 
 	/**
 	 * @brief This is a bit-vector which handles a number of boolean properties
@@ -687,7 +690,7 @@ namespace OCRCorrection {
 	 *
 	 */
 	CandidateChain* candidates_;
-	
+
 	/**
 	 * @brief specifies the nr of cands stored in candidates_
 	 */

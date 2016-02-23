@@ -21,8 +21,8 @@ namespace OCRCorrection {
 
 	size_t tokenCount = 0;
 	for( Document::const_PageIterator pageIt= doc.pagesBegin(); pageIt != doc.pagesEnd(); ++pageIt ) {
-	    xml_out << "<page imageFile=\"" << csl::CSLLocale::string2wstring( pageIt->getImageFile() ) << "\" sourceFile=\"" << csl::CSLLocale::string2wstring( pageIt->getSourceFile() )<< "\">" <<std::endl;
-		
+            xml_out << "<page imageFile=\"" << Utils::utf8(pageIt->getImageFile()) /*csl::CSLLocale::string2wstring( pageIt->getImageFile() )*/ << "\" sourceFile=\"" << Utils::utf8(pageIt->getSourceFile()) /*csl::CSLLocale::string2wstring( pageIt->getSourceFile() )*/<< "\">" <<std::endl;
+
 	    for( Document::const_iterator token = pageIt->begin(); token != pageIt->end(); ++token ) {
 		if( token->getWOCR() == L" " ) {
 		    xml_out
@@ -31,7 +31,7 @@ namespace OCRCorrection {
 			<<  "<wOCR>" << xml_escape( token->getWOCR() ) << "</wOCR>" << std::endl
 			<<  "<wOCR_lc>" << xml_escape( token->getWOCR_lc() ) << "</wOCR_lc>" << std::endl
 			<<  "<wCorr>" << xml_escape( token->getWCorr() ) << "</wCorr>" << std::endl;
-			
+
 		    if( token->hasGroundtruth() ) {
 			xml_out
 			    << "<groundtruth verified=\"false\">" << std::endl
@@ -75,7 +75,7 @@ namespace OCRCorrection {
 			 ++cand ) {
 			xml_out
 			    <<  "<cand>"
-			    << xml_escape( cand->toString() ) 
+			    << xml_escape( cand->toString() )
 			    << "</cand>" << std::endl;
 		    }
 
@@ -85,15 +85,15 @@ namespace OCRCorrection {
 			    << " t=\"" << token->getTokenImageInfoBox()->getCoordinate_Top() << "\""
 			    << " r=\"" << token->getTokenImageInfoBox()->getCoordinate_Right() << "\""
 			    << " b=\"" << token->getTokenImageInfoBox()->getCoordinate_Bottom() << "\""
-			    << "/>" 
+			    << "/>"
 			    << std::endl;
 		    }
 
 		    xml_out
 			<< "<abbyy_suspicious value=\"" << ( token->getAbbyySpecifics().isSuspicious() ? L"true" : L"false" ) << "\"/>" << std::endl;
-			    
+
 		    if( token->hasGroundtruth() ) {
-			xml_out 
+			xml_out
 			    << "<groundtruth verified=\"" << ( (token->getGroundtruth().getVerified())? L"true" : L"false" ) << "\">" << std::endl
 			    << " <classified>" << xml_escape( token->getGroundtruth().getClassified() ) << "</classified>" << std::endl
 			    << " <wOrig>" << xml_escape( token->getGroundtruth().getWOrig() ) << "</wOrig>" << std::endl
@@ -116,7 +116,7 @@ namespace OCRCorrection {
 
     void DocXMLWriter::writeXML( Document const& doc, std::string const& filename ) const {
 	std::wofstream of( filename.c_str() );
-	of.imbue( csl::CSLLocale::Instance() );
+	//of.imbue( csl::CSLLocale::Instance() );
 	if( ! of.good() ) {
 	    throw OCRCException( "OCRC::DocXMLWriter::writeXML: Could not open file for writing" );
 	}

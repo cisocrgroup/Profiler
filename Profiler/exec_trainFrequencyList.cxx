@@ -1,7 +1,7 @@
 #include <memory>
 
 #include "./FrequencyList.h"
-#include<csl/Getopt/Getopt.h>
+#include<Getopt/Getopt.h>
 #include<Stopwatch.h>
 #include<TXTReader/TXTReader.h>
 
@@ -30,7 +30,7 @@ void printHelp() {
  */
 int main( int argc, char const** argv ) {
 
-    OCRCorrection::Stopwatch stopwatch;
+    csl::Stopwatch stopwatch;
 
     std::locale::global( std::locale( "" ) );
 
@@ -53,7 +53,7 @@ int main( int argc, char const** argv ) {
     } catch( csl::Getopt::Exception& exc ) {
 	std::wcerr << "OCRC::trainFrequencyList: Incorrect command line call." << std::endl
 		   << "Message from the command line parser:" << std::endl
-		   << csl::CSLLocale::string2wstring( exc.what() ) << std::endl
+               << OCRCorrection::Utils::utf8(exc.what()) << std::endl
 		   << std::endl
 		   << "Use: trainFrequencyList --help" << std::endl
 	    ;
@@ -92,7 +92,7 @@ int main( int argc, char const** argv ) {
 	}
 
 	if( options.hasOption( "frequencyThreshold" ) ) { // for freqlist processing, ignored otherwise
-	    trainer->setFrequencyThreshold( csl::CSLLocale::string2number< size_t >( options.getOption( "frequencyThreshold" ) ) );
+            trainer->setFrequencyThreshold(OCRCorrection::Utils::toNum<size_t>(options.getOption( "frequencyThreshold")));
 	}
 
 

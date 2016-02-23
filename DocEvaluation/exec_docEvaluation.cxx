@@ -1,6 +1,7 @@
 
-#include<csl/Getopt/Getopt.h>
+#include<Getopt/Getopt.h>
 
+#include"LevDistance/LevDistance.h"
 #include<DocEvaluation/DocEvaluation.h>
 #include<DocXML/DocXMLReader.h>
 
@@ -10,10 +11,10 @@ int main( int argc, char const** argv ) {
     csl::Getopt options;
     options.specifyOption( "silent", csl::Getopt::VOID );
     options.getOptionsAsSpecified( argc, argv );
-    
+
 
     OCRCorrection::DocEvaluation docEval;
-    
+
     OCRCorrection::Document doc;
     OCRCorrection::DocXMLReader reader;
 
@@ -23,7 +24,7 @@ int main( int argc, char const** argv ) {
     }
 
 
-    try { 
+    try {
 	reader.parse( options.getArgument( 0 ), &doc );
 
 	docEval.analyzeDocument( doc );
@@ -31,5 +32,5 @@ int main( int argc, char const** argv ) {
     	std::wcerr << "EXC:" << exc.what() << std::endl;
     	return EXIT_FAILURE;
     }
-    
+
 }

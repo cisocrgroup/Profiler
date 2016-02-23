@@ -1,5 +1,5 @@
-#include<csl/INIConfig/INIConfig.h>
-#include<csl/Getopt/Getopt.h>
+#include<INIConfig/INIConfig.h>
+#include<Getopt/Getopt.h>
 #include<Document/Document.h>
 #include<AbbyyXmlParser/AbbyyXmlParser.h>
 #include<DocXML/DocXMLReader.h>
@@ -39,7 +39,7 @@ int main( int argc, char const** argv ) {
 	    printHelp();
 	    return EXIT_FAILURE;
 	}
-    
+
 	csl::INIConfig iniConf( options.getOption( "config" ) );
 
 	OCRCorrection::GuessTraces gt;
@@ -47,7 +47,7 @@ int main( int argc, char const** argv ) {
 	gt.getDictSearch().readConfiguration( iniConf );
 
 	OCRCorrection::Document doc;
-    
+
 	if( options.getOption( "inFormat" ) == "DocXML" ) {
 	    OCRCorrection::DocXMLReader reader;
 	    reader.parse( options.getArgument( 0 ), &doc );
@@ -70,7 +70,7 @@ int main( int argc, char const** argv ) {
 	    OCRCorrection::MergedGroundtruthReader merger;
 	    OCRCorrection::Document abbyyDoc;
 	    abbyyReader.parseDirToDocument( options.getOption( "merge" ), "_NO_IMAGE_DIR_", &abbyyDoc );
-	    
+
 	    merger.mergeDocuments( &abbyyDoc, doc );
 
 	    writer.writeXML( abbyyDoc, std::wcout);
@@ -79,7 +79,7 @@ int main( int argc, char const** argv ) {
 	else {
 	    writer.writeXML( doc, std::wcout);
 	}
-	
+
 
 
 

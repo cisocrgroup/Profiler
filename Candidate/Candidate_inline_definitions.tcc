@@ -2,11 +2,11 @@ namespace OCRCorrection {
 
     inline Candidate::Candidate() :
 	voteWeight_( 0 ) {
-    } 
-	    
+    }
+
     /**
      * @brief This constructor is equivalent to its version in csl::DictSearch
-     * 
+     *
      */
     inline Candidate::Candidate( csl::Interpretation const& interpretation, csl::DictSearch::iDictModule const& dm ) :
 	csl::DictSearch::Interpretation( interpretation, dm ),
@@ -30,7 +30,7 @@ namespace OCRCorrection {
     inline size_t Candidate::getFrequency() const {
 	return getBaseWordScore();
     }
-    
+
     inline size_t Candidate::getDlev() const {
 	return getLevDistance();
     }
@@ -43,14 +43,13 @@ namespace OCRCorrection {
     inline void Candidate::setOCRTrace( csl::Trace const& ocrt ) {
 	ocrTrace_ = ocrt;
     }
-	    
+
     inline void Candidate::setVoteWeight( float w ) {
 	voteWeight_ = w;
     }
 
     inline std::wstring Candidate::toString() const {
 	std::wostringstream oss;
-	oss.imbue( csl::CSLLocale::Instance() );
 	print( oss );
 	oss.flush();
 	return oss.str();

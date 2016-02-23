@@ -8,17 +8,17 @@
 #include<fstream>
 #include <iomanip>
 
-#include<csl/TransTable/TransTable.h>
-#include<csl/DictSearch/DictSearch.h>
-#include<csl/Pattern/PatternWeights.h>
-#include<csl/Pattern/ComputeInstruction.h>
-#include<csl/Stopwatch.h>
+#include<TransTable/TransTable.h>
+#include<DictSearch/DictSearch.h>
+#include<Pattern/PatternWeights.h>
+#include<Pattern/ComputeInstruction.h>
+#include<Stopwatch.h>
 #include<Utils/Utils.h>
 
 #include<Document/Document.h>
 #include<LevenshteinWeights/LevenshteinWeights.h>
 #include<PatternCounter/PatternCounter.h>
-#include<csl/INIConfig/INIConfig.h>
+#include<INIConfig/INIConfig.h>
 
 #include <time.h>
 
@@ -26,7 +26,7 @@
 
 #include<GlobalProfile/GlobalProfile.h>
 
-#include<csl/MinDic/MinDic.h>
+#include<MinDic/MinDic.h>
 
 #include "./CompoundDictModule.h"
 #include "./FrequencyList.h"
@@ -42,9 +42,9 @@ namespace OCRCorrection {
      *        and draws a number of conclusions and to return a profile of the text, regarding mainly:
      *        - estimated probabilities for frequent historical orthographical patterns
      *        - estimated probabilities for frequent ocr error patterns
-     *       
-     * 
-     * 
+     *
+     *
+     *
      * Developed at CIS, University of Munich
      * For EU-funded project IMPACT, www.impact-project.eu
      * @author Ulrich Reffle, <uli@cis.uni-muenchen.de>
@@ -71,7 +71,7 @@ namespace OCRCorrection {
 	typedef std::vector< OCRCorrection::Profiler::Profiler_Token > Document_t;
 
     private:
-	
+
 #include "./Profiler_Interpretation.h"
 	class Evaluation;
 	class Evaluation_Token;
@@ -79,7 +79,7 @@ namespace OCRCorrection {
 
 #include "./Evaluation.h"
 #include "./HTMLWriter.h"
-	
+
 	/**
 	 * @brief sort operator to sort two {@Profiler_Interpretation}s according to their combined-probability values.
 	 */
@@ -94,8 +94,8 @@ namespace OCRCorrection {
 
 
 	/**
-	 * @brief Constructor. 
-	 * 
+	 * @brief Constructor.
+	 *
 	 */
 	Profiler();
 
@@ -108,26 +108,26 @@ namespace OCRCorrection {
 	 */
 	void readConfiguration( char const* configFile );
 
-	
+
 	/**
 	 * @brief Load a configuration from an existing INIConfig object
 	 */
 	void readConfiguration( csl::INIConfig const& iniConf );
-	
+
 
 	/**
-	 * @brief Set the number of iterations for the profiler to run to @a nr. 
-	 * 
-	 * 
+	 * @brief Set the number of iterations for the profiler to run to @a nr.
+	 *
+	 *
 	 */
 	void setNumberOfIterations( size_t nr ) {
 	    config_.nrOfIterations_ = nr;
 	}
-	
+
 	/**
-	 * @brief Set the number of initial pages to be processed 
-	 * 
-	 * 
+	 * @brief Set the number of initial pages to be processed
+	 *
+	 *
 	 */
 	void setPageRestriction( size_t n ) {
 	    config_.pageRestriction_ = n;
@@ -138,12 +138,12 @@ namespace OCRCorrection {
 	 * @brief Write an xml representation of the text profile to @a filename
 	 */
 	void profile2xml( char const* filename ) const;
-	
+
 	/**
 	 * @brief Write an xml representation of the text profile to the stream @a os
 	 */
 	void profile2xml( std::wostream& os = std::wcout ) const;
-	
+
 	/**
 	 * @brief Compute a profile of the text specified by @a txtFile
 	 */
@@ -169,7 +169,6 @@ namespace OCRCorrection {
 	    htmlStream_ = new std::wofstream( htmlFile.c_str() );
 	    // make sure that no thousands separators are printed
 	    std::locale loc = std::locale( std::locale( "" ), new std::numpunct< wchar_t >() );
-	    htmlStream_->imbue( csl::CSLLocale::Instance() );
 	    if( ! htmlStream_->good() ) {
 		delete( htmlStream_ );
 		htmlStream_ = 0;
@@ -186,15 +185,15 @@ namespace OCRCorrection {
 	/**
 	 * @brief Returns a reference to the csl::DictSearch - object used by the Profiler.
 	 *
-	 * This is not a const reference so it can be used to change the settings. 
+	 * This is not a const reference so it can be used to change the settings.
 	 */
 	csl::DictSearch& getDictSearch() {
 	    return dictSearch_;
 	}
-	
-	
+
+
     private:
-	
+
 	/**
 	 * @brief Execute one iteration of the profiling process.
 	 */
@@ -209,14 +208,14 @@ namespace OCRCorrection {
 	 */
 	double getCombinedProb( Profiler_Interpretation& cand ) const;
 
-	
+
 	void prepareDocument( Document& sourceDocument );
 
 	/**
 	 * @brief Here the document to process is stored.
 	 */
 	Document_t document_;
-	
+
 	/**
 	 * @brief This module is responsible for the language modelling.
 	 *
@@ -225,14 +224,14 @@ namespace OCRCorrection {
 	 * for its functionality.
 	 */
 	FrequencyList freqList_;
-	
+
 	/**
 	 * @brief csl::DictSearch handles all the variant- and error-tolerant dictionary lookups.
 	 */
 	csl::DictSearch dictSearch_;
 
 	/**
-	 * @brief Holds all external DictModules that were added to the DictSearch object. We need 
+	 * @brief Holds all external DictModules that were added to the DictSearch object. We need
 	 *        to collect these in order to destrroy them safely.
 	 */
 	std::vector< csl::DictSearch::iDictModule* > externalDictModules_;
@@ -254,7 +253,7 @@ namespace OCRCorrection {
 	 */
 	PatternCounter histCounter_;
 
-	
+
 	/**
 	 * @brief During a run through the text, histCounter_ accumulates the necessary statistics related to
 	 *        ocr error patterns.
@@ -284,10 +283,10 @@ namespace OCRCorrection {
 	 * @brief Number of chars in the ocr. Counted are only normal tokens
 	 */
 	size_t ocrCharacterCount_;
-	
+
 
 	/**
-	 * @brief 
+	 * @brief
 	 */
 	csl::MinDic< float >* baseWordFrequencyDic_;
 
@@ -310,12 +309,12 @@ namespace OCRCorrection {
 	    return ( a.second > b.second ); // reverse ordering
 	}
 
-	
+
 	class Configuration {
 	public:
 	    /**
-	     * @brief The constructor initializes the parameters with zero-values that will 
-	     *        let the profiler do nothing. So you are bound to explicitly set 
+	     * @brief The constructor initializes the parameters with zero-values that will
+	     *        let the profiler do nothing. So you are bound to explicitly set
 	     *        values.
 	     */
 	    Configuration() :
@@ -345,13 +344,13 @@ namespace OCRCorrection {
 
 	    /**
 	     * @brief This number set to n means that only those hist patterns are kept which
-	     *        are estimated to appear at least n times per 1000 profiled tokens 
+	     *        are estimated to appear at least n times per 1000 profiled tokens
 	     */
 	    double patternCutoff_hist_;
 
 	    /**
 	     * @brief This number set to n means that only those ocr patterns are kept which
-	     *        are estimated to appear at least n times per 1000 profiled tokens 
+	     *        are estimated to appear at least n times per 1000 profiled tokens
 	     */
 	    double patternCutoff_ocr_;
 
@@ -371,14 +370,14 @@ namespace OCRCorrection {
 	    double ocrPatternSmoothingProb_;
 
 	    /**
-	     * @brief this bool value decides if, before setting new hist pattern probabilities, 
+	     * @brief this bool value decides if, before setting new hist pattern probabilities,
 	     *        the old list of probabilities is emptied. If this value is false, all
 	     *        old probabilities are kept and updated only if a new value was determined.
 	     */
 	    bool resetHistPatternProbabilities_;
 
 	    /**
-	     * @brief this bool value decides if, before setting new ocr pattern probabilities, 
+	     * @brief this bool value decides if, before setting new ocr pattern probabilities,
 	     *        the old list of probabilities is emptied. If this value is false, all
 	     *        old probabilities are kept and updated only if a new value was determined.
 	     */
@@ -402,17 +401,17 @@ namespace OCRCorrection {
 		   << "histPatternSmoothingProb_:      " << histPatternSmoothingProb_ << std::endl
 		   << "ocrPatternSmoothingProb_:       " << ocrPatternSmoothingProb_ << std::endl
 		   << std::endl
-		   << "resetHistPatternProbabilities_: " << resetHistPatternProbabilities_ << std::endl 
+		   << "resetHistPatternProbabilities_: " << resetHistPatternProbabilities_ << std::endl
 		   << "resetOCRPatternProbabilities_:  " << resetOCRPatternProbabilities_ << std::endl
 		   << std::endl
-		   << "donttouch_hyphenation_:         " << donttouch_hyphenation_ << std::endl 
-		   << "donttouch_lineborders_:         " << donttouch_lineborders_ << std::endl 
+		   << "donttouch_hyphenation_:         " << donttouch_hyphenation_ << std::endl
+		   << "donttouch_lineborders_:         " << donttouch_lineborders_ << std::endl
 		    ;
 	    }
-	    
+
 	}; // class Configuration
 
-	
+
 
 	/**
 	 * @brief An object holding all configuration parameters
@@ -420,7 +419,7 @@ namespace OCRCorrection {
 	Configuration config_;
 
 	int verbose_;
-	
+
     }; // class Profiler
 
 
@@ -428,7 +427,7 @@ namespace OCRCorrection {
 
 
 
-    
+
 
 } // eon
 

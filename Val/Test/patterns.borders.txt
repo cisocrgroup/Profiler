@@ -1,0 +1,8 @@
+^ab:^beb
+abra:zebra
+ra$:po$
+raca:taka
+$:sim$
+bra$:$
+^:^rumb
+^abr:^

@@ -1,0 +1,10 @@
+aachen#15
+aalen#63
+absacken#543
+absacker#6411
+anna#2
+berta#5
+fuddeln#17
+tüdeln#7
+vertüdeln#989
+zertüdeln#345

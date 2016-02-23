@@ -8,24 +8,24 @@ namespace OCRCorrection {
     PatternContainerXMLReader::PatternContainerXMLReader( PatternContainer* pc ) :
 	pc_( pc )
     {
-	
+
     }
 
     void PatternContainerXMLReader::parse( std::string const& xmlFile, PatternContainer* pc ) {
 	pc_ = pc;
-	
+
 	xercesc::XMLPlatformUtils::Initialize();
-    
+
 	xercesc::SAXParser parser_;
-    
+
 	parser_.setDocumentHandler( this );
 	parser_.setErrorHandler( this );
 
 	parser_.parse( xmlFile.c_str() );
-    
-    
+
+
 	//  xercesc::XMLPlatformUtils::Terminate();
-    
+
     }
 
 
@@ -43,9 +43,9 @@ namespace OCRCorrection {
 	if( ! pc_ ) throw OCRCException( "OCRC::PatternContainerXMLReader::startElement: no PatternContainer object specified." );
 
 
-	
+
 	content_.clear();
-	
+
 	if( xmlReaderHelper_.name() == "pattern" ) {
 //<pattern left="i" right="y" pat_string="i_y" relFreq="0.0389177" absFreq="257.693"/>
 
@@ -54,33 +54,37 @@ namespace OCRCorrection {
 	    std::wstring left;
 	    attrValue = attrs.getValue( "left" );
 	    char* left_cstr = XMLString::transcode( attrValue );
-	    csl::CSLLocale::string2wstring( left_cstr, left );
+	    left = Utils::utf8(left_cstr);
+//csl::CSLLocale::string2wstring( left_cstr, left );
 	    XMLString::release( &left_cstr );
 
 	    std::wstring right;
 	    attrValue = attrs.getValue( "right" );
 	    char* right_cstr = XMLString::transcode( attrValue );
-	    csl::CSLLocale::string2wstring( right_cstr, right );
+	    right = Utils::utf8(right_cstr);
+//csl::CSLLocale::string2wstring( right_cstr, right );
 	    XMLString::release( &right_cstr );
-	    
+
 	    double relFreq = 0;
 	    attrValue = attrs.getValue( "relFreq" );
 	    char* relFreq_cstr = XMLString::transcode( attrValue );
-	    relFreq = csl::CSLLocale::string2number< double >( std::string( relFreq_cstr ) );
+	    relFreq = Utils::toNum<double>(relFreq_cstr);
+        //csl::CSLLocale::string2number< double >( std::string( relFreq_cstr ) );
 	    XMLString::release( &relFreq_cstr );
-	    
+
 	    double absFreq = 0;
 	    attrValue = attrs.getValue( "absFreq" );
 	    char* absFreq_cstr = XMLString::transcode( attrValue );
-	    absFreq = csl::CSLLocale::string2number< double >( std::string( absFreq_cstr ) );
+	    absFreq = Utils::toNum<double>(absFreq_cstr);
+        //csl::CSLLocale::string2number< double >( std::string( absFreq_cstr ) );
 	    XMLString::release( &absFreq_cstr );
 
-	    
+
 	    pc_->setWeight( csl::Pattern( left, right ), relFreq, absFreq );
 
 	}
     }
-    
+
 
 // schliessende Tags, Tagname in Anführungszeichen
     void PatternContainerXMLReader::endElement( const XMLCh* const initName ) {
@@ -88,8 +92,8 @@ namespace OCRCorrection {
 
 	if( ! pc_ ) throw OCRCException( "OCRC::PatternContainerXMLReader::Element: no PatternContainer object specified." );
 
-	
-	
+
+
     }
 
     void PatternContainerXMLReader::characters(const XMLCh* chars, XMLSize_t length) {
@@ -99,13 +103,14 @@ namespace OCRCorrection {
 	static std::wstring eingabe_wide;
 
 	eingabe = eingabe_cstr;
-    
-	csl::CSLLocale::string2wstring( eingabe, eingabe_wide );
+
+    eingabe_wide = Utils::utf8(eingabe);
+	//csl::CSLLocale::string2wstring( eingabe, eingabe_wide );
 
 
 	content_ += eingabe_wide;
-    
-	XMLString::release( &eingabe_cstr ); 
+
+	XMLString::release( &eingabe_cstr );
     }
 
     void PatternContainerXMLReader::ignorableWhitespace(const XMLCh* const chars, const XMLSize_t length) {
@@ -131,8 +136,8 @@ namespace OCRCorrection {
 	my_message += message;
 	throw OCRCException( my_message );
 
-	std::wstring wideMessage;
-	csl::CSLLocale::string2wstring( std::string( message), wideMessage );
+	std::wstring wideMessage = Utils::utf8(message);
+	//csl::CSLLocale::string2wstring( std::string( message), wideMessage );
 	std::wcerr << wideMessage << std::endl;
 	XMLString::release(&message);
     }
@@ -145,8 +150,8 @@ namespace OCRCorrection {
 
 	throw OCRCException( my_message );
 
-	std::wstring wideMessage;
-	csl::CSLLocale::string2wstring( std::string( message), wideMessage );
+	std::wstring wideMessage = Utils::utf8(message);
+	//csl::CSLLocale::string2wstring( std::string( message), wideMessage );
 	std::wcerr << wideMessage << std::endl;
 
 	XMLString::release(&message);
@@ -159,8 +164,8 @@ namespace OCRCorrection {
 
 	throw OCRCException( my_message );
 
-	std::wstring wideMessage;
-	csl::CSLLocale::string2wstring( std::string( message), wideMessage );
+	std::wstring wideMessage = Utils::utf8(message);
+	//csl::CSLLocale::string2wstring( std::string( message), wideMessage );
 	std::wcerr << wideMessage << std::endl;
 	XMLString::release(&message);
     }

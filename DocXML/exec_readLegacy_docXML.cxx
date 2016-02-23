@@ -2,7 +2,7 @@
 #include<DocXML/DocXMLWriter.cxx>
 #include<Document/Document.h>
 
-#include<csl/Getopt/Getopt.h>
+#include<Getopt/Getopt.h>
 
 
 void printHelp() {
@@ -37,15 +37,15 @@ int main( int argc, char const** argv ) {
 
     OCRCorrection::LegacyDocXMLReader reader;
     OCRCorrection::Document doc;
-    
+
     if( options.hasOption( "dirMode" ) ) {
 	reader.parseDir( options.getArgument( 0 ), "NO_IMAGE_DIR", &doc );
     }
     else {
 	reader.parse( options.getArgument( 0 ), &doc );
     }
-    
-    
+
+
     if( ! options.hasOption( "alignedList" ) ) {
 	// print new xml format to stdout
 	OCRCorrection::DocXMLWriter writer;
@@ -53,9 +53,9 @@ int main( int argc, char const** argv ) {
     }
     else  {
 	// print aligned list to stdout
-	
+
 	// doc.findHyphenation();
-	
+
 	for( OCRCorrection::Document::iterator tok = doc.begin(); tok != doc.end(); ++tok ) {
 	    if( tok->getWOCR_lc() == L"\n" ) {
 		std::wcout << "**NL**\t**NL**\t**NL**\t**NL**" << std::endl;
@@ -65,7 +65,7 @@ int main( int argc, char const** argv ) {
 	    }
 	    else {
 		std::wstring suggest;
-		if( ! tok->isNormal() ) suggest = L"*****"; 
+		if( ! tok->isNormal() ) suggest = L"*****";
 		else if( tok->getGroundtruth().getClassified() == L"modern" )                     suggest = L"*****";
 		else if( tok->getGroundtruth().getClassified() == L"hypothetic" )                 suggest = tok->getGroundtruth().getBaseWord();
 		else if( tok->getGroundtruth().getClassified() == L"simplex_other_historic" )     suggest = L"";
@@ -84,15 +84,15 @@ int main( int argc, char const** argv ) {
 		else if( tok->getGroundtruth().getClassified() == L"unknown" )                    suggest = L"";
 		else if( tok->getGroundtruth().getClassified() == L"geo_lex_gap" )                suggest = L"";
 		else {
-		    std::string narrow_class;
-		    csl::CSLLocale::wstring2string( tok->getGroundtruth().getClassified(), narrow_class );
-		    
+                std::string narrow_class(OCRCorrection::Utils::utf8(tok->getGroundtruth().getClassified()));
+//		    csl::CSLLocale::wstring2string( tok->getGroundtruth().getClassified(), narrow_class );
+
 		    throw OCRCorrection::OCRCException( std::string( "OCRC::readLegacy: unknown token classification" ) + narrow_class  );
 		}
-		
+
 		std::wcout << tok->getWOCR_lc() << "\t"
-			   << tok->getGroundtruth().getBaseWord() << "\t" 
-			   << suggest << "\t" 
+			   << tok->getGroundtruth().getBaseWord() << "\t"
+			   << suggest << "\t"
 			   << "(" << tok->getGroundtruth().getClassified() << ")"
 			   << std::endl;
 	    }
