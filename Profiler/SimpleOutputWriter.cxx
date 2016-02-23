@@ -34,11 +34,13 @@ OCRCorrection::SimpleOutputWriter::writeNormalToken(const Token& token) const
                 // skip these: sogleich:{sogleich+[]}+ocr[],voteWeight=1,levDistance=0
                 if (c->getDlev() and c->getString() != token.getWOCR()) {
                         somethingWasPrinted = true;
-                        std::wcout << "@" << token.getWOCR() << "/"
+                        std::wcout << "@" << token.getWOCR() << ","
+                                   << token.getIndexInDocument() << ","
                                    << c->toString() << std::endl;
                 }
         }
         if (not somethingWasPrinted) {
-                std::wcout << token.getWOCR() << std::endl;
+                std::wcout << token.getIndexInDocument() << ","
+                           << token.getWOCR() << std::endl;
         }
 }
