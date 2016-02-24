@@ -2,7 +2,7 @@
 #define OCRC_PROFILER_CXX OCRC_PROFILER_CXX
 
 #include "./Profiler.h"
-
+#include "Utils/NoThousandGrouping.h"
 #include "./Profiler_Token.tcc"
 
 namespace OCRCorrection {
@@ -627,11 +627,6 @@ namespace OCRCorrection {
 //	fo.imbue( csl::CSLLocale::Instance() );
 	profile2xml( fo );
     }
-
-  struct NoThousandGrouping: public std::numpunct<wchar_t> {
-  protected:
-    wchar_t do_thousands_sep() const /*override*/ {return L'\0';}
-  };
 
     void Profiler::profile2xml( std::wostream& os ) const {
 	if( ! os.good() ) throw OCRCException( std::string( "OCRC::Profiler::profile2xml: Bad filehandle" ) );
