@@ -2,7 +2,7 @@
 #define OCRC_PROFILER_CXX OCRC_PROFILER_CXX
 
 #include "./Profiler.h"
-
+#include "Utils/NoThousandGrouping.h"
 #include "./Profiler_Token.tcc"
 
 namespace OCRCorrection {
@@ -628,7 +628,6 @@ namespace OCRCorrection {
 	profile2xml( fo );
     }
 
-
     void Profiler::profile2xml( std::wostream& os ) const {
 	if( ! os.good() ) throw OCRCException( std::string( "OCRC::Profiler::profile2xml: Bad filehandle" ) );
 
@@ -638,6 +637,7 @@ namespace OCRCorrection {
 	std::wstring wide_timeString = Utils::utf8(timeString);
 	//csl::CSLLocale::string2wstring( timeString, wide_timeString );
 
+	os.imbue(std::locale(std::locale(), new NoThousandGrouping()));
 	os << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl
 	   << "<profile>" << std::endl
 	   << "<head>" << std::endl
@@ -689,17 +689,16 @@ namespace OCRCorrection {
 		    // if( isupper( word->first.at( 0 ), loc ) ) {
 		    // 	wSuggest = toupper( word->second.at( 0 ), loc );
 		    // }
-		    os << "<type wOCR_lc=\"" << word->first << "\" wSuggest=\"" << word->second <<  "\" freq=\"" << Utils::queryConstMap< std::wstring, size_t >( wOCRFreqlist_, word->first, 0 ) << "\"/>" << std::endl;
+		    os << "<type wOCR_lc=\"" << word->first
+		       << "\" wSuggest=\"" << word->second
+		       <<  "\" freq=\"" << Utils::queryConstMap<std::wstring, size_t>(wOCRFreqlist_, word->first, 0)
+		       << "\"/>" << std::endl;
 		}
 	    }
 	    os << "</pattern_occurrences>" << std::endl;
-
-
 	    os << "</pattern>" << std::endl;
 	}
-
 	os << "</ocr_errors>" << std::endl;
-
 	os << "</profile>" << std::endl;
     }
 

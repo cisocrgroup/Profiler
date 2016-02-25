@@ -2,15 +2,19 @@
 #define OCRC_DOCXMLWRITER_CXX OCRC_DOCXMLWRITER_CXX
 
 #include "./DocXMLWriter.h"
+#include "Utils/NoThousandGrouping.h"
 
 namespace OCRCorrection {
     void DocXMLWriter::writeXML( Document const& doc, std::wostream& xml_out ) const {
 
 	// at least try to make sure that the wostream is imbued with a decent locale
 	if( ! ( std::use_facet< std::numpunct< wchar_t > >( xml_out.getloc() ).decimal_point() == '.' ) ) {
-	    throw OCRCException( "OCRC::DocXMLWriter::writeXML: The specified wostream object uses a locale which does not use '.' as decimal point." );
+	    throw OCRCException("OCRC::DocXMLWriter::writeXML: The specified wostream "
+				"object uses a locale which does not use '.' as decimal point." );
 	}
 
+	//os.imbue(std::locale(std::locale(), new NoThousandGrouping()));
+	xml_out.imbue(std::locale(std::locale(), new NoThousandGrouping()));
 	xml_out << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl
 		<< "<document>" << std::endl
 	    ;
