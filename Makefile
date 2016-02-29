@@ -1,5 +1,6 @@
 DESTDIR ?=
 PREFIX ?= /usr/local/
+BINDIR ?= $(PREFIX)/bin
 
 PROFILER=build/bin/profiler
 COMPILE=build/bin/compileFBDic
