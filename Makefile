@@ -20,5 +20,5 @@ clean:
 
 .PHONY: install
 install: $(PROFILER) $(COMPILE) $(TRAIN)
-	install -d $(DESTDIR)$(BINDIR)
-	install $^ $(DESTDIR)$(BINDIR)
+	install -d $(DESTDIR)$(PREFIX)/bin
+	install $^ $(DESTDIR)$(PREFIX)/bin
