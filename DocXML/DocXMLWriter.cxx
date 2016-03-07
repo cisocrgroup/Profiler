@@ -7,14 +7,14 @@
 namespace OCRCorrection {
     void DocXMLWriter::writeXML( Document const& doc, std::wostream& xml_out ) const {
 
+	xml_out.imbue(std::locale(std::locale(), new NoThousandGroupingWithDecimalDot()));
+
 	// at least try to make sure that the wostream is imbued with a decent locale
 	if( ! ( std::use_facet< std::numpunct< wchar_t > >( xml_out.getloc() ).decimal_point() == '.' ) ) {
 	    throw OCRCException("OCRC::DocXMLWriter::writeXML: The specified wostream "
 				"object uses a locale which does not use '.' as decimal point." );
 	}
 
-	//os.imbue(std::locale(std::locale(), new NoThousandGrouping()));
-	xml_out.imbue(std::locale(std::locale(), new NoThousandGrouping()));
 	xml_out << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl
 		<< "<document>" << std::endl
 	    ;
@@ -76,10 +76,14 @@ namespace OCRCorrection {
 
 		    for( Token::CandidateIterator cand = token->candidatesBegin();
 			 cand != token->candidatesEnd();
-			 ++cand ) {
+                 ++cand ) {
+                    std::wostringstream os;
+                    // use same locale for stringstream as for xml stream
+                    os.imbue(xml_out.getloc());
+                    cand->print(os);
 			xml_out
 			    <<  "<cand>"
-			    << xml_escape( cand->toString() )
+			    << xml_escape(os.str())
 			    << "</cand>" << std::endl;
 		    }
 
