@@ -62,6 +62,7 @@ IF( XERCES_FOUND )
 ENDIF( XERCES_FOUND )
 
 add_subdirectory(AbbyyXmlParser)
+add_subdirectory(Autocorrection)
 add_subdirectory(Alphabet)
 add_subdirectory(AltoXML)
 add_subdirectory(CorrectionSystem)
@@ -89,6 +90,7 @@ add_subdirectory(tools)
 
 ###### TO DO: Move this (and all related headers and sources) to a separate folder ##########
 SET( OCRCORRECTION_SOURCES
+             Autocorrection/autocorrection.cxx
              Utils/Utils.cxx
 	     Document/Document.cxx
 	     CorrectionSystem/CorrectionSystem.cxx
