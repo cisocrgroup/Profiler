@@ -196,6 +196,12 @@ int main( int argc, char const** argv ) {
     }
 
 
+    if (options.hasOption("autocorrect")) {
+            //profiler.setPageRestriction( atol( options.getOption( "pageRestriction" ).c_str() ) );
+            const size_t k = atol(options.getOption("autocorrect").data());
+            OCRCorrection::autocorrect(profiler, document, k);
+    }
+
     if (options.hasOption("simpleOutput")) {
             OCRCorrection::SimpleOutputWriter(document).write();
     }
@@ -217,12 +223,6 @@ int main( int argc, char const** argv ) {
         OCRCorrection::DocXMLWriter writer;
 
         writer.writeXML( document, options.getOption( "out_doc" ).c_str() );
-    }
-
-    if (options.hasOption("autocorrect")) {
-            //profiler.setPageRestriction( atol( options.getOption( "pageRestriction" ).c_str() ) );
-            const size_t k = atol(options.getOption("autocorrect").data());
-            OCRCorrection::autocorrect(document, k);
     }
 
 

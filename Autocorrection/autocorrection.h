@@ -5,10 +5,11 @@
 
 namespace OCRCorrection {
         class Document;
+        class Profiler;
 
         // k = 0 means full autocorrect;
         // k > 0 means autocorrect k largest error pattern sets
-        void autocorrect(Document& doc, size_t k = 0);
+        void autocorrect(const Profiler& profiler, Document& doc, size_t k = 0);
 }
 
 #endif // OCRCorrection_autocorrection_h__
