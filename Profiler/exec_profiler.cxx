@@ -11,6 +11,7 @@
 #include <DocXML/DocXMLWriter.h>
 #include <DocXML/DocXMLReader.h>
 #include <AltoXML/AltoXMLReader.h>
+#include <Autocorrection/autocorrection.h>
 #include "SimpleOutputWriter.h"
 #include<IBMGroundtruth/IBMGTReader.h>
 #include<Getopt/Getopt.h>
@@ -37,6 +38,8 @@ void printHelp() {
 	       << "                            (Only for evaluation with groundtruth documents.)"
            << std::endl
            << "[--simpleOutput]            Print simple text output to stdout"
+           << "[--autocorrect k]           Autocorrect the k most ocr error patterns (correct all patterns if k=0)"
+               << std::endl
            << std::endl
 	;
 }
@@ -62,6 +65,7 @@ int main( int argc, char const** argv ) {
     options.specifyOption( "imageDir", csl::Getopt::STRING, "_NO_IMAGE_DIR_" );
     options.specifyOption( "createConfigFile", csl::Getopt::VOID );
     options.specifyOption( "simpleOutput", csl::Getopt::VOID );
+    options.specifyOption( "autocorrect", csl::Getopt::STRING, "0" );
 
     try {
 	options.getOptionsAsSpecified( argc, argv );
@@ -215,7 +219,11 @@ int main( int argc, char const** argv ) {
         writer.writeXML( document, options.getOption( "out_doc" ).c_str() );
     }
 
-
+    if (options.hasOption("autocorrect")) {
+            //profiler.setPageRestriction( atol( options.getOption( "pageRestriction" ).c_str() ) );
+            const size_t k = atol(options.getOption("autocorrect").data());
+            OCRCorrection::autocorrect(document, k);
+    }
 
 
     } catch ( OCRCorrection::OCRCException& exc ) {
