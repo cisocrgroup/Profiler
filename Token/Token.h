@@ -55,7 +55,8 @@ namespace OCRCorrection {
 	    HYPHENATION_MARK     = 0x80,
 	    HYPHENATION_2ND      = 0x100,
 	    LINE_BEGIN           = 0x200,
-	    LINE_END             = 0x400
+	    LINE_END             = 0x400,
+            TITLECASE            = 0x800
 	};
 
 
@@ -180,6 +181,7 @@ namespace OCRCorrection {
 	 */
 	inline bool isCapitalized() const;
 
+        inline bool isTitleCase() const;
 
 	/**
 	 * @brief returns true iff token is marked as "Don't Touch"
@@ -268,6 +270,7 @@ namespace OCRCorrection {
 	 * @brief This flag indicates that wOCR has a capitalized first char
 	 */
 	inline void setCapitalized( bool b = true );
+	inline void setTitleCase( bool b = true );
 
 	inline void setProperty( TokenProperties property, bool b );
 

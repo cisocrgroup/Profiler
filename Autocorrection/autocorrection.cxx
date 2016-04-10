@@ -80,11 +80,9 @@ correctkmost(const ocrc::Profiler& profiler, ocrc::Document& doc, size_t k)
 void
 correct(ocrc::Token& token, const ocrc::Candidate& candidate)
 {
-        std::wcerr << "Correcting " << token.getWOCR() << " with "
-                   << candidate.getWord() << "\n";
-        token.setWCorr(candidate.getWord());
-//        std::wcerr << "SETTING CORRECTION: " << token.getWCorr() << "\n";
-//        token.setWOCR(L"");
-//        token.setWOCR_lc(L"");
-//        token.setWOCR(candidate.getWord());
+        if (token.getWOCR() != candidate.getWord()) {
+                std::wcerr << "Correcting " << token.getWOCR() << " with "
+                           << candidate.getWord() << "\n";
+                token.setWCorr(candidate.getWord());
+        }
 }

@@ -211,7 +211,11 @@ namespace OCRCorrection {
 
     void Token::setWOCR( std::wstring const& w ) {
             wOCR_ = w;
-            if ((not wOCR_.empty()) and iswupper(wOCR_[0])) {
+
+            // if (not wOCR_.empty() and std::all_of(wOCR_.begin(), wOCR_.end(), iswupper)) {
+            //         setTitleCase();
+            // }
+            if (not wOCR_.empty() and iswupper(wOCR_[0])) {
                     setCapitalized();
             }
             if (wOCR_lc_.empty()) {
