@@ -9,7 +9,7 @@ target_link_libraries (readLegacy_docXML OCRCorrection )
 
 add_subdirectory( Test )
 
-install( 
+install(
   TARGETS mergeGroundtruth ocrc_transform
   DESTINATION bin
   )

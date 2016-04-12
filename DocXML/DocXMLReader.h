@@ -51,7 +51,7 @@ namespace OCRCorrection {
 	 * @brief This method parses a whole directory of docXML files into a document. It is deprecated,
 	 *        new docXML files are supposed to contain all pages of a document in one file.
 	 *
-	 * @deprecated 
+	 * @deprecated
 	 *
 	 * @param[in]  Directory containing xml files
 	 * @param[in]  Directory containing the respective images
@@ -90,7 +90,7 @@ namespace OCRCorrection {
 	 * @brief implements the HandlerBase interface from the xerces-c parser
 	 */
 	void endDocument();
-	
+
 	// -----------------------------------------------------------------------
 	//  Handlers for the SAX ErrorHandler interface
 	// -----------------------------------------------------------------------
@@ -111,13 +111,13 @@ namespace OCRCorrection {
 	void fatalError(const SAXParseException& exc);
 
 	bool selected_;
-	
+
 	std::wstring content_;
-	
+
 	Document* doc_;
 	GlobalProfile* globalProfile_;
 	Token* tok_;
-	
+
 	XMLReaderHelper xmlReaderHelper_;
 
 	bool verbose_;
