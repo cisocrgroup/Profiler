@@ -23,7 +23,7 @@ SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 
 SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -Wall -Werror -Wno-unused -DXML_LIBRARY " )
-SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -O3 " )
+SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -O3 -std=gnu++11" )
 SET(CMKAE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -Wdisabled-optimization")
 #SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -O1 " )
 #SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -O0 -ggdb " )
@@ -90,25 +90,28 @@ add_subdirectory(tools)
 
 ###### TO DO: Move this (and all related headers and sources) to a separate folder ##########
 SET( OCRCORRECTION_SOURCES
-             Autocorrection/autocorrection.cxx
-             Utils/Utils.cxx
-	     Document/Document.cxx
-	     CorrectionSystem/CorrectionSystem.cxx
-	     LevenshteinWeights/LevenshteinWeights.cxx
-	     Profiler/Profiler.cxx Profiler/HTMLWriter.cxx Profiler/Evaluation.cxx Profiler/SimpleOutputWriter.cxx
 	     AbbyyXmlParser/AbbyyXmlParser.cxx
-	     DocXML/DocXMLReader.cxx
-	     DocXML/LegacyDocXMLReader.cxx
-	     DocXML/DocXMLWriter.cxx
-	     DocXML/MergedGroundtruthReader.cxx
-	     AltoXML/AltoXMLReader.cxx
 	     AltoXML/AltoEnrich.cxx
-	     TXTReader/TXTReader.cxx
-	     TXTReader/AlignedTXTReader.cxx
-	     Token/TokenImageInfoBox.cxx
+	     AltoXML/AltoXMLReader.cxx
+	     CorrectionSystem/CorrectionSystem.cxx
+	     DocXML/DocXMLReader.cxx
+	     DocXML/DocXMLWriter.cxx
+	     DocXML/LegacyDocXMLReader.cxx
+	     DocXML/MergedGroundtruthReader.cxx
+	     Document/Document.cxx
 	     GlobalProfile/GlobalProfileXMLReader.cxx
 	     GlobalProfile/PatternContainerXMLReader.cxx
-
+	     LevenshteinWeights/LevenshteinWeights.cxx
+	     Llocs/LlocsReader.cxx
+	     Profiler/Profiler.cxx
+	     TXTReader/AlignedTXTReader.cxx
+	     TXTReader/TXTReader.cxx
+	     Token/TokenImageInfoBox.cxx
+             Autocorrection/autocorrection.cxx
+             Profiler/Evaluation.cxx
+             Profiler/HTMLWriter.cxx
+             Profiler/SimpleOutputWriter.cxx
+             Utils/Utils.cxx
 	     )
 
 add_library( OCRCorrection STATIC ${OCRCORRECTION_SOURCES})

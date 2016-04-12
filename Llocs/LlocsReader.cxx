@@ -1,0 +1,8 @@
+#include "LlocsReader.h"
+
+////////////////////////////////////////////////////////////////////////////////
+void
+OCRCorrection::LlocsReader::parse(const char **llocs, Document& document)
+{
+
+}
