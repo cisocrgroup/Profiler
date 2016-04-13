@@ -1,7 +1,7 @@
 
 
 class Profiler_Token  {
-    
+
 
 	public:
 	enum VerifiedStatus {VERIFIED_FALSE, VERIFIED_TRUE, VERIFIED_GUESSED};
@@ -58,7 +58,7 @@ class Profiler_Token  {
 	bool isDontTouch() const;
 	void setDontTouch( bool b = true );
 
-	
+
 	size_t getTokenNr() const {
 	    return tokenNr_;
 	}
@@ -90,20 +90,24 @@ class Profiler_Token  {
 
 	void setLevDistance( float stdDist, float weightLev);
 
+        static const size_t SHORT = 2;
+        static bool isShort(const std::wstring& word) {
+                return word.size() <= SHORT;
+        }
 	bool isShort() const {
-	    return ( getWOCR().size() <= 3 );
+                return isShort(getWOCR());
 	}
 
 	inline void setSuspicious( bool b ) {
 	    isSuspicious_ = b;
 	}
-	
+
 
 
 	void setTokenNr( size_t tn ) {
 	    tokenNr_ = tn;
 	}
-    
+
 	void setProbNormalizationFactor( double f );
 
 	double getProbNormalizationFactor() const;
@@ -127,9 +131,9 @@ class Profiler_Token  {
 		isNormal_( false ),
 		verified_( VERIFIED_FALSE ),
 		classified_( L"unknown" ) {
-		
+
 	    }
-	    
+
 	    /**
 	     * @brief This lets us assign a Token::Groundtruth object to this Profiler_Token::Groundtruth object.
 	     */
@@ -142,7 +146,7 @@ class Profiler_Token  {
 		setBaseWord( other.getBaseWord() );
 		setVerified( other.getVerified() );
 		setClassified( other.getClassified() );
-		
+
 		return *this;
 	    }
 
@@ -164,19 +168,19 @@ class Profiler_Token  {
 	    void setBaseWord( std::wstring const& );
 	    void setVerified( VerifiedStatus v );
 	    /**
-	     * @brief This method sets the verified-status according to the respective attribute in the 
+	     * @brief This method sets the verified-status according to the respective attribute in the
 	     *        "normal" Token obejct.
 	     */
 	    void setVerified( Token::VerifiedStatus v );
 	    void setClassified( std::wstring const& str );
-	    
+
 	private:
 	    /**
 	     * @brief The groundtruth token
 	     */
 	    std::wstring wOrig_;
 
-	    /** 
+	    /**
 	     * @brief The lower-cased groundtruth token
 	     */
 	    std::wstring wOrig_lc_;
@@ -192,7 +196,7 @@ class Profiler_Token  {
 	    VerifiedStatus verified_;
 
 	    /**
-	     * @brief 
+	     * @brief
 	     */
 	    std::wstring classified_;
 
@@ -218,7 +222,7 @@ class Profiler_Token  {
 	    inline void setSuspicious( bool b ) {
 		isSuspicious_ = b;
 	    }
-	    
+
 	    inline bool isSuspicious() const {
 		return isSuspicious_;
 	    }
@@ -237,7 +241,7 @@ class Profiler_Token  {
 	AbbyySpecifics const& getAbbyySpecifics() const {
 	    return abbyySpecifics_;
 	}
-	
+
 
 
 
@@ -248,7 +252,7 @@ class Profiler_Token  {
 	std::vector< Profiler_Interpretation > const* getCandidateSet() const {
 	    return candidateSet_;
 	}
-	
+
     protected:
 	/************************** PROTECTED **********************************/
 
@@ -270,7 +274,7 @@ class Profiler_Token  {
 	unsigned int bitProperties_;
 
 	/**
-	 * @brief *DANGEROUS*  A pointer to the candidate list. This structure is created by the 
+	 * @brief *DANGEROUS*  A pointer to the candidate list. This structure is created by the
 	 *        Profiler ON THE STACK and is re-used for the next token, once the processing of
 	 *        the current one is finished.
 	 *
@@ -292,9 +296,6 @@ class Profiler_Token  {
 	size_t tokenNr_;
 	bool isShort_;
 	bool isSuspicious_;
-	
+
 
     }; // class Token
-
-
-
