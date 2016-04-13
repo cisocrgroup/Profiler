@@ -13,7 +13,7 @@
 #include "Llocs/LlocsReader.h"
 
 namespace ocrc = OCRCorrection;
-static const double THRESHOLD = .6;
+static const double THRESHOLD = .8;//.9;//1.0;
 
 ////////////////////////////////////////////////////////////////////////////////
 static bool
@@ -76,8 +76,11 @@ printRange(ocrc::LlocsReader& reader,
         const char *path = nullptr;
         for (; b != e; ++b) {
                 std::wcout << getCorrectToken(*b);
-                // if (b->getNrOfCandidates())
-                //         std::wcout << "/" << b->candidatesBegin()->getVoteWeight();
+                if (b->getNrOfCandidates()) {
+                        std::wcout << "$";
+                        b->candidatesBegin()->print(std::wcout);
+                        std::wcout << "$";
+                }
 
                 const auto& tloc = reader.getTloc(*b);
                 start = std::min(start, tloc.start);
