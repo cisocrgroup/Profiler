@@ -142,9 +142,9 @@ namespace OCRCorrection {
     void Profiler::doIteration( size_t iterationNumber, bool lastIteration ) {
             csl::Stopwatch iterationTime;
 
-	std::wcout << "*** Iteration " << iterationNumber << " ***" << std::endl;
+	std::wcerr << "*** Iteration " << iterationNumber << " ***" << std::endl;
 
-	static_cast< csl::PatternProbabilities >( globalProfile_.ocrPatternProbabilities_ ).print( std::wcout );
+	static_cast< csl::PatternProbabilities >( globalProfile_.ocrPatternProbabilities_ ).print( std::wcerr );
 
 	globalProfile_.dictDistribution_.clear();
 
@@ -172,7 +172,7 @@ namespace OCRCorrection {
 	for( Document_t::iterator token = document_.begin(); // for all tokens
 	     token != document_.end();
 	     ++token ) {
-                //std::wcout << "TOKEN: " << token->getWOCR() << std::endl;
+                //std::wcerr << "TOKEN: " << token->getWOCR() << std::endl;
 	    if( ( config_.pageRestriction_ != (size_t)-1 ) &&
                 token->getOriginalToken().getPageIndex()  >= config_.pageRestriction_ ) {
                 break;
@@ -200,7 +200,7 @@ namespace OCRCorrection {
                 htmlWriter_.registerToken( *token, evalToken, candidates_ );
 	    }
 	    else if( token->isShort() ) {
-                ++counter[L"short"];
+                    ++counter[L"short"];
                 token->setSuspicious( token->getAbbyySpecifics().isSuspicious() );
                 htmlWriter_.registerToken( *token, evalToken, candidates_ );
 	    }
@@ -221,7 +221,7 @@ namespace OCRCorrection {
                         stopwatch.start();
                 }
 		tempCands.reset();
-		//std::wcout << "Profiler:: process Token " << token->getWOCR_lc() << std::endl;
+		//std::wcerr << "Profiler:: process Token " << token->getWOCR_lc() << std::endl;
 		dictSearch_.query( token->getWOCR_lc(), &tempCands );
 
 
@@ -234,8 +234,8 @@ namespace OCRCorrection {
 		    std::vector< csl::Instruction > ocrInstructions;
 
 		    // throw away "short" candidates for "long" words
-		    if( cand->getWord().length() < 4 ) {
-			continue;
+		    if (Profiler_Token::isShort(cand->getWord())) {
+		        continue;
 		    }
 		    // throw away candidates containing a hyphen
 		    // Yes, there are such words in staticlex :-/
@@ -246,7 +246,7 @@ namespace OCRCorrection {
 
 		    //std::wcerr << "instructionComputer_.computeInstruction( " << cand->getWord() << ", " <<token->getWOCR_lc() <<", "<<&ocrInstructions<<" )"<<std::endl; // DEBUG
 		    instructionComputer_.computeInstruction( cand->getWord(), token->getWOCR_lc(), &ocrInstructions );
-		    //std::wcout << "BLA: Finished" << std::endl;
+		    //std::wcerr << "BLA: Finished" << std::endl;
 
 
 		    // std::wcerr << cand->toString() << std::endl;
@@ -291,7 +291,7 @@ namespace OCRCorrection {
 				//}
 			}
 			else {
-// 			    std::wcout << "Remove duplicate:" << std::endl
+// 			    std::wcerr << "Remove duplicate:" << std::endl
 // 				       << candidates_.back() << std::endl
 // 				       << current << std::endl;
 			}
@@ -331,7 +331,7 @@ namespace OCRCorrection {
 			 pat != cand->getInstruction().end();
 			 ++pat ) {
 
-			// std::wcout << "histCounter_[" << static_cast<csl::Pattern>(*pat).toString() <<"] += "<< token->voteWeight << std::endl;
+			// std::wcerr << "histCounter_[" << static_cast<csl::Pattern>(*pat).toString() <<"] += "<< token->voteWeight << std::endl;
 			histCounter_.registerPattern( *pat, cand->getVoteWeight() );
 		    }
 
@@ -501,11 +501,11 @@ namespace OCRCorrection {
 		//
 		if( iterationNumber >= 3 ) {
 		    if( ocrPatternsInWords[it->first].size() < 2 ) {
-			std::wcout << it->first.toString() << "(" << it->second << ") only in ";
+			std::wcerr << it->first.toString() << "(" << it->second << ") only in ";
 			for( std::set< std::wstring >::const_iterator wit = ocrPatternsInWords[it->first].begin(); wit != ocrPatternsInWords[it->first].end(); ++wit ) {
-			    std::wcout << *wit << ",";
+			    std::wcerr << *wit << ",";
 			}
-			std::wcout << ", continue" << std::endl;
+			std::wcerr << ", continue" << std::endl;
 			continue;
 		    }
 		}
@@ -527,7 +527,7 @@ namespace OCRCorrection {
 			( it->second / denominator ), // its count / the left-hand-side's nGramCount
 			it->second );        // absolute freq
 
-		    std::wcout << "globalProfile_.ocrPatternProbabilities_.setWeight( " << it->first.toString()
+		    std::wcerr << "globalProfile_.ocrPatternProbabilities_.setWeight( " << it->first.toString()
 			       <<", ( " << it->second << " / " << ocrCounter_.getNGramCount( it->first.getLeft() ) << " ) )"
 			       << "=" << ( it->second / ocrCounter_.getNGramCount( it->first.getLeft() ) ) << std::endl;
 		}
