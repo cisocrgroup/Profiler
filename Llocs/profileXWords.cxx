@@ -13,7 +13,7 @@
 #include "Llocs/LlocsReader.h"
 
 namespace ocrc = OCRCorrection;
-static const double THRESHOLD = .8;//.9;//1.0;
+static const double THRESHOLD = 1;
 
 ////////////////////////////////////////////////////////////////////////////////
 static bool
@@ -22,6 +22,28 @@ isCorrect(const ocrc::Token& t)
         return t.isNormal() and
                 t.getNrOfCandidates() > 0 and
                 t.candidatesBegin()->getVoteWeight() >= THRESHOLD;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// check for `multiple,tokens&connected/with&no.whitespace`
+static bool
+couldBeMultipleTokens(const ocrc::Token& t)
+{
+        return not t.isNormal() and
+                std::any_of(begin(t.getWOCR()),
+                            end(t.getWOCR()),
+                            ocrc::Document::isWord);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+static bool
+isEndOfRange(const ocrc::Token& t)
+{
+        if (t.isNormal()) {
+                return not isCorrect(t);
+        } else {
+                return couldBeMultipleTokens(t);
+        }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +69,7 @@ getCorrectRangeEnd(const ocrc::LlocsReader& reader,
                 const char *path = reader.getTloc(*b).path;
                 for (; b != e; ++b) {
                         if ((strcmp(path, reader.getTloc(*b).path) != 0) or
-                            (b->isNormal() and not isCorrect(*b))) {
+                            isEndOfRange(*b)) {
                                 break;
                         }
                 }
@@ -76,11 +98,11 @@ printRange(ocrc::LlocsReader& reader,
         const char *path = nullptr;
         for (; b != e; ++b) {
                 std::wcout << getCorrectToken(*b);
-                if (b->getNrOfCandidates()) {
-                        std::wcout << "$";
-                        b->candidatesBegin()->print(std::wcout);
-                        std::wcout << "$";
-                }
+//                if (b->getNrOfCandidates()) {
+//                        std::wcout << "$";
+//                        b->candidatesBegin()->print(std::wcout);
+//                        std::wcout << "$";
+//                }
 
                 const auto& tloc = reader.getTloc(*b);
                 start = std::min(start, tloc.start);
