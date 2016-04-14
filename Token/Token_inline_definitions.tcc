@@ -72,6 +72,10 @@ namespace OCRCorrection {
 	return ( bitProperties_ & CAPITALIZED );
     }
 
+    bool Token::isTitleCase() const {
+	return ( bitProperties_ & TITLECASE );
+    }
+
     bool Token::isDontTouch() const {
 	return ( bitProperties_ & DONT_TOUCH );
     }
@@ -212,6 +216,15 @@ namespace OCRCorrection {
 	}
 	else {
 	    bitProperties_ &= ~( CAPITALIZED );
+	}
+    }
+
+    void Token::setTitleCase( bool b ) {
+	if( b ) {
+	    bitProperties_ |= TITLECASE;
+	}
+	else {
+	    bitProperties_ &= ~(TITLECASE);
 	}
     }
 

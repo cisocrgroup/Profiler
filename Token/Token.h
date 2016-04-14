@@ -181,6 +181,7 @@ namespace OCRCorrection {
 	 */
 	inline bool isCapitalized() const;
 
+        // TOKEN is all uppercase letters
         inline bool isTitleCase() const;
 
 	/**

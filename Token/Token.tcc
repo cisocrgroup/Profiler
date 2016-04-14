@@ -211,16 +211,12 @@ namespace OCRCorrection {
 
     void Token::setWOCR( std::wstring const& w ) {
             wOCR_ = w;
-
-            // if (not wOCR_.empty() and std::all_of(wOCR_.begin(), wOCR_.end(), iswupper)) {
-            //         setTitleCase();
-            // }
-            if (not wOCR_.empty() and iswupper(wOCR_[0])) {
-                    setCapitalized();
-            }
-            if (wOCR_lc_.empty()) {
-                    setWOCR_lc(w);
-            }
+            if (not wOCR_.empty() and std::all_of(begin(wOCR_), end(wOCR_), iswupper))
+                    setTitleCase(true);
+            else if (not wOCR_.empty() and iswupper(wOCR_[0]))
+                    setCapitalized(true);
+            if (wOCR_lc_.empty())
+                    setWOCR_lc(wOCR_);
     }
 
         void Token::setWOCR_lc(std::wstring const& wlc) {
@@ -228,7 +224,7 @@ namespace OCRCorrection {
                 for (std::wstring::const_iterator i = wlc.begin(); i != wlc.end(); ++i) {
                         wOCR_lc_.push_back(towlower(*i));
                 }
-        }
+                        }
 
     size_t Token::mergeRight() {
 	if( indexInDocument_ + 1 >= myDocument_.getNrOfTokens() ) {
@@ -364,11 +360,15 @@ namespace OCRCorrection {
 
     void Token::addCandidate( Candidate const& initCand ) {
 	CandidateChain* candItem = new CandidateChain( initCand );
+        auto &candstr = candItem->getCandidate().getString();
 
-	// if token is capitalized, also capitalize the candidate
-	if( this->isCapitalized() && !candItem->getCandidate().getString().empty() ) {
-                wchar_t firstCharToUpperCase = towupper(candItem->getCandidate().getString()[0]);
-                candItem->getCandidate().getString()[0] = firstCharToUpperCase;
+        // if token is TITLECASE set all chars of the candidates to uppercase
+        if (this->isTitleCase() and not candstr.empty()) {
+                for (auto& c: candstr)
+                        c = towupper(c);
+	// if token is Capitalized, also capitalize the candidate
+        } else if( this->isCapitalized() && !candstr.empty()) {
+                candstr[0] = towupper(candstr[0]);
         }
 	if( candidates_ == 0 ) {
 	    candidates_ = candItem;
