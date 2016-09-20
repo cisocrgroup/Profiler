@@ -47,20 +47,20 @@ namespace OCRCorrection {
 	 *
 	 * As new token the first @c length characters of @c token are taken.
 	 */
-	void pushBackToken( const wchar_t* token, size_t length, bool isNormal );
+	Token* pushBackToken( const wchar_t* token, size_t length, bool isNormal );
 
 	/**
 	 * @brief Create a new Token object with the parameters given and add it to the end
 	 * of the array of Tokens.
 	 *
 	 */
-	void pushBackToken( std::wstring const& token, bool isNormal );
+	Token* pushBackToken( std::wstring const& token, bool isNormal );
 
 	/**
 	 * @brief Add token object referenced by @c newToken to the end of the array of tokens. NOTE THAT the object itself
 	 *        not a copy is added. So @c newToken must be created on the heap. class Document takes care of the destruction.
 	 */
-	void pushBackToken( Token* newToken );
+	Token* pushBackToken( Token* newToken );
 
 	/**
 	 * @brief Create a new Token object with the parameters given and add it in front of

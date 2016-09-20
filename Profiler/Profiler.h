@@ -181,7 +181,7 @@ namespace OCRCorrection {
 	 */
 	static void printConfigTemplate( std::wostream& os );
 
-    protected:
+    public:
 	/**
 	 * @brief Returns a reference to the csl::DictSearch - object used by the Profiler.
 	 *
@@ -190,7 +190,9 @@ namespace OCRCorrection {
 	csl::DictSearch& getDictSearch() {
 	    return dictSearch_;
 	}
-
+        const Document_t& getDocument() const {
+                return document_;
+        }
 
     private:
 

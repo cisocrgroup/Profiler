@@ -4,6 +4,7 @@
 #include <vector>
 #include <utility>
 #include <string>
+#include "Llocs.hpp"
 
 namespace OCRCorrection {
         class Document;
@@ -11,24 +12,24 @@ namespace OCRCorrection {
 
         class LlocsReader {
         public:
-                struct Tloc {
-                        const char *path;
-                        double start, end;
+                using LlocsPtr = std::shared_ptr<Llocs>;
+                struct Tlocs {
+                     Tlocs() = default;
+                     LlocsPtr llocs;
+                     Token* token;
+                     Llocs::iterator b, e;
+                     std::wstring string() const;
                 };
 
-                void parse(int n, char** llocs, Document& document);
-                const Tloc& getTloc(const Token& token) const;
+                void parse(char** llocs, Document& document);
+                const std::vector<Tlocs>& tlocs() const {return tlocs_;}
+                const std::vector<LlocsPtr>& llocs() const {return llocs_;}
+                const Tlocs& operator[](const Token& token) const;
 
         private:
-                struct Llocs {
-                        const char *path;
-                        std::wstring chars;
-                        std::vector<double> offsets;
-                };
-                void add(const Llocs& llocs, Document& document);
-                Llocs read(const char* llocs);
-
-                std::vector<Tloc> tlocs_;
+                void add(const LlocsPtr& llocs, Document& document);
+                std::vector<Tlocs> tlocs_;
+                std::vector<LlocsPtr> llocs_;
         };
 }
 

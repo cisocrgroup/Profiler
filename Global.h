@@ -92,7 +92,8 @@ namespace csl {
 	static const size_t maxNrOfChars = 65536;
 
 	// those lengths are the maximum size of bytes from the input stream
-	static const size_t lengthOfWord = 64;
+	// static const size_t lengthOfWord = 64;
+	static const size_t lengthOfWord = 128;
 	static const size_t lengthOfStr = 3000;
 	static const size_t lengthOfLongStr = 5000;
 

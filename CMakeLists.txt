@@ -104,6 +104,8 @@ SET( OCRCORRECTION_SOURCES
 	     GlobalProfile/PatternContainerXMLReader.cxx
 	     LevenshteinWeights/LevenshteinWeights.cxx
 	     Llocs/LlocsReader.cxx
+	     Llocs/Llocs.cpp
+             Llocs/WagnerFischer.cpp
 	     Profiler/Profiler.cxx
 	     TXTReader/AlignedTXTReader.cxx
 	     TXTReader/TXTReader.cxx

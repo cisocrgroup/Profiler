@@ -90,7 +90,9 @@ namespace csl {
 	cleanCharvecs(); // do this while the old pattern is still loaded!
 	patLength_ = wcslen( p );
 	if( patLength_ > Global::lengthOfWord ) {
-	    throw exceptions::badInput( "csl::LevDEA::loadPattern: Maximum Pattern length (as specified by Global::lengthOfWord) violated." );
+            //throw exceptions::badInput( "csl::LevDEA::loadPattern: Maximum Pattern length (as specified by Global::lengthOfWord) violated." );
+            std::wcerr << "csl::LevDEA::loadPattern: Maximum Pattern length (as specified by Global::lengthOfWord) violated.\n";
+            return;
 	}
 	wcsncpy( pattern_, p, patLength_);
 	calcCharvec();

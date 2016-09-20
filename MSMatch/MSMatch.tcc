@@ -16,7 +16,7 @@ namespace csl {
 	}
 
 	dictBW_ = 0;
- 
+
 	levDEASecond_ = new LevDEA( k_ );
     }
 
@@ -37,7 +37,7 @@ namespace csl {
 	levDEAFirst_ = new LevDEA( 0 );
 	levDEASecond_ = new LevDEA( 0 );
     }
-    
+
     template< MSMatchMode Mode >
     inline MSMatch< Mode >::~MSMatch() {
     }
@@ -59,7 +59,11 @@ namespace csl {
 	static int newDicPos;
 	static LevDEA::Pos newLevPos;
 
-	if( (size_t)depth > ( Global::lengthOfWord-1 ) ) throw exceptions::cslException( "csl::MSMatch: candidate too long" );
+	if( (size_t)depth > ( Global::lengthOfWord-1 ) ) {
+            //throw exceptions::cslException( "csl::MSMatch: candidate too long" );
+            std::wcerr << "csl::MSMatch: candidate too long\n";
+            return;
+         }
 
 	// store w if node is final in dic and lev;
 	static int levDistanceSecond;
@@ -96,12 +100,12 @@ namespace csl {
 	    CandidateMap::iterator pos = results_.find( wordCorrectDir );
 	    if( pos == results_.end() ) {
 		// printf( "MATCH FIRST TIME :%ls, dist is %d\n", wordCorrectDir, levDistance ); // DEBUG
-		results_.insert( std::pair< std::wstring, std::pair< size_t, int > >( 
-				     std::wstring( wordCorrectDir ), 
-				     std::pair< size_t, int >( 
-					 levDistance, 
-					 dictFW_->getAnnotation( perfHashValue ) 
-					 ) 
+		results_.insert( std::pair< std::wstring, std::pair< size_t, int > >(
+				     std::wstring( wordCorrectDir ),
+				     std::pair< size_t, int >(
+					 levDistance,
+					 dictFW_->getAnnotation( perfHashValue )
+					 )
 				     )
 		    );
 	    }
@@ -120,7 +124,7 @@ namespace csl {
 //	    printf( "word is %s, dicpos is %d, Try with %c(%d)\n", word_, dicPos, alph_.decode( *c ), *c );
 	    if( ( newLevPos = levDEASecond_->walk( levPos, *c ) ).isValid() ) {
 		newDicPos = curDict_->walk( dicPos, *c );
-		
+
 
 		assert( newDicPos != 0 ); // the transition always exists
 		word_[depth] = *c;
@@ -171,7 +175,7 @@ namespace csl {
 	    results_.insert( std::pair< std::wstring, std::pair< size_t, int > >( std::wstring( pattern_ ), std::pair< size_t, int >( 0, ann ) ) );
 	}
     }
-    
+
     template<>
     inline void MSMatch< FW_BW >::queryCases_1() {
 	uint_t pos = 0;
@@ -200,11 +204,11 @@ namespace csl {
 	    intersectSecond( pos, LevDEA::Pos( 0, 0 ), wcslen( patRightRev_ ) );
  	}
     }
-    
+
     template<>
     inline void MSMatch< FW_BW >::queryCases_2() {
 	uint_t pos = 0;
-	
+
 //	printf( "0 | 0,1,2 errors\n" );
 	// 0 | 0,1,2 errors
  	reverse_ = false;
@@ -285,7 +289,7 @@ namespace csl {
 	    //printf( "FOUND FIRST:%ls, dist of 1st part is 0\n", word_ );
 	    levDEASecond_->setDistance( 3 );
 	    minDistSecond_ = 2;
-	    
+
 	    intersectSecond( pos, LevDEA::Pos( 0, 0 ), wcslen( patRightRev_ ) );
 	}
 
@@ -303,7 +307,7 @@ namespace csl {
 
 
 
-    
+
 
     template<>
     inline void MSMatch< STANDARD >::intersect( int dicPos, LevDEA::Pos levPos, int depth ) {
@@ -319,7 +323,7 @@ namespace csl {
 		// print w if node is final in dic and lev;
 		if( dictFW_->isFinal( newDicPos ) && curLevDEA_->isFinal( newLevPos ) ) {
 		    word_[depth+1] = 0;
-		    
+
 		    // push word and annotated value into the output list
 		    // follow the word through the automaton once more to get the perfect hashing value
 		    static size_t perfHashValue; static uint_t dicPos2;
@@ -342,7 +346,7 @@ namespace csl {
 
 	candReceiver_ = &candReceiver;
 	wcscpy( pattern_, pattern );
-	
+
 	curLevDEA_ = levDEASecond_;
 	curLevDEA_->setDistance( k_ );
 	curLevDEA_->loadPattern( pattern );
@@ -361,7 +365,7 @@ namespace csl {
 	}
 
 	candReceiver_ = &candReceiver; // is not necessary at the moment
-	
+
 	// std::wcout << "query=" << pattern << std::flush;
 	// std::wcout << ",results=" << &results_ << std::flush;
 	// std::wcout << ",size=" << results_.size() << std::endl;
@@ -373,7 +377,9 @@ namespace csl {
 	pattern_[Global::lengthOfWord - 1] = 0;
 	wcsncpy( pattern_, pattern, Global::lengthOfWord );
 	if( pattern_[Global::lengthOfWord - 1] != 0 ) {
-	    throw exceptions::badInput( "csl::MSMATCH::query: Maximum Pattern length (as specified by Global::lengthOfWord) violated." );
+            // throw exceptions::badInput( "csl::MSMATCH::query: Maximum Pattern length (as specified by Global::lengthOfWord) violated." );
+	    std::wcerr << "csl::MSMATCH::query: Maximum Pattern length (as specified by Global::lengthOfWord) violated.\n";
+            return false;
 	}
 
 	bool wasUpperCase = 0;
@@ -385,13 +391,13 @@ namespace csl {
 	// split pattern into 2 halves
 	size_t patLength = wcslen( pattern_ );
 	size_t patCenter = (size_t) ( patLength / 2 );
-	size_t cLeft = 0, cRight = 0;	
+	size_t cLeft = 0, cRight = 0;
 	for ( size_t i = 0; i < patLength; ++i ) {
 	    if( i < patCenter ) patLeft_[cLeft++] = pattern_[i];
 	    else patRight_[cRight++] = pattern_[i];
 	}
 	patLeft_[cLeft] = patRight_[cRight] = 0;
-	
+
 	// reverse patterns
 	for( int i = cLeft - 1, iRev = 0; i >=0; --i, ++iRev ) patLeftRev_[iRev] = patLeft_[i];
 	for( int i = cRight - 1, iRev = 0; i >=0; --i, ++iRev ) patRightRev_[iRev] = patRight_[i];
@@ -415,8 +421,8 @@ namespace csl {
 	}
 	return ( ! results_.empty() );
     }
-    
-	
+
+
 
 } // eon
 

@@ -20,16 +20,16 @@ namespace OCRCorrection {
     }
 
 
-    void Document::pushBackToken( const wchar_t* token, size_t length, bool isNormal ) {
-	pushBackToken( new Token( *this, tokens_.size(), token, length, isNormal ) );
+    Token* Document::pushBackToken( const wchar_t* token, size_t length, bool isNormal ) {
+	return pushBackToken( new Token( *this, tokens_.size(), token, length, isNormal ) );
     }
 
-    void Document::pushBackToken( std::wstring const& token, bool isNormal ) {
-	pushBackToken( new Token( *this, tokens_.size(), token, isNormal ) );
+    Token* Document::pushBackToken( std::wstring const& token, bool isNormal ) {
+	return pushBackToken( new Token( *this, tokens_.size(), token, isNormal ) );
     }
 
 
-    void Document::pushBackToken( Token* newToken ) {
+    Token* Document::pushBackToken( Token* newToken ) {
 	if( newToken == 0 ) {
 	    throw OCRCException( "OCRC::Document::pushBackToken: Tried to add 0-Pointer as new token." );
 	}
@@ -47,6 +47,7 @@ namespace OCRCorrection {
 	    pages_.back()->offsetEnd_ += 1;
 	    assert( pages_.back()->offsetEnd_ == tokens_.size() );
 	}
+        return newToken;
     }
 
     void Document::insertToken( size_t position, const wchar_t* token, size_t length, bool isNormal, size_t page ) {
