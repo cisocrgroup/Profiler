@@ -225,6 +225,9 @@ namespace OCRCorrection {
 	    }
 	}
 
+	/*
+	 * Ignore candidates in docxml import
+	 *
 	else if( strcmp( message, "cand" ) == 0 ) {
 	    Candidate cand;
 	    if( cand.parseFromString( content_, 0 ) != content_.length() ) {
@@ -232,6 +235,7 @@ namespace OCRCorrection {
 	    }
 	    tok_->addCandidate( cand );
 	}
+	*/
 
 	else if(strcmp(message, "wOCR_lc") == 0) {
                 tok_->setWOCR_lc(content_);
