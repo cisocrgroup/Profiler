@@ -19,6 +19,7 @@
 #include "WagnerFischer.hpp"
 
 namespace ocrc = OCRCorrection;
+#ifdef FOO
 struct Data {
         Data(): llocs(), nlex(0), n(0) {}
         ocrc::LlocsReader::LlocsPtr llocs;
@@ -77,12 +78,33 @@ run2(int argc, char **argv)
 	std::wcout << "mean-error " << (errorsum/nchars) << "\n";
         return EXIT_SUCCESS;
 }
-
+#endif // FOO
 ////////////////////////////////////////////////////////////////////////////////
 int
 main(int argc, char **argv)
 {
+
         std::locale::global(std::locale(""));
+
+        if (argc != 2) {
+                std::wcerr << "Usage: " << argv[0] << " llocs\n";
+                return 1;
+        }
+        ocrc::Document document;
+        ocrc::LlocsReader reader;
+        reader.parse(argv + 1, document);
+	double nchars = 0;
+	double errsum = 0;
+	for (const auto& llocs: reader.llocs()) {
+		for (const auto& triple: *llocs) {
+			++nchars;
+			errsum += triple.conf;
+		}
+	}
+	std::wcout << (errsum/nchars) << "\n";
+	return 0;
+
+#ifdef FOO
         if (argc < 3) {
                 std::wcerr << "Usage: " << argv[0] << " config llocs [llocs...]\n";
                 return 1;
@@ -94,4 +116,5 @@ main(int argc, char **argv)
                 std::wcerr << "[error] " << e.what() << "\n";
         }
         return 1;
+#endif // FOO
 }
