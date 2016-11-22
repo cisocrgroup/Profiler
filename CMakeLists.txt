@@ -77,6 +77,7 @@ add_subdirectory(INIConfig)
 add_subdirectory(LevDEA)
 add_subdirectory(LevenshteinWeights)
 add_subdirectory(MinDic)
+add_subdirectory(MinDicString)
 add_subdirectory(Pattern)
 add_subdirectory(Profiler)
 add_subdirectory(SimpleEnrich)
@@ -86,6 +87,7 @@ add_subdirectory(Vaam)
 add_subdirectory(Val)
 add_subdirectory(markup)
 add_subdirectory(tools)
+add_subdirectory(tools/vaamFilter)
 
 ###### TO DO: Move this (and all related headers and sources) to a separate folder ##########
 SET( OCRCORRECTION_SOURCES

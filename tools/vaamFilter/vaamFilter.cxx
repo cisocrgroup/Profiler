@@ -1,10 +1,11 @@
 #include<iostream>
 #include<Global.h>
 #include<Vaam/Vaam.h>
+#include<Utils/Utils.h>
 #include<Vaam/Vaam.h>
 #include<Getopt/Getopt.h>
 #include<FBDic/FBDic.h>
-//#include<MinDicString/MinDicString.h>
+#include<MinDicString/MinDicString.h>
 
 /**
  * Vaam
@@ -182,8 +183,12 @@ int main(int argc, const char** argv ) {
 
 		    if( minDicString ) {
 			// in a MinDicString the annotation ("score") is the offset of the word's respective annotation
-			csl::CSLLocale::string2wstring( (char const*)minDicString->getAnnByOffset( it->getBaseWordScore() ), wideAnnotation );
+			// csl::CSLLocale::string2wstring( (char const*)minDicString->getAnnByOffset( it->getBaseWordScore() ), wideAnnotation );
+			wideAnnotation = OCRCorrection::Utils::utf8(
+				(const char*) minDicString->getAnnByOffset(it->getBaseWordScore())
+			);
 			std::wcout << ",annotation=" << wideAnnotation;
+
 		    }
 		    std::wcout<<std::endl;
 		}
