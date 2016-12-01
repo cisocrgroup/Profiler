@@ -64,6 +64,7 @@ int main( int argc, char const** argv ) {
     options.specifyOption( "imageDir", csl::Getopt::STRING, "_NO_IMAGE_DIR_" );
     options.specifyOption( "createConfigFile", csl::Getopt::VOID );
     options.specifyOption( "simpleOutput", csl::Getopt::VOID );
+    options.specifyOption( "adaptive", csl::Getopt::VOID );
 
     try {
 	options.getOptionsAsSpecified( argc, argv );
