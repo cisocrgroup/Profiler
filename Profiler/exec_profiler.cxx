@@ -37,6 +37,8 @@ void printHelp() {
 	       << "                            (Only for evaluation with groundtruth documents.)"
            << std::endl
            << "[--simpleOutput]            Print simple text output to stdout"
+	   << std::endl
+	   << "[--adaptive]		       Use adaptive profiler, that uses correction information (defunct)"
            << std::endl
 	;
 }
