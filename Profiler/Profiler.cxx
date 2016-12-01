@@ -75,7 +75,7 @@ namespace OCRCorrection {
 	config_.print( std::wcerr );
 
 	if( config_.nrOfIterations_ == 0 ) {
-	    std::wcerr << "OCRC::Profiler::createProfile: config says 0 iterations, so I do nothing." << std::endl;
+	    std::wcerr << "OCRC::Profiler::createNonAdaptiveProfile: config says 0 iterations, so I do nothing." << std::endl;
 	}
 
 	prepareDocument( sourceDoc );
