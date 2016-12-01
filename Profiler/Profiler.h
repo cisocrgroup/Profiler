@@ -125,6 +125,13 @@ namespace OCRCorrection {
 	}
 
 	/**
+	 * @brief Enable/disable adaptive profiling
+	 */
+	void setAdaptive(bool adaptive) {
+		config_.adaptive_ = adaptive;
+	}
+
+	/**
 	 * @brief Set the number of initial pages to be processed
 	 *
 	 *

@@ -151,10 +151,10 @@ int main( int argc, char const** argv ) {
     }
 
 
-
     if( options.hasOption( "out_html" ) ) {
 	profiler.setHTMLOutFile( options.getOption( "out_html" ) );
     }
+    profiler.setAdaptive(options.hasOption("adaptive"));
 
     OCRCorrection::Document document;
 
