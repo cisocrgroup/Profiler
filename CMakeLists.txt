@@ -93,7 +93,11 @@ SET( OCRCORRECTION_SOURCES
 	     Document/Document.cxx
 	     CorrectionSystem/CorrectionSystem.cxx
 	     LevenshteinWeights/LevenshteinWeights.cxx
-	     Profiler/Profiler.cxx Profiler/HTMLWriter.cxx Profiler/Evaluation.cxx Profiler/SimpleOutputWriter.cxx
+	     Profiler/Profiler.cxx
+	     Profiler/AdaptiveProfiling.cxx
+	     Profiler/HTMLWriter.cxx
+	     Profiler/Evaluation.cxx
+	     Profiler/SimpleOutputWriter.cxx
 	     AbbyyXmlParser/AbbyyXmlParser.cxx
 	     DocXML/DocXMLReader.cxx
 	     DocXML/LegacyDocXMLReader.cxx

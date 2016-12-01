@@ -66,6 +66,12 @@ namespace OCRCorrection {
 
 
     void Profiler::createProfile( Document& sourceDoc ) {
+	    if (config_.adaptive_)
+		    createAdaptiveProfile(sourceDoc);
+	    else
+		    createNonAdaptiveProfile(sourceDoc);
+    }
+    void Profiler::createNonAdaptiveProfile(Document& sourceDoc) {
 	config_.print( std::wcerr );
 
 	if( config_.nrOfIterations_ == 0 ) {

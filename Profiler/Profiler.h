@@ -200,6 +200,15 @@ namespace OCRCorrection {
 
 
     private:
+	/**
+	 * Create an adaptive profile
+	 */
+	void createAdaptiveProfile(Document& sourceDoc);
+
+	/**
+	 * Create an non adaptive profile
+	 */
+	void createNonAdaptiveProfile(Document& sourceDoc);
 
 	/**
 	 * @brief Execute one iteration of the profiling process.
@@ -390,6 +399,7 @@ namespace OCRCorrection {
 	     */
 	    bool resetOCRPatternProbabilities_;
 
+	    bool adaptive_;
 
 	    bool donttouch_hyphenation_;
 
@@ -413,6 +423,7 @@ namespace OCRCorrection {
 		   << std::endl
 		   << "donttouch_hyphenation_:         " << donttouch_hyphenation_ << std::endl
 		   << "donttouch_lineborders_:         " << donttouch_lineborders_ << std::endl
+		   << "adaptive_:                      " << adaptive_ << std::endl
 		    ;
 	    }
 
