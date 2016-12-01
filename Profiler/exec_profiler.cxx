@@ -35,11 +35,11 @@ void printHelp() {
 	       << std::endl
 	       << "[--out_gtxml <outputFile>]  Prints xml containing the GROUNDTRUTH lists of hist. variants and ocr errors. (if available)" << std::endl
 	       << "                            (Only for evaluation with groundtruth documents.)"
-           << std::endl
-           << "[--simpleOutput]            Print simple text output to stdout"
-	   << std::endl
-	   << "[--adaptive]		       Use adaptive profiler, that uses correction information (defunct)"
-           << std::endl
+               << std::endl
+               << "[--simpleOutput]            Print simple text output to stdout"
+	       << std::endl
+	       << "[--adaptive]                Use adaptive profiler, that uses correction information (defunct)"
+               << std::endl
 	;
 }
 
