@@ -45,16 +45,18 @@ AdaptiveHistLex::save(std::wostream& os) const
 void
 AdaptiveHistLex::add(const Document& doc)
 {
-	for (const auto& token: doc)
+	for (const auto& token: doc) {
 		add(token);
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void
 AdaptiveHistLex::add(const Token& token)
 {
-	if (token.isNormal()) // only add normal token
-		add(token);
+	if (token.isNormal()) { // only add normal token
+		add(token.getWCorr());
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
