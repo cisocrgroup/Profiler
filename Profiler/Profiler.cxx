@@ -8,6 +8,7 @@
 namespace OCRCorrection {
 
     Profiler::Profiler() :
+	adaptive_hist_gt_lex_(nullptr),
     	freqList_(),
     	baseWordFrequencyDic_( 0 ),
     	htmlStream_( 0 )
@@ -66,12 +67,37 @@ namespace OCRCorrection {
 
 
     void Profiler::createProfile( Document& sourceDoc ) {
-	    if (config_.adaptive_)
-		    createAdaptiveProfile(sourceDoc);
-	    else
-		    createNonAdaptiveProfile(sourceDoc);
+	    doCreateProfile(sourceDoc);
     }
-    void Profiler::createNonAdaptiveProfile(Document& sourceDoc) {
+
+    void Profiler::initGlobalOcrPatternProbs(int itn) {
+	    if (itn <= 1) {
+                globalProfile_.ocrPatternProbabilities_.
+		    setDefault( csl::PatternWeights::PatternType( 1, 1 ), config_.ocrPatternStartProb_ );
+		globalProfile_.ocrPatternProbabilities_.
+	    		setDefault( csl::PatternWeights::PatternType( 2, 1 ), config_.ocrPatternStartProb_ );
+		globalProfile_.ocrPatternProbabilities_.
+		    setDefault( csl::PatternWeights::PatternType( 1, 2 ), config_.ocrPatternStartProb_ );
+		globalProfile_.ocrPatternProbabilities_.
+		    setDefault( csl::PatternWeights::PatternType( 0, 1 ), config_.ocrPatternStartProb_ );
+		globalProfile_.ocrPatternProbabilities_.
+		    setDefault( csl::PatternWeights::PatternType( 1, 0 ), config_.ocrPatternStartProb_ );
+	    } else {
+		// remove default weights for all ocr operations, set smoothing weights instead
+		globalProfile_.ocrPatternProbabilities_.setDefault(
+				csl::PatternWeights::PatternType( 1, 1 ), config_.ocrPatternSmoothingProb_ );
+		globalProfile_.ocrPatternProbabilities_.setDefault(
+				csl::PatternWeights::PatternType( 2, 1 ), config_.ocrPatternSmoothingProb_ );
+		globalProfile_.ocrPatternProbabilities_.setDefault(
+				csl::PatternWeights::PatternType( 1, 2 ), config_.ocrPatternSmoothingProb_ );
+		globalProfile_.ocrPatternProbabilities_.setDefault(
+				csl::PatternWeights::PatternType( 0, 1 ), config_.ocrPatternSmoothingProb_ );
+		globalProfile_.ocrPatternProbabilities_.setDefault(
+				csl::PatternWeights::PatternType( 1, 0 ), config_.ocrPatternSmoothingProb_ );
+	    }
+    }
+
+    void Profiler::doCreateProfile(Document& sourceDoc) {
 	config_.print( std::wcerr );
 
 	if( config_.nrOfIterations_ == 0 ) {
@@ -92,19 +118,7 @@ namespace OCRCorrection {
 
 
 	//////// 1ST ITERATION ///////////////////
-
-	globalProfile_.ocrPatternProbabilities_.
-	    setDefault( csl::PatternWeights::PatternType( 1, 1 ), config_.ocrPatternStartProb_ );
-	globalProfile_.ocrPatternProbabilities_.
-	    setDefault( csl::PatternWeights::PatternType( 2, 1 ), config_.ocrPatternStartProb_ );
-	globalProfile_.ocrPatternProbabilities_.
-	    setDefault( csl::PatternWeights::PatternType( 1, 2 ), config_.ocrPatternStartProb_ );
-	globalProfile_.ocrPatternProbabilities_.
-	    setDefault( csl::PatternWeights::PatternType( 0, 1 ), config_.ocrPatternStartProb_ );
-	globalProfile_.ocrPatternProbabilities_.
-	    setDefault( csl::PatternWeights::PatternType( 1, 0 ), config_.ocrPatternStartProb_ );
-
-
+	initGlobalOcrPatternProbs(1);
 	globalProfile_.ocrPatternProbabilities_.setSmartMerge(); // this means that pseudo-merges and splits like ab<>b ot ab<>a are not allowed
 
 	//                --> true/false specifies if HTML output for 1st iteration is to be written to stdout
@@ -113,14 +127,7 @@ namespace OCRCorrection {
 	doIteration( 1, doWriteHTML );
 
 	//////// 2ND AND FURTHER ITERATIONS ///////////////////
-
-	// remove default weights for all ocr operations, set smoothing weights instead
-
-	globalProfile_.ocrPatternProbabilities_.setDefault( csl::PatternWeights::PatternType( 1, 1 ), config_.ocrPatternSmoothingProb_ );
-	globalProfile_.ocrPatternProbabilities_.setDefault( csl::PatternWeights::PatternType( 2, 1 ), config_.ocrPatternSmoothingProb_ );
-	globalProfile_.ocrPatternProbabilities_.setDefault( csl::PatternWeights::PatternType( 1, 2 ), config_.ocrPatternSmoothingProb_ );
-	globalProfile_.ocrPatternProbabilities_.setDefault( csl::PatternWeights::PatternType( 0, 1 ), config_.ocrPatternSmoothingProb_ );
-	globalProfile_.ocrPatternProbabilities_.setDefault( csl::PatternWeights::PatternType( 1, 0 ), config_.ocrPatternSmoothingProb_ );
+	initGlobalOcrPatternProbs(2);
 
 
 	freqList_.connectPatternProbabilities( &globalProfile_.histPatternProbabilities_ );
@@ -226,12 +233,13 @@ namespace OCRCorrection {
                                    << stopwatch.readMilliseconds() << "ms" << std::endl;
                         stopwatch.start();
                 }
-		tempCands.reset();
-		//std::wcout << "Profiler:: process Token " << token->getWOCR_lc() << std::endl;
-		dictSearch_.query( token->getWOCR_lc(), &tempCands );
+		calculateCandidateSet(*token, tempCands);
+		// tempCands.reset();
+		// //std::wcout << "Profiler:: process Token " << token->getWOCR_lc() << std::endl;
+		// dictSearch_.query( token->getWOCR_lc(), &tempCands );
 
 
-		std::sort( tempCands.begin(), tempCands.end() );
+		// std::sort( tempCands.begin(), tempCands.end() );
 
 
 		// compute ocrTraces, values like the candProbabilities and the sum of cand-scores
@@ -261,6 +269,7 @@ namespace OCRCorrection {
 		    // ocrInstructions is empty, if the ocr errors can be explained by std. lev. distance but not
 		    // by the distance defined with the patternWeights object. In that case, drop the candidate.
 		    if( ocrInstructions.empty() ) {
+			    std::wcerr << "NO OCR INSTRUCTIONS\n";
 			continue;
 		    }
 
@@ -280,18 +289,25 @@ namespace OCRCorrection {
 			 instruction != ocrInstructions.end();
 			 ++instruction ) {
 			// std::wcerr<<"Instr: "<<*instruction << std::endl; // DEBUG
+			//     std::wcerr << "(POFILER) " << token->getWOCR_lc() << ","
+			// 	       << cand->getWord() << "," << cand->getLevDistance()
+			// 	       << "+ocr" << *instruction << "\n";
 
-			if( instruction->size() > cand->getLevDistance() ) continue;
+			if( instruction->size() > cand->getLevDistance() ) {std::wcerr << "CONTINUE\n"; continue;}
 
 			Profiler_Interpretation current = Profiler_Interpretation( *cand );
 			current.setOCRTrace( *instruction );
 
 			current.setCombinedProbability( getCombinedProb( current ) );
 
+			    // std::wcerr << "(POFILER) current: " << current << "\n";
+			    // std::wcerr << "(POFILER) current.getOCRTrace(): " << current.getOCRTrace() << "\n";
+
 			// Here, candidates with equal hist- and OCR-Trace are avoided!
 			// See the compare-operator above
 			if( candidates_.empty() || ( ! myEquals( current, candidates_.back() ) ) ) {
 			    //if( ( iterationNumber < 2 ) || current.getCombinedProbability() > 1e-8 ) { // EXPERIMENTAL
+				std::wcerr << "PUSHGING BACK CURRENT (" << candidates_.size() << ")\n";
 				sumOfProbabilities += current.getCombinedProbability();
 				candidates_.push_back( current );
 				//}
@@ -725,6 +741,7 @@ namespace OCRCorrection {
 
 	    token.setWOCR( tmpToken->getWOCR() );
 	    token.setWOCR_lc( tmpToken->getWOCR_lc() );
+	    token.setWCorr(tmpToken->getWCorr().data());
 	    token.getAbbyySpecifics().setSuspicious( tmpToken->getAbbyySpecifics().isSuspicious() );
 
 

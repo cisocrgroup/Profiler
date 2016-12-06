@@ -141,6 +141,43 @@ namespace csl {
 	val_->setMinNrOfPatterns( 1 );
     }
 
+DictSearch::iDictModule&
+DictSearch::addDictModule(iDictModule& module)
+{
+	internalDictModules_.push_back(&module);
+	allDictModules_.emplace(module.getCascadeRank(), &module);
+	return module;
+}
+
+DictSearch::iDictModule*
+DictSearch::findDictModule(const std::wstring& name) const
+{
+	using Map = std::multimap<size_t, iDictModule*>;
+	using Val = Map::value_type;
+	auto find = [&name](const Val& val) {
+		return val.second->getName() == name;
+	};
+	auto i = std::find_if(begin(allDictModules_), end(allDictModules_), find);
+	return i == end(allDictModules_) ? nullptr : i->second;
+}
+
+size_t
+DictSearch::getMaxCascadeRank() const
+{
+	if (allDictModules_.empty())
+		return 0;
+	else
+		return std::prev(allDictModules_.end())->first;
+}
+
+size_t
+DictSearch::getMinCascadeRank() const
+{
+	if (allDictModules_.empty())
+		return 0;
+	else
+		return allDictModules_.begin()->first;
+}
 
     DictSearch::DictModule& DictSearch::addDictModule( std::wstring const& name, std::string const& dicFile, size_t cascadeRank ) {
 	DictModule* newDM = new DictModule( *this, name, dicFile, cascadeRank );

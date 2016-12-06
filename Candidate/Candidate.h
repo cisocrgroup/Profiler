@@ -106,6 +106,11 @@ namespace OCRCorrection {
 	float voteWeight_;
 
     }; // class Candidate
+    static inline std::wostream&
+    operator<<(std::wostream& os, const Candidate& cand) {
+	    cand.print(os);
+	    return os;
+    }
 
 } // ns OCRCorrection
 

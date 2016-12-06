@@ -39,6 +39,13 @@ namespace OCRCorrection {
     Profiler::Profiler_Token::~Profiler_Token() {
     }
 
+    const Token& Profiler::Profiler_Token::getOriginalToken() const {
+	if( ! originalToken_ ) {
+	    throw OCRCException( "OCRC::Profiler_Token::getOriginalToken: originalToken is NULL - this should not happen." );
+	}
+	return *originalToken_;
+    }
+
     Token& Profiler::Profiler_Token::getOriginalToken() {
 	if( ! originalToken_ ) {
 	    throw OCRCException( "OCRC::Profiler_Token::getOriginalToken: originalToken is NULL - this should not happen." );
@@ -59,6 +66,9 @@ namespace OCRCorrection {
 	return wCorr_;
     }
 
+    const std::wstring& Profiler::Profiler_Token::getWCorr_lc() const {
+	return wCorr_lc_;
+    }
 
     bool Profiler::Profiler_Token::isNormal() const {
 	return ( bitProperties_ && NORMAL );
@@ -117,6 +127,10 @@ namespace OCRCorrection {
 
     void Profiler::Profiler_Token::setWCorr( const wchar_t* w ) {
 	wCorr_ = w;
+	wCorr_lc_ = wCorr_;
+	using std::begin;
+	using std::end;
+	std::transform(begin(wCorr_), end(wCorr_), begin(wCorr_lc_), towlower);
     }
 
 

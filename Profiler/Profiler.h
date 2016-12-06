@@ -33,6 +33,7 @@
 
 namespace OCRCorrection {
 
+	class AdaptiveHistGtLex; // fwd
 
 
 
@@ -200,15 +201,25 @@ namespace OCRCorrection {
 
 
     private:
-	/**
-	 * Create an adaptive profile
-	 */
-	void createAdaptiveProfile(Document& sourceDoc);
+	// Adaptive Profiling
+	void calculateCandidateSet(const Profiler_Token& t,
+			csl::DictSearch::CandidateSet& candidates);
+	void calculateAdaptiveCandidateSet(const Profiler_Token& t,
+			csl::DictSearch::CandidateSet& candidates);
+	void calculateNonAdaptiveCandidateSet(const Profiler_Token& t,
+			csl::DictSearch::CandidateSet& candidates);
+	void createCandidatesFromGt(const Profiler_Token& t,
+		csl::DictSearch::CandidateSet& candidates);
+	AdaptiveHistGtLex& getAdaptiveHistGtLex();
+	bool canApplyAdaptiveProfiling(const Profiler_Token& t) const;
+	AdaptiveHistGtLex* adaptive_hist_gt_lex_;
+
+	void initGlobalOcrPatternProbs(int itn);
 
 	/**
-	 * Create an non adaptive profile
+	 * Do calculate the profile
 	 */
-	void createNonAdaptiveProfile(Document& sourceDoc);
+	void doCreateProfile(Document& sourceDoc);
 
 	/**
 	 * @brief Execute one iteration of the profiling process.

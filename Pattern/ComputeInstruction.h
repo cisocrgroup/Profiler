@@ -1,3 +1,6 @@
+#ifndef csl_ComputeInstruction_hpp__
+#define csl_ComputeInstruction_hpp__
+
 #include "math.h"
 #include<iostream>
 #include <vector>
@@ -120,3 +123,4 @@ namespace csl {
     }; // class ComputeInstruction
 
 } // ns csl
+#endif // csl_ComputeInstruction_hpp__

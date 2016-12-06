@@ -195,7 +195,7 @@ int main( int argc, char const** argv ) {
 
 
     if (options.hasOption("simpleOutput")) {
-            OCRCorrection::SimpleOutputWriter(document).write();
+            OCRCorrection::SimpleOutputWriter(std::wcout, document).write();
     }
 
 

@@ -138,11 +138,7 @@ namespace csl {
 	     *
 	     */
 	    iDictModule const* dictModule_;
-	}; // class Interpretation
-
-
-
-
+	}; // class Inter
 
 	/**
 	 * @brief Whoever wants to receive results from DictSearch, has to implement
@@ -269,6 +265,16 @@ namespace csl {
 	     */
 	    Interpretation_t const& at( size_t i ) const {
 		return myVector_.at( i );
+	    }
+
+	    /**
+	     * Remove all interpretations from the candidate set that match the
+	     * given predicate p.
+	     */
+	    template<class P>
+	    void discard_if(P p) {
+		    auto e = std::remove_if(myVector_.begin(), myVector_.end(), p);
+		    myVector_.erase(e, myVector_.end());
 	    }
 
 
@@ -687,6 +693,26 @@ namespace csl {
 	 */
 	void initHypothetic( char const* patternFile );
 
+
+	/**
+	 * Add a new managed DictionaryModule
+	 */
+	iDictModule& addDictModule(iDictModule& module);
+
+	/**
+	 * Search for a dictionary module by name
+	 */
+	iDictModule* findDictModule(const std::wstring& name) const;
+
+	/**
+	 * Get the maximum cascade rank of dictionary modules
+	 */
+	size_t getMaxCascadeRank() const;
+
+	/**
+	 * Get the maximum cascade rank of dictionary modules
+	 */
+	size_t getMinCascadeRank() const;
 
 	DictModule& addDictModule( std::wstring const& name, std::string const& dicFile, size_t cascadeRank = 0 );
 
