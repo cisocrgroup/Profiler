@@ -121,6 +121,9 @@ namespace OCRCorrection {
 		size_t size() const noexcept {return e_ - b_;}
 		bool empty() const noexcept {return b_ == e_;}
 
+		const std::string& file() const noexcept {
+			return line_->file();
+		}
 		std::wstring gt() const;
 		Trace trace() const;
 		std::wstring ocr() const;

@@ -176,6 +176,7 @@ OCRCorrection::operator>>(std::wistream& is, GtLine& line)
 std::wostream&
 OCRCorrection::operator<<(std::wostream& os, const GtToken& token)
 {
+	os << Utils::utf8(token.file()) << "\n";
 	for (wchar_t c: token.gt_range()) {
 		if (u_charType(c) == U_NON_SPACING_MARK)
 			os << L'◌';
