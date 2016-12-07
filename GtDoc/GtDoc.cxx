@@ -113,16 +113,18 @@ GtDoc::parse(Document& document)
 void
 GtDoc::add(const GtLine& line, Document& document)
 {
-	bool normal = false;
-	for (auto ofs = 0U; ofs != std::wstring::npos;) {
-		auto n = document.findBorder(line.ocr(), ofs, &normal);
-		document.pushBackToken(line.ocr().substr(ofs, n), normal);
-		assert(document.getNrOfTokens() > 0);
-		const auto idx  = document.at(document.getNrOfTokens() - 1).
-			getIndexInDocument();
-		tokens_.resize(idx + 1);
-		tokens_[idx] = line.token(idx, ofs, n);
-		ofs += n;
+	for (auto ofs = 0U; ofs < line.ocr().size();) {
+		bool normal = false;
+		const auto n = document.findBorder(line.ocr(), ofs, &normal);
+		if (n != std::wstring::npos) {
+			document.pushBackToken(line.ocr().substr(ofs, n - ofs), normal);
+			assert(document.getNrOfTokens() > 0);
+			const auto idx  = document.at(document.getNrOfTokens() - 1).
+				getIndexInDocument();
+			tokens_.resize(idx + 1);
+			tokens_[idx] = line.token(idx, ofs, n);
+		}
+		ofs = n;
 	}
 }
 
@@ -167,7 +169,7 @@ OCRCorrection::operator>>(std::wistream& is, GtLine& line)
 		return is;
 	line = GtLine(Utils::utf8(file), remove_dottet_circles(gt),
 			trace, remove_dottet_circles(ocr));
-	return is;
+	return std::getline(is, file); // read empty line;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -183,7 +185,7 @@ OCRCorrection::operator<<(std::wostream& os, const GtToken& token)
 	std::copy(token.trace_begin(), token.trace_end(),
 			std::ostream_iterator<wchar_t, wchar_t>(os));
 	os << "\n";
-	for (wchar_t c: token.gt_range()) {
+	for (wchar_t c: token.ocr_range()) {
 		if (u_charType(c) == U_NON_SPACING_MARK)
 			os << L'◌';
 		os << c;
@@ -202,7 +204,7 @@ OCRCorrection::operator<<(std::wostream& os, const Trace& trace)
 
 ////////////////////////////////////////////////////////////////////////////////
 std::wostream&
-OCRCorrection::operator>>(std::wostream& os, const GtDoc& doc)
+OCRCorrection::operator<<(std::wostream& os, const GtDoc& doc)
 {
 	for (const auto& line: doc.lines())
 		os << line << "\n";
