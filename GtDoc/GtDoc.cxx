@@ -45,6 +45,41 @@ GtLine::GtLine(const std::string& file, const std::wstring& gt,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+std::wstring
+GtToken::gt() const
+{
+	std::wstring res;
+	res.reserve(size());
+	for (auto i = b_; i != e_; ++i) {
+		if (not std::next(trace_begin(), i)->is_insertion())
+			res.push_back(*(std::next(gt_begin(), i)));
+	}
+	return res;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+Trace
+GtToken::trace() const
+{
+	Trace trace(size());
+	std::copy(trace_begin(), trace_end(), begin(trace));
+	return trace;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::wstring
+GtToken::ocr() const
+{
+	std::wstring res;
+	res.reserve(size());
+	for (auto i = b_; i != e_; ++i) {
+		if (not std::next(trace_begin(), i)->is_deletion())
+			res.push_back(*(std::next(gt_begin(), i)));
+	}
+	return res;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 bool
 GtToken::is_ok() const noexcept
 {

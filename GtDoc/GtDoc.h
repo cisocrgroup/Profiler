@@ -118,7 +118,12 @@ namespace OCRCorrection {
 		ConstStringRange ocr_range() const noexcept {
 			return {ocr_begin(), ocr_end()};
 		}
+		size_t size() const noexcept {return e_ - b_;}
+		bool empty() const noexcept {return b_ == e_;}
 
+		std::wstring gt() const;
+		Trace trace() const;
+		std::wstring ocr() const;
 		bool is_ok() const noexcept;
 		bool is_error() const noexcept {return not is_ok();}
 
