@@ -1,6 +1,8 @@
 #ifndef OCRCorrection_RecPrec_hpp__
 #define OCRCorrection_RecPrec_hpp__
 
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
 #include "Document/Document.h"
 #include <array>
 
@@ -52,6 +54,9 @@ namespace OCRCorrection {
 		double f_measure(double beta = 1) const noexcept;
 
 		template<class Gt>
+		void write(const std::string& path, const Document& doc,
+				const Gt& gt) const;
+		template<class Gt>
 		void classify(const Document& doc, const Gt& gt);
 		template<class GtToken>
 		Class classify(const Token& token, const GtToken& gt) const;
@@ -79,6 +84,10 @@ namespace OCRCorrection {
 		template<class GtToken>
 		static Class classify(const Token& token, const GtToken& gt,
 				ModeVeryStrict);
+		template<class Gt>
+		void write(std::wostream& os, Class c, const Document& doc,
+				const Gt& gt) const;
+
 		std::array<std::vector<size_t>, 4> classes_;
 		Mode mode_;
 	};
@@ -169,6 +178,84 @@ OCRCorrection::RecPrec::classify(const Token& token, const GtToken& gt,
 	} else {
 		return gt.gt() == r.begin()->getWord() ?
 			Class::FalsePositive : Class::TruePositive;
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+template<class Gt>
+void
+OCRCorrection::RecPrec::write(const std::string& path, const Document& doc,
+		const Gt& gt) const
+{
+	namespace bs = boost::filesystem;
+	bs::path dir(path);
+	auto info = dir / "info.txt";
+	auto tp = dir / "true_positive.txt";
+	auto tn = dir / "true_negative.txt";
+	auto fp = dir / "false_positive.txt";
+	auto fn = dir / "false_negative.txt";
+
+	bs::create_directory(dir);
+	std::wofstream os;
+	os.open(info.string());
+	if (not os.good())
+		throw std::system_error(errno, std::system_category(), info.string());
+	os << "# " << info << "\n"
+	   << "True positive:  " << true_positives() << "\n"
+	   << "True negative:  " << true_negatives() << "\n"
+	   << "False positive: " << false_positives() << "\n"
+	   << "False negative: " << false_negatives() << "\n"
+	   << "Precision:      " << precision() << "\n"
+	   << "Recall:         " << recall() << "\n";
+	os.close();
+
+	os.open(tp.string());
+	if (not os.good())
+		throw std::system_error(errno, std::system_category(), tp.string());
+	os << "# " << tp << "\n";
+	write(os, Class::TruePositive, doc, gt);
+	os.close();
+
+	os.open(tn.string());
+	if (not os.good())
+		throw std::system_error(errno, std::system_category(), tn.string());
+	os << "# " << tn << "\n";
+	write(os, Class::TrueNegative, doc, gt);
+	os.close();
+
+	os.open(fp.string());
+	if (not os.good())
+		throw std::system_error(errno, std::system_category(), fp.string());
+	os << "# " << fp << "\n";
+	write(os, Class::FalsePositive, doc, gt);
+	os.close();
+
+	os.open(fn.string());
+	if (not os.good())
+		throw std::system_error(errno, std::system_category(), fn.string());
+	os << "# " << fn << "\n";
+	write(os, Class::FalseNegative, doc, gt);
+	os.close();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+template<class Gt>
+void
+OCRCorrection::RecPrec::write(std::wostream& os, Class c, const Document& doc,
+		const Gt& gt) const
+{
+	struct CandRange {
+		CandRange(const Token& token): token_(token) {}
+		Token::CandidateIterator begin() const {return token_.candidatesBegin();}
+		Token::CandidateIterator end() const {return token_.candidatesEnd();}
+		const Token& token_;
+	};
+
+	for (const size_t id: classes_[static_cast<size_t>(c)]) {
+		os << gt.tokens()[id] << "\n";
+		for (const auto& cand: CandRange(doc.at(id))) {
+			os << cand << "\n";
+		}
 	}
 }
 

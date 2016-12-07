@@ -33,3 +33,4 @@ RecPrec::f_measure(double beta) const noexcept
 	const auto r = recall();
 	return (p * r) / ((beta_square * p) + r);
 }
+
