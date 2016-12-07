@@ -43,8 +43,8 @@ namespace OCRCorrection {
 		class Range {
 		public:
 			Range(It b, It e): b_(b), e_(e) {}
-			It begin() const noexcept {return e_;}
-			It end() const noexcept {return b_;}
+			It begin() const noexcept {return b_;}
+			It end() const noexcept {return e_;}
 		private:
 			const It b_, e_;
 		};
@@ -157,7 +157,7 @@ namespace OCRCorrection {
 	std::wistream& operator>>(std::wistream& is, GtLine& line);
 	std::wostream& operator<<(std::wostream& os, const GtToken& token);
 	std::wostream& operator<<(std::wostream& os, const Trace& trace);
-	std::wostream& operator>>(std::wostream& os, const GtDoc& doc);
+	std::wostream& operator<<(std::wostream& os, const GtDoc& doc);
 	std::wistream& operator>>(std::wistream& is, GtDoc& doc);
 }
 
