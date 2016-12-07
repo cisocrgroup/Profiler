@@ -63,7 +63,9 @@ namespace OCRCorrection {
 		trace_const_iterator trace_begin() const noexcept {return trace_.begin();}
 		trace_const_iterator trace_end() const noexcept {return trace_.end();}
 		ConstTraceRange trace_range() const noexcept {return {trace_begin(), trace_end()};}
-		inline GtToken as_token() const noexcept;
+		inline GtToken token(size_t id, size_t ofs, size_t n) const noexcept;
+		inline GtToken token() const noexcept;
+
 
 		size_t size() const noexcept {return gt_.size();}
 		bool empty() const noexcept {return gt_.empty();}
@@ -85,6 +87,7 @@ namespace OCRCorrection {
 		using ConstStringRange = GtLine::ConstStringRange;
 		using ConstTraceRange = GtLine::ConstTraceRange;
 
+		GtToken(): id_(0), b_(0), e_(0), line_(nullptr) {}
 		GtToken(size_t id, size_t b, size_t e, const GtLine* line)
 			: id_(id), b_(b), e_(e), line_(line)
 		{}
@@ -138,6 +141,8 @@ namespace OCRCorrection {
 		void parse(Document& document);
 
 	private:
+		void add(const GtLine& line, Document& document);
+
 		Lines lines_;
 		Tokens tokens_;
 	};
@@ -153,6 +158,16 @@ namespace OCRCorrection {
 
 ////////////////////////////////////////////////////////////////////////////////
 OCRCorrection::GtToken
-OCRCorrection::GtLine::as_token() const noexcept {return {0, 0, size(), this};}
+OCRCorrection::GtLine::token() const noexcept
+{
+	return token(0, 0, size());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+OCRCorrection::GtToken
+OCRCorrection::GtLine::token(size_t id, size_t ofs, size_t n) const noexcept
+{
+	return {id, ofs, ofs + n, this};
+}
 
 #endif // OCRCorrection_GtDoc_hpp__

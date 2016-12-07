@@ -4,6 +4,7 @@
 #include <unicode/uchar.h>
 #include <fstream>
 #include "Utils/Utils.h"
+#include "Document/Document.h"
 #include "GtDoc.h"
 
 using namespace OCRCorrection;
@@ -67,7 +68,27 @@ GtDoc::load(const std::string& file)
 void
 GtDoc::parse(Document& document)
 {
+	document.clear();
+	for (const auto& line: lines_) {
+		add(line, document);
+	}
+}
 
+////////////////////////////////////////////////////////////////////////////////
+void
+GtDoc::add(const GtLine& line, Document& document)
+{
+	bool normal = false;
+	for (auto ofs = 0U; ofs != std::wstring::npos;) {
+		auto n = document.findBorder(line.ocr(), ofs, &normal);
+		document.pushBackToken(line.ocr().substr(ofs, n), normal);
+		assert(document.getNrOfTokens() > 0);
+		const auto idx  = document.at(document.getNrOfTokens() - 1).
+			getIndexInDocument();
+		tokens_.resize(idx + 1);
+		tokens_[idx] = line.token(idx, ofs, n);
+		ofs += n;
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -81,7 +102,7 @@ OCRCorrection::operator<<(std::wostream& os, const EditOperation& op)
 std::wostream&
 OCRCorrection::operator<<(std::wostream& os, const GtLine& line)
 {
-	return os << Utils::utf8(line.file()) << "\n" << line.as_token();
+	return os << Utils::utf8(line.file()) << "\n" << line.token();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
