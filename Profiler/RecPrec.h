@@ -70,9 +70,6 @@ namespace OCRCorrection {
 			bool empty() const noexcept {return b_ == e_;}
 			Token::CandidateIterator b_, e_;
 		};
-		std::vector<size_t>& operator[](Class c) noexcept {
-			return classes_[static_cast<size_t>(c)];
-		}
 		template<class GtToken>
 		static Class classify(const Token& token, const GtToken& gt,
 				ModeNormal);
@@ -94,7 +91,7 @@ OCRCorrection::RecPrec::classify(const Document& doc, const Gt& gt)
 {
 	for (const auto& token: doc) {
 		const auto idx = token.getIndexInDocument();
-		(*this)[classify(token, gt.tokens()[idx])].push_back(idx);
+		classes_[classify(token, gt.tokens()[idx])].push_back(idx);
 	}
 }
 
