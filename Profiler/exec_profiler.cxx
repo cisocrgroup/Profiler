@@ -121,7 +121,8 @@ int main( int argc, char const** argv ) {
             options.hasOption( "out_none" ) ||
             options.hasOption("simpleOutput")) ) {
 	std::wcerr << "Specify some output." << std::endl
-		   << "If you really want to run without any output, say this explicitly using --out_none" << std::endl
+		   << "If you really want to run without any output, say this explicitly using --out_none"
+		   << std::endl
 		   << "Use --help to learn about output options." << std::endl;
 	exit( EXIT_FAILURE );
     }
