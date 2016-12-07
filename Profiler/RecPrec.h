@@ -19,20 +19,20 @@ namespace OCRCorrection {
 			Strict,
 			VeryStrict,
 		};
-		size_t operator[](Class c) const noexcept {
-			return counts_[static_cast<size_t>(c)];
+		const std::vector<size_t>& operator[](Class c) const noexcept {
+			return classes_[static_cast<size_t>(c)];
 		}
 		size_t true_positives() const noexcept {
-			return (*this)[Class::TruePositive];
+			return (*this)[Class::TruePositive].size();
 		}
 		size_t true_negatives() const noexcept {
-			return (*this)[Class::TrueNegative];
+			return (*this)[Class::TrueNegative].size();
 		}
 		size_t false_positives() const noexcept {
-			return (*this)[Class::FalsePositive];
+			return (*this)[Class::FalsePositive].size();
 		}
 		size_t false_negatives() const noexcept {
-			return (*this)[Class::FalseNegative];
+			return (*this)[Class::FalseNegative].size();
 		}
 		size_t sum() const noexcept {
 			return true_positives() +
@@ -41,7 +41,8 @@ namespace OCRCorrection {
 				false_negatives();
 		}
 		void clear() noexcept {
-			std::fill(begin(counts_), end(counts_), 0);
+			std::fill(begin(classes_), end(classes_),
+					std::vector<size_t>());
 		}
 		void set_mode(Mode mode) {mode_ = mode;}
 
@@ -55,10 +56,13 @@ namespace OCRCorrection {
 		template<class GtToken>
 		Class classify(const Token& token, const GtToken& gt) const;
 		template<class GtToken>
-		static bool is_positive(const Token& token, const GtToken& gt);
+		bool is_positive(const Token& token, const GtToken& gt) const;
 		static bool is_true(const Token& token);
 
 	private:
+		struct ModeNormal{};
+		struct ModeStrict{};
+		struct ModeVeryStrict{};
 		struct CandidateRange {
 			CandidateRange(const Token& token)
 				: b_(token.candidatesBegin())
@@ -69,10 +73,19 @@ namespace OCRCorrection {
 			bool empty() const noexcept {return b_ == e_;}
 			Token::CandidateIterator b_, e_;
 		};
-		size_t& operator[](Class c) noexcept {
-			return counts_[static_cast<size_t>(c)];
+		std::vector<size_t>& operator[](Class c) noexcept {
+			return classes_[static_cast<size_t>(c)];
 		}
-		std::array<size_t, 4> counts_;
+		template<class GtToken>
+		static bool is_positive(const Token& token, const GtToken& gt,
+				ModeNormal);
+		template<class GtToken>
+		static bool is_positive(const Token& token, const GtToken& gt,
+				ModeStrict);
+		template<class GtToken>
+		static bool is_positive(const Token& token, const GtToken& gt,
+				ModeVeryStrict);
+		std::array<std::vector<size_t>, 4> classes_;
 		Mode mode_;
 	};
 }
@@ -84,7 +97,7 @@ OCRCorrection::RecPrec::classify(const Document& doc, const Gt& gt)
 {
 	for (const auto& token: doc) {
 		const auto idx = token.getIndexInDocument();
-		(*this)[classify(token, gt.tokens()[idx])]++;
+		(*this)[classify(token, gt.tokens()[idx])].push_back(idx);
 	}
 }
 
@@ -109,7 +122,41 @@ OCRCorrection::RecPrec::classify(const Token& token, const GtToken& gt) const
 ////////////////////////////////////////////////////////////////////////////////
 template<class GtToken>
 bool
-OCRCorrection::RecPrec::is_positive(const Token& token, const GtToken& gt)
+OCRCorrection::RecPrec::is_positive(const Token& token, const GtToken& gt) const
+{
+	switch (mode_) {
+	case Mode::Normal:
+		return is_positive(token, gt, ModeNormal());
+	case Mode::Strict:
+		return is_positive(token, gt, ModeStrict());
+	case Mode::VeryStrict:
+		return is_positive(token, gt, ModeVeryStrict());
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+template<class GtToken>
+bool
+OCRCorrection::RecPrec::is_positive(const Token& token, const GtToken& gt,
+		ModeNormal)
+{
+	return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+template<class GtToken>
+bool
+OCRCorrection::RecPrec::is_positive(const Token& token, const GtToken& gt,
+		ModeStrict)
+{
+	return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+template<class GtToken>
+bool
+OCRCorrection::RecPrec::is_positive(const Token& token, const GtToken& gt,
+		ModeVeryStrict)
 {
 	return true;
 }
