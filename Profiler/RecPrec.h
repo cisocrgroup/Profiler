@@ -52,11 +52,23 @@ namespace OCRCorrection {
 
 		template<class Gt>
 		void classify(const Document& doc, const Gt& gt);
-
-		template<class Gt>
-		Class classify(const Token& token, const Gt& gt) const;
+		template<class GtToken>
+		Class classify(const Token& token, const GtToken& gt) const;
+		template<class GtToken>
+		static bool is_positive(const Token& token, const GtToken& gt);
+		static bool is_true(const Token& token);
 
 	private:
+		struct CandidateRange {
+			CandidateRange(const Token& token)
+				: b_(token.candidatesBegin())
+				, e_(token.candidatesEnd())
+			{}
+			Token::CandidateIterator begin() const noexcept {return b_;}
+			Token::CandidateIterator end() const noexcept {return e_;}
+			bool empty() const noexcept {return b_ == e_;}
+			Token::CandidateIterator b_, e_;
+		};
 		size_t& operator[](Class c) noexcept {
 			return counts_[static_cast<size_t>(c)];
 		}
@@ -70,16 +82,44 @@ template<class Gt>
 void
 OCRCorrection::RecPrec::classify(const Document& doc, const Gt& gt)
 {
-	for (const auto& token: doc)
-		(*this)[classify(token, gt)]++;
+	for (const auto& token: doc) {
+		const auto idx = token.getIndexInDocument();
+		(*this)[classify(token, gt.tokens()[idx])]++;
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-template<class Gt>
+template<class GtToken>
 OCRCorrection::RecPrec::Class
-OCRCorrection::RecPrec::classify(const Token& token, const Gt& gt) const
+OCRCorrection::RecPrec::classify(const Token& token, const GtToken& gt) const
 {
-	return Class::TruePositive;
+	if (is_positive(token, gt)) {
+		if (is_true(token))
+			return Class::TruePositive;
+		else
+			return Class::FalsePositive;
+	} else {
+		if (is_true(token))
+			return Class::TrueNegative;
+		else
+			return Class::FalseNegative;
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+template<class GtToken>
+bool
+OCRCorrection::RecPrec::is_positive(const Token& token, const GtToken& gt)
+{
+	return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool
+OCRCorrection::RecPrec::is_true(const Token& token)
+{
+	CandidateRange r(token);
+	return not r.empty();
 }
 
 #endif // OCRCorrection_RecPrec_hpp__

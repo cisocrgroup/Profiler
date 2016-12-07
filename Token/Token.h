@@ -529,7 +529,11 @@ namespace OCRCorrection {
 		return *this;
 	    }
 
-	    bool operator !=( CandidateIterator const& other ) {
+	    bool operator==(CandidateIterator const& other) const {
+		    return pos_ == other.pos_;
+	    }
+
+	    bool operator !=( CandidateIterator const& other ) const {
 		return pos_ != other.pos_;
 	    }
 
