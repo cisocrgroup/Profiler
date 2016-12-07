@@ -11,6 +11,7 @@
 #include <DocXML/DocXMLReader.h>
 #include <AltoXML/AltoXMLReader.h>
 #include "SimpleOutputWriter.h"
+#include "GtDoc/GtDoc.h"
 #include<IBMGroundtruth/IBMGTReader.h>
 #include<Getopt/Getopt.h>
 
@@ -18,7 +19,7 @@
 void printHelp() {
     std::wcerr << "Use like: profiler --config=<iniFile> --sourceFile=<xmlFile>"
 	       << std::endl
-	       << "--sourceFormat DocXML | AltoXML | ABBYY_XML_DIR | TXT   (Default: DocXML)" << std::endl
+	       << "--sourceFormat DocXML | AltoXML | DocGt | ABBYY_XML_DIR | TXT   (Default: DocXML)" << std::endl
 	       << "[--out_xml  <outputFile> ]  Prints xml containing the lists of hist. variants and ocr errors." << std::endl
 	       << "[--out_html <outputFile> ]  Prints all kinds of things to control the Profiler's performance to html." <<  std::endl
 	       << "[--out_doc  <outputFile> ]  Prints the document in DocXML format, including correction suggestions." <<  std::endl
@@ -182,6 +183,12 @@ int main( int argc, char const** argv ) {
 	    OCRCorrection::IBMGTReader r;
 	    r.parse( options.getOption( "sourceFile" ).c_str(), &document );
 	    profiler.createProfile( document );
+	}
+	else if (options.getOption("sourceFormat") == "DocGt") {
+		OCRCorrection::GtDoc gtdoc;
+		gtdoc.load(options.getOption("sourceFile"));
+		gtdoc.parse(document);
+		profiler.createProfile(document);
 	}
 	else {
 	    std::wcerr << "Unknown sourceFormat! Use: profiler --help" << std::endl;

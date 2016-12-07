@@ -111,7 +111,7 @@ SET( OCRCORRECTION_SOURCES
 	     Token/TokenImageInfoBox.cxx
 	     GlobalProfile/GlobalProfileXMLReader.cxx
 	     GlobalProfile/PatternContainerXMLReader.cxx
-
+	     GtDoc/GtDoc.cxx
 	     )
 
 add_library( OCRCorrection STATIC ${OCRCORRECTION_SOURCES})
