@@ -37,7 +37,7 @@ void printHelp() {
                << std::endl
                << "[--simpleOutput]            Print simple text output to stdout"
 	       << std::endl
-	       << "[--adaptive]                Use adaptive profiler, that uses correction information (defunct)"
+	       << "[--adaptive]                Use adaptive profiler, that uses correction information"
                << std::endl
 	;
 }
