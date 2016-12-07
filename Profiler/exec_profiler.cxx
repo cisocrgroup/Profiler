@@ -40,9 +40,12 @@ void printHelp() {
 	       << std::endl
 	       << "[--adaptive]                Use adaptive profiler, that uses correction information (defunct)"
                << std::endl
+	       << "[--recprec <out-dir>]       Calculate recall and precision of the profiler and write results to <out-dir>"
+               << std::endl
+	       << "[--strict yes|no|very]      set the strictness of the recprec evaluation"
+               << std::endl
 	;
 }
-
 
 int main( int argc, char const** argv ) {
 
@@ -65,6 +68,8 @@ int main( int argc, char const** argv ) {
     options.specifyOption( "createConfigFile", csl::Getopt::VOID );
     options.specifyOption( "simpleOutput", csl::Getopt::VOID );
     options.specifyOption( "adaptive", csl::Getopt::VOID );
+    options.specifyOption( "recprec", csl::Getopt::STRING );
+    options.specifyOption( "strict", csl::Getopt::STRING );
 
     try {
 	options.getOptionsAsSpecified( argc, argv );
