@@ -1,17 +1,10 @@
 #ifndef OCRCorrection_Metadata_hpp__
 #define OCRCorrection_Metadata_hpp__
 
-#include <cstring>
 #include <map>
+#include "Utils/IStrCmp.h"
 
 namespace OCRCorrection {
-	struct IStrCmp {
-		bool operator()(const std::string& a,
-				const std::string& b) const noexcept {
-			return strcasecmp(a.data(), b.data()) < 0;
-		}
-	};
-
 	class Metadata {
 	public:
 		const std::wstring& operator[](const std::string& s) const {
