@@ -347,7 +347,7 @@ namespace OCRCorrection {
 		return *metadata_;
 	}
 	Metadata& metadata() noexcept {
-		return *metadata_;
+		return metadata_ ? *metadata_ : init_metadata();
 	}
 	bool has_metadata(Metadata::Type type) const noexcept {
 		return metadata_ ? metadata_->has(type) : false;
