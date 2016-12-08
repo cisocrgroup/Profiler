@@ -91,6 +91,10 @@ namespace OCRCorrection {
 	if( other.hasGroundtruth() ) {
 	    groundtruth_ = new Groundtruth( other.getGroundtruth() );
 	}
+        if (other.metadata_) {
+	    metadata_ = other.metadata_->clone(*this);
+	}
+
     }
 
 

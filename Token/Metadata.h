@@ -32,6 +32,11 @@ namespace OCRCorrection {
 		bool has(Type type) const noexcept {
 			return map_.count(type);
 		}
+		std::unique_ptr<Metadata> clone(Token& token) const {
+			std::unique_ptr<Metadata> clone(new Metadata(token));
+			clone->map_ = map_;
+			return clone;
+		}
 
 	private:
 		std::map<Type, std::wstring> map_;

@@ -21,7 +21,6 @@ namespace OCRCorrection {
 	tokenNr_( 0 ),
 	isSuspicious_( false )
     {
-
         // All this is done in Profiler::preparedocument
 
 	// setWOCR( originalToken_->getWOCR() );
