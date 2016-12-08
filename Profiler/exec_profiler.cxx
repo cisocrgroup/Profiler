@@ -11,6 +11,8 @@
 #include <DocXML/DocXMLReader.h>
 #include <AltoXML/AltoXMLReader.h>
 #include "SimpleOutputWriter.h"
+#include "GtDoc/GtDoc.h"
+#include "Profiler/RecPrec.h"
 #include<IBMGroundtruth/IBMGTReader.h>
 #include<Getopt/Getopt.h>
 
@@ -18,7 +20,7 @@
 void printHelp() {
     std::wcerr << "Use like: profiler --config=<iniFile> --sourceFile=<xmlFile>"
 	       << std::endl
-	       << "--sourceFormat DocXML | AltoXML | ABBYY_XML_DIR | TXT   (Default: DocXML)" << std::endl
+	       << "--sourceFormat DocXML | AltoXML | DocGt | ABBYY_XML_DIR | TXT   (Default: DocXML)" << std::endl
 	       << "[--out_xml  <outputFile> ]  Prints xml containing the lists of hist. variants and ocr errors." << std::endl
 	       << "[--out_html <outputFile> ]  Prints all kinds of things to control the Profiler's performance to html." <<  std::endl
 	       << "[--out_doc  <outputFile> ]  Prints the document in DocXML format, including correction suggestions." <<  std::endl
@@ -39,9 +41,12 @@ void printHelp() {
 	       << std::endl
 	       << "[--adaptive]                Use adaptive profiler, that uses correction information"
                << std::endl
+	       << "[--recprec <out-dir>]       Calculate recall and precision of the profiler and write results to <out-dir>"
+               << std::endl
+	       << "[--strict yes|no|very]      set the strictness of the recprec evaluation"
+               << std::endl
 	;
 }
-
 
 int main( int argc, char const** argv ) {
 
@@ -64,6 +69,8 @@ int main( int argc, char const** argv ) {
     options.specifyOption( "createConfigFile", csl::Getopt::VOID );
     options.specifyOption( "simpleOutput", csl::Getopt::VOID );
     options.specifyOption( "adaptive", csl::Getopt::VOID );
+    options.specifyOption( "recprec", csl::Getopt::STRING );
+    options.specifyOption( "strict", csl::Getopt::STRING );
 
     try {
 	options.getOptionsAsSpecified( argc, argv );
@@ -115,7 +122,8 @@ int main( int argc, char const** argv ) {
             options.hasOption( "out_none" ) ||
             options.hasOption("simpleOutput")) ) {
 	std::wcerr << "Specify some output." << std::endl
-		   << "If you really want to run without any output, say this explicitly using --out_none" << std::endl
+		   << "If you really want to run without any output, say this explicitly using --out_none"
+		   << std::endl
 		   << "Use --help to learn about output options." << std::endl;
 	exit( EXIT_FAILURE );
     }
@@ -182,6 +190,27 @@ int main( int argc, char const** argv ) {
 	    OCRCorrection::IBMGTReader r;
 	    r.parse( options.getOption( "sourceFile" ).c_str(), &document );
 	    profiler.createProfile( document );
+	}
+	else if (options.getOption("sourceFormat") == "DocGt") {
+		OCRCorrection::GtDoc gtdoc;
+		gtdoc.load(options.getOption("sourceFile"));
+		gtdoc.parse(document);
+		profiler.createProfile(document);
+		if (options.hasOption("recprec")) {
+			OCRCorrection::RecPrec recprec;
+			if (options.hasOption("strict")) {
+				if (options.getOption("strict") == "no")
+					recprec.set_mode(OCRCorrection::RecPrec::Mode::Normal);
+				else if (options.getOption("strict") == "yes")
+					recprec.set_mode(OCRCorrection::RecPrec::Mode::Strict);
+				else if (options.getOption("strict") == "very")
+					recprec.set_mode(OCRCorrection::RecPrec::Mode::VeryStrict);
+				else
+					throw std::runtime_error("Invalid strict mode given");
+			}
+			recprec.classify(document, gtdoc);
+			recprec.write(options.getOption("recprec"), document, gtdoc);
+		}
 	}
 	else {
 	    std::wcerr << "Unknown sourceFormat! Use: profiler --help" << std::endl;

@@ -96,6 +96,7 @@ SET( OCRCORRECTION_SOURCES
 	     Profiler/Profiler.cxx
 	     Profiler/AdaptiveProfiling.cxx
 	     Profiler/AdaptiveHistGtLex.cxx
+	     Profiler/RecPrec.cxx
 	     Profiler/HTMLWriter.cxx
 	     Profiler/Evaluation.cxx
 	     Profiler/SimpleOutputWriter.cxx
@@ -111,7 +112,7 @@ SET( OCRCORRECTION_SOURCES
 	     Token/TokenImageInfoBox.cxx
 	     GlobalProfile/GlobalProfileXMLReader.cxx
 	     GlobalProfile/PatternContainerXMLReader.cxx
-
+	     GtDoc/GtDoc.cxx
 	     )
 
 add_library( OCRCorrection STATIC ${OCRCORRECTION_SOURCES})
