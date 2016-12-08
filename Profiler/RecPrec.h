@@ -1,8 +1,8 @@
 #ifndef OCRCorrection_RecPrec_hpp__
 #define OCRCorrection_RecPrec_hpp__
 
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/path.hpp>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "Document/Document.h"
 #include <array>
 
@@ -87,6 +87,9 @@ namespace OCRCorrection {
 		template<class Gt>
 		void write(std::wostream& os, Class c, const Document& doc,
 				const Gt& gt) const;
+		std::vector<size_t>& operator[](Class c) noexcept {
+			return classes_[static_cast<size_t>(c)];
+		}
 
 		std::array<std::vector<size_t>, 4> classes_;
 		Mode mode_;
@@ -100,7 +103,7 @@ OCRCorrection::RecPrec::classify(const Document& doc, const Gt& gt)
 {
 	for (const auto& token: doc) {
 		const auto idx = token.getIndexInDocument();
-		classes_[classify(token, gt.tokens()[idx])].push_back(idx);
+		(*this)[classify(token, gt.tokens()[idx])].push_back(idx);
 	}
 }
 
@@ -116,6 +119,8 @@ OCRCorrection::RecPrec::classify(const Token& token, const GtToken& gt) const
 		return classify(token, gt, ModeStrict());
 	case Mode::VeryStrict:
 		return classify(token, gt, ModeVeryStrict());
+	default:
+		throw std::logic_error("default label in `switch(mode_)` encountered");
 	}
 }
 
@@ -184,23 +189,23 @@ OCRCorrection::RecPrec::classify(const Token& token, const GtToken& gt,
 ////////////////////////////////////////////////////////////////////////////////
 template<class Gt>
 void
-OCRCorrection::RecPrec::write(const std::string& path, const Document& doc,
+OCRCorrection::RecPrec::write(const std::string& dir, const Document& doc,
 		const Gt& gt) const
 {
-	namespace bs = boost::filesystem;
-	bs::path dir(path);
-	auto info = dir / "info.txt";
-	auto tp = dir / "true_positive.txt";
-	auto tn = dir / "true_negative.txt";
-	auto fp = dir / "false_positive.txt";
-	auto fn = dir / "false_negative.txt";
+	auto info = dir + "/info.txt";
+	auto tp = dir + "/true_positive.txt";
+	auto tn = dir + "/true_negative.txt";
+	auto fp = dir + "/false_positive.txt";
+	auto fn = dir + "/false_negative.txt";
 
-	bs::create_directory(dir);
+	if (mkdir(dir.data(), 0007) != 0)
+		throw std::system_error(errno, std::system_category(), dir);
+
 	std::wofstream os;
-	os.open(info.string());
+	os.open(info);
 	if (not os.good())
-		throw std::system_error(errno, std::system_category(), info.string());
-	os << "# " << info << "\n"
+		throw std::system_error(errno, std::system_category(), info);
+	os << "# " << Utils::utf8(info) << "\n"
 	   << "True positive:  " << true_positives() << "\n"
 	   << "True negative:  " << true_negatives() << "\n"
 	   << "False positive: " << false_positives() << "\n"
@@ -209,31 +214,31 @@ OCRCorrection::RecPrec::write(const std::string& path, const Document& doc,
 	   << "Recall:         " << recall() << "\n";
 	os.close();
 
-	os.open(tp.string());
+	os.open(tp);
 	if (not os.good())
-		throw std::system_error(errno, std::system_category(), tp.string());
-	os << "# " << tp << "\n";
+		throw std::system_error(errno, std::system_category(), tp);
+	os << "# " << Utils::utf8(tp) << "\n";
 	write(os, Class::TruePositive, doc, gt);
 	os.close();
 
-	os.open(tn.string());
+	os.open(tn);
 	if (not os.good())
-		throw std::system_error(errno, std::system_category(), tn.string());
-	os << "# " << tn << "\n";
+		throw std::system_error(errno, std::system_category(), tn);
+	os << "# " << Utils::utf8(tn) << "\n";
 	write(os, Class::TrueNegative, doc, gt);
 	os.close();
 
-	os.open(fp.string());
+	os.open(fp);
 	if (not os.good())
-		throw std::system_error(errno, std::system_category(), fp.string());
-	os << "# " << fp << "\n";
+		throw std::system_error(errno, std::system_category(), fp);
+	os << "# " << Utils::utf8(fp) << "\n";
 	write(os, Class::FalsePositive, doc, gt);
 	os.close();
 
-	os.open(fn.string());
+	os.open(fn);
 	if (not os.good())
-		throw std::system_error(errno, std::system_category(), fn.string());
-	os << "# " << fn << "\n";
+		throw std::system_error(errno, std::system_category(), fn);
+	os << "# " << Utils::utf8(fn) << "\n";
 	write(os, Class::FalseNegative, doc, gt);
 	os.close();
 }
