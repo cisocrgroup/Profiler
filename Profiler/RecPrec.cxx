@@ -61,7 +61,7 @@ RecPrec::is_true_positive(const Token& token, ModeStrict)
 	using std::end;
 	CandidateRange r(token);
 	auto i = std::find_if(begin(r), end(r), [&token](const Candidate& cand) {
-		return token.metadata()[Metadata::Type::GroundTruth] == cand.getWord();
+		return token.metadata()["groundtruth"] == cand.getWord();
 	});
 	return i != end(r);
 }
@@ -71,7 +71,7 @@ bool
 RecPrec::is_true_positive(const Token& token, ModeVeryStrict)
 {
 	CandidateRange r(token);
-	return token.metadata()[Metadata::Type::GroundTruth] == r.begin()->getWord();
+	return token.metadata()["groundtruth"] == r.begin()->getWord();
 }
 
 
@@ -82,9 +82,8 @@ OCRCorrection::RecPrec::classify(const Document& doc)
 	for (const auto& token: doc) {
 		// handle normal tokens without corrections
 		std::wcerr << "token " << token.getWOCR() << "\n";
-		std::wcerr << "corr " << token.has_metadata(Metadata::Type::Correction) << "\n";
-		if (not token.has_metadata(Metadata::Type::Correction) and
-				token.isNormal()) {
+		std::wcerr << "corr " << token.has_metadata("correction") << "\n";
+		if (not token.has_metadata("correction") and token.isNormal()) {
 			const auto idx = token.getIndexInDocument();
 			(*this)[classify(token)].push_back(idx);
 		}
@@ -174,7 +173,7 @@ RecPrec::write(std::wostream& os, Class c, const Document& doc) const
 	};
 
 	for (const size_t id: classes_[static_cast<size_t>(c)]) {
-		os << "gt: " << doc.at(id).metadata()[Metadata::Type::GroundTruth] << "\n";
+		os << "gt: " << doc.at(id).metadata()["groundtruth"] << "\n";
 		os << "ocr: " << doc.at(id).getWOCR() << "\n";
 		for (const auto& cand: CandRange(doc.at(id))) {
 			os << "cand: " << cand << "\n";

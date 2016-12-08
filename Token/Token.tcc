@@ -92,7 +92,7 @@ namespace OCRCorrection {
 	    groundtruth_ = new Groundtruth( other.getGroundtruth() );
 	}
         if (other.metadata_) {
-	    metadata_ = other.metadata_->clone(*this);
+		metadata_.reset(new Metadata(*other.metadata_));
 	}
 
     }

@@ -250,12 +250,10 @@ namespace OCRCorrection {
 	}
 
 	else if(strcmp(message, "wCorr") == 0 and not content_.empty()) {
-		tok_->metadata()[Metadata::Type::Correction] = content_;
-		tok_->metadata()[Metadata::Type::CorrectionLowerCase] =
-			Utils::tolower(content_);
+		tok_->metadata()["correction"] = content_;
 	}
 	else if (strcmp(message, "wGT") == 0 and not content_.empty()) {
-		tok_->metadata()[Metadata::Type::GroundTruth] = content_;
+		tok_->metadata()["groundtruth"] = content_;
 	}
 
 	else if(strcmp(message, "ocrInstructions") == 0) {
