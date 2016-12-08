@@ -21,6 +21,7 @@ namespace OCRCorrection {
 			Strict,
 			VeryStrict,
 		};
+		RecPrec(): classes_(), mode_(Mode::Normal) {}
 		const std::vector<size_t>& operator[](Class c) const noexcept {
 			return classes_[static_cast<size_t>(c)];
 		}

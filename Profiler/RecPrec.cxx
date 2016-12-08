@@ -81,7 +81,9 @@ OCRCorrection::RecPrec::classify(const Document& doc)
 {
 	for (const auto& token: doc) {
 		// handle normal tokens without corrections
-		if (not token.has_metadata(Metadata::Type::GroundTruth) and
+		std::wcerr << "token " << token.getWOCR() << "\n";
+		std::wcerr << "corr " << token.has_metadata(Metadata::Type::Correction) << "\n";
+		if (not token.has_metadata(Metadata::Type::Correction) and
 				token.isNormal()) {
 			const auto idx = token.getIndexInDocument();
 			(*this)[classify(token)].push_back(idx);
