@@ -200,7 +200,7 @@ OCRCorrection::RecPrec::write(const std::string& dir, const Document& doc,
 	auto fp = dir + "/false_positive.txt";
 	auto fn = dir + "/false_negative.txt";
 
-	if (mkdir(dir.data(), 0752) != 0)
+	if (mkdir(dir.data(), 0752) != 0 and errno != EEXIST)
 		throw std::system_error(errno, std::system_category(), dir);
 
 	std::wofstream os;
