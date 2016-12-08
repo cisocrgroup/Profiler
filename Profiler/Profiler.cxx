@@ -293,7 +293,8 @@ namespace OCRCorrection {
 			// 	       << cand->getWord() << "," << cand->getLevDistance()
 			// 	       << "+ocr" << *instruction << "\n";
 
-			if( instruction->size() > cand->getLevDistance() ) {std::wcerr << "CONTINUE\n"; continue;}
+			if( instruction->size() > cand->getLevDistance() )
+				continue;
 
 			Profiler_Interpretation current = Profiler_Interpretation( *cand );
 			current.setOCRTrace( *instruction );
@@ -307,7 +308,6 @@ namespace OCRCorrection {
 			// See the compare-operator above
 			if( candidates_.empty() || ( ! myEquals( current, candidates_.back() ) ) ) {
 			    //if( ( iterationNumber < 2 ) || current.getCombinedProbability() > 1e-8 ) { // EXPERIMENTAL
-				std::wcerr << "PUSHGING BACK CURRENT (" << candidates_.size() << ")\n";
 				sumOfProbabilities += current.getCombinedProbability();
 				candidates_.push_back( current );
 				//}
