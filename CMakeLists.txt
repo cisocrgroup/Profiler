@@ -2,13 +2,7 @@ project(OCRCorrection_cxx)
 
 cmake_minimum_required(VERSION 2.4)
 
-
-
-
-
 ADD_CUSTOM_TARGET(postcorrection DEPENDS JNICorrectionSystem )
-
-
 
 #SET(CMAKE_VERBOSE_MAKEFILE true)
 
@@ -89,6 +83,7 @@ add_subdirectory(tools)
 
 ###### TO DO: Move this (and all related headers and sources) to a separate folder ##########
 SET( OCRCORRECTION_SOURCES
+	     AutoCorrector/AutoCorrector.cxx
              Utils/Utils.cxx
 	     Document/Document.cxx
 	     CorrectionSystem/CorrectionSystem.cxx
