@@ -2,46 +2,23 @@
 #define OCRCorrection_Metadata_hpp__
 
 #include <map>
+#include "Utils/IStrCmp.h"
 
 namespace OCRCorrection {
-	class Token;
 	class Metadata {
 	public:
-		enum class Type {
-			Correction,
-			CorrectionLowerCase,
-			GroundTruth,
-		};
-
-		Metadata(Token& token)
-			: map_()
-			, token_(&token)
-		{}
-
-		const Token& token() const noexcept {
-			return *token_;
+		const std::wstring& operator[](const std::string& s) const {
+			return map_.at(s);
 		}
-		Token& token() noexcept {
-			return *token_;
+		std::wstring& operator[](const std::string& s) {
+			return map_[s];
 		}
-		const std::wstring& operator[](Type type) const {
-			return map_.at(type);
-		}
-		std::wstring& operator[](Type type) {
-			return map_[type];
-		}
-		bool has(Type type) const noexcept {
-			return map_.count(type);
-		}
-		std::unique_ptr<Metadata> clone(Token& token) const {
-			std::unique_ptr<Metadata> clone(new Metadata(token));
-			clone->map_ = map_;
-			return clone;
+		bool has(const std::string& s) const noexcept {
+			return map_.count(s);
 		}
 
 	private:
-		std::map<Type, std::wstring> map_;
-		Token* token_;
+		std::map<std::string, std::wstring, IStrCmp> map_;
 	};
 }
 

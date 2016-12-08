@@ -340,7 +340,7 @@ namespace OCRCorrection {
 	}
 
 	Metadata& init_metadata() {
-		metadata_.reset(new Metadata(*this));
+		metadata_.reset(new Metadata());
 		return *metadata_;
 	}
 	const Metadata& metadata() const noexcept {
@@ -349,8 +349,8 @@ namespace OCRCorrection {
 	Metadata& metadata() noexcept {
 		return metadata_ ? *metadata_ : init_metadata();
 	}
-	bool has_metadata(Metadata::Type type) const noexcept {
-		return metadata_ ? metadata_->has(type) : false;
+	bool has_metadata(const std::string& s) const noexcept {
+		return metadata_ ? metadata_->has(s) : false;
 	}
 
 	//@}

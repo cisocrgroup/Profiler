@@ -94,7 +94,7 @@ template<class M>
 OCRCorrection::RecPrec::Class
 OCRCorrection::RecPrec::classify(const Token& token, M m)
 {
-	if (token.metadata()[Metadata::Type::GroundTruth] != token.getWOCR()) {
+	if (token.metadata()["correction"] != token.getWOCR()) {
 		if (has_ocr_errors(token)) {
 			if (is_true_positive(token, m))
 				return Class::TruePositive;

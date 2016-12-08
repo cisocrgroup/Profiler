@@ -56,13 +56,23 @@ namespace OCRCorrection {
 				const std::wstring& ops, const std::wstring& ocr);
 		str_const_iterator gt_begin() const noexcept {return gt_.begin();}
 		str_const_iterator gt_end() const noexcept {return gt_.end();}
-		ConstStringRange gt_range() const noexcept {return {gt_begin(), gt_end()};}
+		ConstStringRange gt_range() const noexcept {
+			return {gt_begin(), gt_end()};
+		}
 		str_const_iterator ocr_begin() const noexcept {return ocr_.begin();}
 		str_const_iterator ocr_end() const noexcept {return ocr_.end();}
-		ConstStringRange ocr_range() const noexcept {return {ocr_begin(), ocr_end()};}
-		trace_const_iterator trace_begin() const noexcept {return trace_.begin();}
-		trace_const_iterator trace_end() const noexcept {return trace_.end();}
-		ConstTraceRange trace_range() const noexcept {return {trace_begin(), trace_end()};}
+		ConstStringRange ocr_range() const noexcept {
+			return {ocr_begin(), ocr_end()};
+		}
+		trace_const_iterator trace_begin() const noexcept {
+			return trace_.begin();
+		}
+		trace_const_iterator trace_end() const noexcept {
+			return trace_.end();
+		}
+		ConstTraceRange trace_range() const noexcept {
+			return {trace_begin(), trace_end()};
+		}
 		inline GtToken token(size_t id, size_t b, size_t e) const noexcept;
 		inline GtToken token() const noexcept;
 
@@ -73,6 +83,12 @@ namespace OCRCorrection {
 		const std::wstring& gt() const noexcept {return gt_;}
 		const std::wstring& ocr() const noexcept {return ocr_;}
 		const Trace& trace() const noexcept {return trace_;}
+
+		template<class Oit>
+		void copy_ocr(size_t b, size_t e, Oit o) const;
+		template<class Oit>
+		void copy_gt(size_t b, size_t e, Oit o) const;
+
 
 	private:
 		std::string file_;
@@ -130,7 +146,7 @@ namespace OCRCorrection {
 		bool is_ok() const noexcept;
 		bool is_error() const noexcept {return not is_ok();}
 
-	// private:
+	private:
 		size_t id_, b_, e_;
 		const GtLine* line_;
 	};
@@ -146,10 +162,11 @@ namespace OCRCorrection {
 		Lines& lines() noexcept {return lines_;}
 		const Tokens& tokens() const noexcept {return tokens_;}
 		void load(const std::string& file);
-		void parse(Document& document);
+		void parse(Document& document) const;
+		void parse(const std::string& file, Document& document);
 
 	private:
-		void add(const GtLine& line, Document& document);
+		void add(const GtLine& line, Document& document) const;
 
 		Lines lines_;
 		Tokens tokens_;
@@ -176,6 +193,28 @@ OCRCorrection::GtToken
 OCRCorrection::GtLine::token(size_t id, size_t b, size_t e) const noexcept
 {
 	return GtToken(id, b, e, this);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+template<class Oit>
+void
+OCRCorrection::GtLine::copy_ocr(size_t b, size_t e, Oit o) const
+{
+	for (auto i = 0U; (b + i) != e; ++i) {
+		if (not std::next(trace_begin(), i)->is_deletion())
+			*o++ = *std::next(ocr_begin(), i);
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+template<class Oit>
+void
+OCRCorrection::GtLine::copy_gt(size_t b, size_t e, Oit o) const
+{
+	for (auto i = 0U; (b + i) != e; ++i) {
+		if (not std::next(trace_begin(), i)->is_insertion())
+			*o++ = *std::next(gt_begin(), i);
+	}
 }
 
 #endif // OCRCorrection_GtDoc_hpp__
