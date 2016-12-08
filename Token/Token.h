@@ -11,6 +11,7 @@
 #include <Candidate/Candidate.h>
 #include "./Character.h"
 #include "./TokenImageInfoBox.h"
+#include "./Metadata.h"
 
 /******************************************************/
 /***********  IMPORTANT *******************************/
@@ -338,6 +339,20 @@ namespace OCRCorrection {
 	    return characters_.end();
 	}
 
+	Metadata& init_metadata() {
+		metadata_.reset(new Metadata(*this));
+		return *metadata_;
+	}
+	const Metadata& metadata() const noexcept {
+		return *metadata_;
+	}
+	Metadata& metadata() noexcept {
+		return metadata_ ? *metadata_ : init_metadata();
+	}
+	bool has_metadata(Metadata::Type type) const noexcept {
+		return metadata_ ? metadata_->has(type) : false;
+	}
+
 	//@}
 
 	/************************* CONVENIENCE *********************************/
@@ -658,8 +673,6 @@ namespace OCRCorrection {
 	 */
 	std::wstring externalId_;
 
-
-
 	/**
 	 * @brief Holds the index of the Token in its document.
 	 */
@@ -694,8 +707,6 @@ namespace OCRCorrection {
 	 */
 	csl::DictSearch::iDictModule const* currentDictModule_;
 
-
-
 	/**
 	 * @brief The list of candidates is provided by the Profiler
 	 *
@@ -706,6 +717,12 @@ namespace OCRCorrection {
 	 * @brief specifies the nr of cands stored in candidates_
 	 */
 	size_t nrOfCandidates_;
+    private:
+	/**
+	 * Pointer to a Metadata instance
+	 */
+	std::unique_ptr<Metadata> metadata_;
+
 
     }; // class Token
 

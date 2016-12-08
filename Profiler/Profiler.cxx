@@ -187,13 +187,13 @@ namespace OCRCorrection {
 	     ++token ) {
                 //std::wcout << "TOKEN: " << token->getWOCR() << std::endl;
 	    if( ( config_.pageRestriction_ != (size_t)-1 ) &&
-                token->getOriginalToken().getPageIndex()  >= config_.pageRestriction_ ) {
+                token->origin().getPageIndex()  >= config_.pageRestriction_ ) {
                 break;
             }
 
 	    // remove old correction candidates from Document::Token
 	    // Don't confuse this with the Profiler_Interpretations!!
-	    token->getOriginalToken().removeCandidates();
+	    token->origin().removeCandidates();
 
 	    /*
 	     * Those two statements refer only to Profiler_Interpretations
@@ -432,7 +432,7 @@ namespace OCRCorrection {
 
 		////// MODIFY ORIGINAL TOKENS FOR CORRECTION SYSTEM //////////////
 		if( lastIteration ) {
-		    token->getOriginalToken().setSuspicious( token->isSuspicious() );
+		    token->origin().setSuspicious( token->isSuspicious() );
 
 
 		    std::set< std::wstring > seen;
@@ -451,7 +451,7 @@ namespace OCRCorrection {
 
 			// candidate string not suggested before
 			if( ( seen.insert( cand->getWord() ).second == true ) ) {
-			    token->getOriginalToken().addCandidate( *cand );
+			    token->origin().addCandidate( *cand );
 			}
 		    }
 		}

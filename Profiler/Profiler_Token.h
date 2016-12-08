@@ -1,6 +1,6 @@
 
 
-class Profiler_Token  {
+class Profiler_Token {
 
 
 	public:
@@ -22,8 +22,8 @@ class Profiler_Token  {
 
 	/****************************   GETTERS ***********************************/
 
-    Token& getOriginalToken();
-    const Token& getOriginalToken() const;
+    Token& origin();
+    const Token& origin() const;
 
 	/**
 	 * @brief returns a reference to wOCR, the token as recognized by the ocr engine
