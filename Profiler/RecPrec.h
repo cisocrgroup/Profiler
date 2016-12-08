@@ -102,8 +102,10 @@ void
 OCRCorrection::RecPrec::classify(const Document& doc, const Gt& gt)
 {
 	for (const auto& token: doc) {
-		const auto idx = token.getIndexInDocument();
-		(*this)[classify(token, gt.tokens()[idx])].push_back(idx);
+		if (token.isNormal()) { // handle normal tokens only
+			const auto idx = token.getIndexInDocument();
+			(*this)[classify(token, gt.tokens()[idx])].push_back(idx);
+		}
 	}
 }
 
