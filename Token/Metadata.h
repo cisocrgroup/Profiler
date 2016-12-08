@@ -8,8 +8,8 @@ namespace OCRCorrection {
 	class Metadata {
 	public:
 		enum class Type {
-			AdaptiveGtToken,
-			EvaluationGtToken,
+			Correction,
+			GroundTruth,
 		};
 
 		Metadata(Token& token)
