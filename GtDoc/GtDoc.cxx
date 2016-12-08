@@ -101,7 +101,7 @@ GtDoc::load(const std::string& file)
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-GtDoc::parse(Document& document)
+GtDoc::parse(Document& document) const
 {
 	document.clear();
 	for (const auto& line: lines_) {
@@ -111,7 +111,15 @@ GtDoc::parse(Document& document)
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-GtDoc::add(const GtLine& line, Document& document)
+GtDoc::parse(const std::string& file, Document& document)
+{
+	load(file);
+	parse(document);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void
+GtDoc::add(const GtLine& line, Document& document) const
 {
 	std::wstring str;
 	bool normal = false;

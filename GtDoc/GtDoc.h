@@ -162,10 +162,11 @@ namespace OCRCorrection {
 		Lines& lines() noexcept {return lines_;}
 		const Tokens& tokens() const noexcept {return tokens_;}
 		void load(const std::string& file);
-		void parse(Document& document);
+		void parse(Document& document) const;
+		void parse(const std::string& file, Document& document);
 
 	private:
-		void add(const GtLine& line, Document& document);
+		void add(const GtLine& line, Document& document) const;
 
 		Lines lines_;
 		Tokens tokens_;
