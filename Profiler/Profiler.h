@@ -191,7 +191,8 @@ namespace OCRCorrection {
 
     protected:
 	/**
-	 * @brief Returns a reference to the csl::DictSearch - object used by the Profiler.
+	 * @brief Returns a reference to the csl::DictSearch -
+	 * object used by the Profiler.
 	 *
 	 * This is not a const reference so it can be used to change the settings.
 	 */
