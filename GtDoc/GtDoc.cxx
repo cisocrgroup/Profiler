@@ -50,7 +50,7 @@ GtToken::gt() const
 {
 	std::wstring res;
 	res.reserve(size());
-	for (auto i = b_; i != e_; ++i) {
+	for (auto i = 0; (i + b_) != e_; ++i) {
 		if (not std::next(trace_begin(), i)->is_insertion())
 			res.push_back(*(std::next(gt_begin(), i)));
 	}
@@ -72,9 +72,9 @@ GtToken::ocr() const
 {
 	std::wstring res;
 	res.reserve(size());
-	for (auto i = b_; i != e_; ++i) {
+	for (auto i = 0; (i + b_) != e_; ++i) {
 		if (not std::next(trace_begin(), i)->is_deletion())
-			res.push_back(*(std::next(gt_begin(), i)));
+			res.push_back(*(std::next(ocr_begin(), i)));
 	}
 	return res;
 }
@@ -107,6 +107,7 @@ GtDoc::parse(Document& document)
 	for (const auto& line: lines_) {
 		add(line, document);
 	}
+	throw std::runtime_error("DONE");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -116,13 +117,11 @@ GtDoc::add(const GtLine& line, Document& document)
 	for (auto ofs = 0U; ofs < line.ocr().size();) {
 		bool normal = false;
 		const auto n = document.findBorder(line.ocr(), ofs, &normal);
-		if (n != std::wstring::npos) {
+		if (n != std::wstring::npos and n >= ofs) {
+			const auto idx = document.getNrOfTokens();
 			document.pushBackToken(line.ocr().substr(ofs, n - ofs), normal);
-			assert(document.getNrOfTokens() > 0);
-			const auto idx  = document.at(document.getNrOfTokens() - 1).
-				getIndexInDocument();
-			tokens_.resize(idx + 1);
-			tokens_[idx] = line.token(idx, ofs, n);
+			tokens_.push_back(line.token(idx, ofs, n));
+			document.at(idx).setWCorr(tokens_[idx].gt());
 		}
 		ofs = n;
 	}
