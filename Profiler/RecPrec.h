@@ -75,21 +75,22 @@ namespace OCRCorrection {
 			bool empty() const noexcept {return b_ == e_;}
 			Token::CandidateIterator b_, e_;
 		};
-		template<class GtToken>
-		static Class classify(const Token& token, const GtToken& gt,
+		template<class GtToken, class M>
+		static Class classify(const Token& token, const GtToken& gt, M);
+		static bool is_true_positive(const Token& token, const std::wstring& gt,
 				ModeNormal);
-		template<class GtToken>
-		static Class classify(const Token& token, const GtToken& gt,
+		static bool is_true_positive(const Token& token, const std::wstring& gt,
 				ModeStrict);
-		template<class GtToken>
-		static Class classify(const Token& token, const GtToken& gt,
+		static bool is_true_positive(const Token& token, const std::wstring& gt,
 				ModeVeryStrict);
+
 		template<class Gt>
 		void write(std::wostream& os, Class c, const Document& doc,
 				const Gt& gt) const;
 		std::vector<size_t>& operator[](Class c) noexcept {
 			return classes_[static_cast<size_t>(c)];
 		}
+		static bool has_ocr_errors(const Token& token);
 
 		std::array<std::vector<size_t>, 4> classes_;
 		Mode mode_;
@@ -127,66 +128,27 @@ OCRCorrection::RecPrec::classify(const Token& token, const GtToken& gt) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-template<class GtToken>
+template<class GtToken, class M>
 OCRCorrection::RecPrec::Class
-OCRCorrection::RecPrec::classify(const Token& token, const GtToken& gt,
-		ModeNormal)
+OCRCorrection::RecPrec::classify(const Token& token, const GtToken& gt, M m)
 {
-	CandidateRange r(token);
-	if (r.empty()) {
-		if (gt.is_ok())
-			return Class::TrueNegative;
-		else
+	if (gt.is_error()) {
+		if (has_ocr_errors(token)) {
+			if (is_true_positive(token, gt.gt(), m))
+				return Class::TruePositive;
+			else
+				return Class::FalseNegative;
+		} else {
 			return Class::FalseNegative;
+		}
 	} else {
-		if (gt.is_error())
-			return Class::TruePositive;
-		else
+		if (has_ocr_errors(token))
 			return Class::FalsePositive;
+		else
+			return Class::TrueNegative;
 	}
 }
 
-////////////////////////////////////////////////////////////////////////////////
-template<class GtToken>
-OCRCorrection::RecPrec::Class
-OCRCorrection::RecPrec::classify(const Token& token, const GtToken& gt,
-		ModeStrict)
-{
-	CandidateRange r(token);
-	if (r.empty()) {
-		if (gt.is_ok())
-			return Class::TrueNegative;
-		else
-			return Class::FalseNegative;
-	} else if (gt.is_ok()) {
-			return Class::FalsePositive;
-	} else {
-		auto i = std::find_if(r.begin(), r.end(), [&gt](const Candidate& cand) {
-			return gt.gt() == cand.getWord();
-		});
-		return i == r.end() ? Class::FalsePositive : Class::TruePositive;
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////
-template<class GtToken>
-OCRCorrection::RecPrec::Class
-OCRCorrection::RecPrec::classify(const Token& token, const GtToken& gt,
-		ModeVeryStrict)
-{
-	CandidateRange r(token);
-	if (r.empty()) {
-		if (gt.is_ok())
-			return Class::TrueNegative;
-		else
-			return Class::FalseNegative;
-	} else if (gt.is_ok()) {
-			return Class::FalsePositive;
-	} else {
-		return gt.gt() == r.begin()->getWord() ?
-			Class::FalsePositive : Class::TruePositive;
-	}
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 template<class Gt>
