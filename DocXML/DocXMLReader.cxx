@@ -249,9 +249,13 @@ namespace OCRCorrection {
 	    // ignore this field
 	}
 
-	else if(strcmp(message, "wCorr") == 0) {
+	else if(strcmp(message, "wCorr") == 0 and not content_.empty()) {
 		tok_->metadata()[Metadata::Type::Correction] = content_;
-		tok_->metadata()[Metadata::Type::CorrectionLowerCase] = Utils::tolower(content_);
+		tok_->metadata()[Metadata::Type::CorrectionLowerCase] =
+			Utils::tolower(content_);
+	}
+	else if (strcmp(message, "wGT") == 0 and not content_.empty()) {
+		tok_->metadata()[Metadata::Type::GroundTruth] = content_;
 	}
 
 	else if(strcmp(message, "ocrInstructions") == 0) {

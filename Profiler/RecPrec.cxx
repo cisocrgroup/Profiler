@@ -47,29 +47,137 @@ RecPrec::has_ocr_errors(const Token& token)
 }
 ////////////////////////////////////////////////////////////////////////////////
 bool
-RecPrec::is_true_positive(const Token& token, const std::wstring& gt, ModeNormal)
+RecPrec::is_true_positive(const Token& token, ModeNormal)
 {
 	return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool
-RecPrec::is_true_positive(const Token& token, const std::wstring& gt, ModeStrict)
+RecPrec::is_true_positive(const Token& token, ModeStrict)
 {
 
 	using std::begin;
 	using std::end;
 	CandidateRange r(token);
-	auto i = std::find_if(begin(r), end(r), [&gt](const Candidate& cand) {
-		return gt == cand.getWord();
+	auto i = std::find_if(begin(r), end(r), [&token](const Candidate& cand) {
+		return token.metadata()[Metadata::Type::GroundTruth] == cand.getWord();
 	});
 	return i != end(r);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool
-RecPrec::is_true_positive(const Token& token, const std::wstring& gt, ModeVeryStrict)
+RecPrec::is_true_positive(const Token& token, ModeVeryStrict)
 {
 	CandidateRange r(token);
-	return gt == r.begin()->getWord();
+	return token.metadata()[Metadata::Type::GroundTruth] == r.begin()->getWord();
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+void
+OCRCorrection::RecPrec::classify(const Document& doc)
+{
+	for (const auto& token: doc) {
+		// handle normal tokens without corrections
+		if (not token.has_metadata(Metadata::Type::GroundTruth) and
+				token.isNormal()) {
+			const auto idx = token.getIndexInDocument();
+			(*this)[classify(token)].push_back(idx);
+		}
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+OCRCorrection::RecPrec::Class
+OCRCorrection::RecPrec::classify(const Token& token) const
+{
+	switch (mode_) {
+	case Mode::Normal:
+		return classify(token, ModeNormal());
+	case Mode::Strict:
+		return classify(token, ModeStrict());
+	case Mode::VeryStrict:
+		return classify(token, ModeVeryStrict());
+	default:
+		throw std::logic_error("default label in `switch(mode_)` encountered");
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void
+OCRCorrection::RecPrec::write(const std::string& dir, const Document& doc) const
+{
+	auto info = dir + "/info.txt";
+	auto tp = dir + "/true_positive.txt";
+	auto tn = dir + "/true_negative.txt";
+	auto fp = dir + "/false_positive.txt";
+	auto fn = dir + "/false_negative.txt";
+
+	if (mkdir(dir.data(), 0752) != 0 and errno != EEXIST)
+		throw std::system_error(errno, std::system_category(), dir);
+
+	std::wofstream os;
+	os.open(info);
+	if (not os.good())
+		throw std::system_error(errno, std::system_category(), info);
+	os << "# " << Utils::utf8(info) << "\n"
+	   << "True positive:  " << true_positives() << "\n"
+	   << "True negative:  " << true_negatives() << "\n"
+	   << "False positive: " << false_positives() << "\n"
+	   << "False negative: " << false_negatives() << "\n"
+	   << "Precision:      " << precision() << "\n"
+	   << "Recall:         " << recall() << "\n";
+	os.close();
+
+	os.open(tp);
+	if (not os.good())
+		throw std::system_error(errno, std::system_category(), tp);
+	os << "# " << Utils::utf8(tp) << "\n";
+	write(os, Class::TruePositive, doc);
+	os.close();
+
+	os.open(tn);
+	if (not os.good())
+		throw std::system_error(errno, std::system_category(), tn);
+	os << "# " << Utils::utf8(tn) << "\n";
+	write(os, Class::TrueNegative, doc);
+	os.close();
+
+	os.open(fp);
+	if (not os.good())
+		throw std::system_error(errno, std::system_category(), fp);
+	os << "# " << Utils::utf8(fp) << "\n";
+	write(os, Class::FalsePositive, doc);
+	os.close();
+
+	os.open(fn);
+	if (not os.good())
+		throw std::system_error(errno, std::system_category(), fn);
+	os << "# " << Utils::utf8(fn) << "\n";
+	write(os, Class::FalseNegative, doc);
+	os.close();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void
+RecPrec::write(std::wostream& os, Class c, const Document& doc) const
+{
+	struct CandRange {
+		CandRange(const Token& token): token_(token) {}
+		Token::CandidateIterator begin() const {return token_.candidatesBegin();}
+		Token::CandidateIterator end() const {return token_.candidatesEnd();}
+		const Token& token_;
+	};
+
+	for (const size_t id: classes_[static_cast<size_t>(c)]) {
+		os << "gt: " << doc.at(id).metadata()[Metadata::Type::GroundTruth] << "\n";
+		os << "ocr: " << doc.at(id).getWOCR() << "\n";
+		for (const auto& cand: CandRange(doc.at(id))) {
+			os << "cand: " << cand << "\n";
+		}
+	}
+	os << "\n";
+}
+

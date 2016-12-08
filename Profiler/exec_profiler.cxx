@@ -196,21 +196,6 @@ int main( int argc, char const** argv ) {
 		gtdoc.load(options.getOption("sourceFile"));
 		gtdoc.parse(document);
 		profiler.createProfile(document);
-		if (options.hasOption("recprec")) {
-			OCRCorrection::RecPrec recprec;
-			if (options.hasOption("strict")) {
-				if (options.getOption("strict") == "no")
-					recprec.set_mode(OCRCorrection::RecPrec::Mode::Normal);
-				else if (options.getOption("strict") == "yes")
-					recprec.set_mode(OCRCorrection::RecPrec::Mode::Strict);
-				else if (options.getOption("strict") == "very")
-					recprec.set_mode(OCRCorrection::RecPrec::Mode::VeryStrict);
-				else
-					throw std::runtime_error("Invalid strict mode given");
-			}
-			recprec.classify(document, gtdoc);
-			recprec.write(options.getOption("recprec"), document, gtdoc);
-		}
 	}
 	else {
 	    std::wcerr << "Unknown sourceFormat! Use: profiler --help" << std::endl;
@@ -226,6 +211,21 @@ int main( int argc, char const** argv ) {
     if (options.hasOption("simpleOutput")) {
             OCRCorrection::SimpleOutputWriter(std::wcout, document).write();
     }
+    if (options.hasOption("recprec")) {
+  	OCRCorrection::RecPrec recprec;
+  	if (options.hasOption("strict")) {
+  		if (options.getOption("strict") == "no")
+  			recprec.set_mode(OCRCorrection::RecPrec::Mode::Normal);
+  		else if (options.getOption("strict") == "yes")
+  			recprec.set_mode(OCRCorrection::RecPrec::Mode::Strict);
+  		else if (options.getOption("strict") == "very")
+  			recprec.set_mode(OCRCorrection::RecPrec::Mode::VeryStrict);
+  		else
+  			throw std::runtime_error("Invalid strict mode given");
+  	}
+  	recprec.classify(document);
+  	recprec.write(options.getOption("recprec"), document);
+  }
 
 
     if( options.hasOption( "out_xml" ) ) {
