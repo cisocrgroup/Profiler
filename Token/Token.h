@@ -517,11 +517,18 @@ namespace OCRCorrection {
 
 	};
 
-	class CandidateIterator {
+	class CandidateIterator:
+		public std::iterator <std::forward_iterator_tag, Candidate> {
 	public:
 	    CandidateIterator( CandidateChain* pos ) :
 		pos_( pos ) {
 
+	    }
+
+	    CandidateIterator operator++(int) {
+		auto tmp = *this;
+		operator++();
+		return tmp;
 	    }
 
 	    CandidateIterator& operator++() {
