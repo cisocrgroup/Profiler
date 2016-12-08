@@ -49,17 +49,16 @@ Profiler::calculateAdaptiveCandidateSet(const Profiler_Token& t,
 	if (not candidates.empty())
 		std::sort(candidates.begin(), candidates.end());
 	else
-		createCandidatesFromGt(t, candidates);
+		createCandidatesWithCorrection(t, candidates);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-Profiler::createCandidatesFromGt(const Profiler_Token& t,
+Profiler::createCandidatesWithCorrection(const Profiler_Token& t,
 		csl::DictSearch::CandidateSet& candidates)
 {
 	assert(candidates.empty());
-	std::vector<csl::Instruction> ocrinstrs;
-	std::wcerr << "(Profiler) Calculating candidates from gt for token "
+	std::wcerr << "(Profiler) Calculating candidates from correction for token "
 		   << t.origin().metadata()["correction"] << " ("
 		   << t.getWOCR() << ")\n";
 	getAdaptiveHistGtLex().add(t.origin().metadata()["correction"],
@@ -83,15 +82,3 @@ Profiler::getAdaptiveHistGtLex()
 	}
 	return *adaptive_hist_gt_lex_;
 }
-	// std::wofstream os("/tmp/adaptive-profiler.log");
-	// if (not os.good())
-	// 	throw std::system_error(errno, std::system_category(),
-	// 			"/tmp/adaptive-profiler.log");
-
-	// auto oldcout = std::wcout.rdbuf(os.rdbuf());
-	// auto oldcerr = std::wcerr.rdbuf(os.rdbuf());
-
-	// createNonAdaptiveProfile(document_);
-
-	// std::wcout.rdbuf(oldcout);
-	// std::wcerr.rdbuf(oldcerr);

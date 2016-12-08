@@ -208,7 +208,7 @@ namespace OCRCorrection {
 			csl::DictSearch::CandidateSet& candidates);
 	void calculateNonAdaptiveCandidateSet(const Profiler_Token& t,
 			csl::DictSearch::CandidateSet& candidates);
-	void createCandidatesFromGt(const Profiler_Token& t,
+	void createCandidatesWithCorrection(const Profiler_Token& t,
 		csl::DictSearch::CandidateSet& candidates);
 	AdaptiveHistGtLex& getAdaptiveHistGtLex();
 	AdaptiveHistGtLex* adaptive_hist_gt_lex_;
