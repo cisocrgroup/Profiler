@@ -211,7 +211,6 @@ namespace OCRCorrection {
 	void createCandidatesFromGt(const Profiler_Token& t,
 		csl::DictSearch::CandidateSet& candidates);
 	AdaptiveHistGtLex& getAdaptiveHistGtLex();
-	bool canApplyAdaptiveProfiling(const Profiler_Token& t) const;
 	AdaptiveHistGtLex* adaptive_hist_gt_lex_;
 
 	void initGlobalOcrPatternProbs(int itn);

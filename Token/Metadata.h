@@ -9,6 +9,7 @@ namespace OCRCorrection {
 	public:
 		enum class Type {
 			Correction,
+			CorrectionLowerCase,
 			GroundTruth,
 		};
 

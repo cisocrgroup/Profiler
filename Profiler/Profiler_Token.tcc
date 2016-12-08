@@ -13,13 +13,13 @@ namespace OCRCorrection {
 
     // }
 
-    Profiler::Profiler_Token::Profiler_Token( Token& originalToken ) :
-	originalToken_( &originalToken ),
-	bitProperties_( 0 ),
-	candidateSet_( 0 ),
-	probNormalizationFactor_( 0 ),
-	tokenNr_( 0 ),
-	isSuspicious_( false )
+    Profiler::Profiler_Token::Profiler_Token( Token& originalToken )
+	: originalToken_( &originalToken )
+	, bitProperties_( 0 )
+	, candidateSet_( 0 )
+	, probNormalizationFactor_( 0 )
+	, tokenNr_( 0 )
+	, isSuspicious_( false )
     {
         // All this is done in Profiler::preparedocument
 
@@ -38,14 +38,14 @@ namespace OCRCorrection {
     Profiler::Profiler_Token::~Profiler_Token() {
     }
 
-    const Token& Profiler::Profiler_Token::getOriginalToken() const {
+    const Token& Profiler::Profiler_Token::origin() const {
 	if( ! originalToken_ ) {
 	    throw OCRCException( "OCRC::Profiler_Token::getOriginalToken: originalToken is NULL - this should not happen." );
 	}
 	return *originalToken_;
     }
 
-    Token& Profiler::Profiler_Token::getOriginalToken() {
+    Token& Profiler::Profiler_Token::origin() {
 	if( ! originalToken_ ) {
 	    throw OCRCException( "OCRC::Profiler_Token::getOriginalToken: originalToken is NULL - this should not happen." );
 	}

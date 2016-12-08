@@ -250,7 +250,8 @@ namespace OCRCorrection {
 	}
 
 	else if(strcmp(message, "wCorr") == 0) {
-	    tok_->setWCorr( content_ );
+		tok_->metadata()[Metadata::Type::Correction] = content_;
+		tok_->metadata()[Metadata::Type::CorrectionLowerCase] = Utils::tolower(content_);
 	}
 
 	else if(strcmp(message, "ocrInstructions") == 0) {
