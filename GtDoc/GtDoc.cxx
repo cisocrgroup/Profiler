@@ -107,7 +107,6 @@ GtDoc::parse(Document& document)
 	for (const auto& line: lines_) {
 		add(line, document);
 	}
-	throw std::runtime_error("DONE");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
