@@ -1,4 +1,5 @@
 #include <cmath>
+#include "GlobalProfile/GlobalProfile.h"
 #include "RecPrec.h"
 
 using namespace OCRCorrection;
@@ -123,6 +124,7 @@ OCRCorrection::RecPrec::write(const std::string& dir, const Document& doc) const
 	auto tn = dir + "/true_negative.txt";
 	auto fp = dir + "/false_positive.txt";
 	auto fn = dir + "/false_negative.txt";
+	auto corrs = dir + "/corrections.txt";
 
 	if (mkdir(dir.data(), 0752) != 0 and errno != EEXIST)
 		throw std::system_error(errno, std::system_category(), dir);
@@ -167,6 +169,29 @@ OCRCorrection::RecPrec::write(const std::string& dir, const Document& doc) const
 	os << "# " << Utils::utf8(fn) << "\n";
 	write(os, Class::FalseNegative, doc);
 	os.close();
+
+	os.open(corrs);
+	if (not os.good())
+		throw std::system_error(errno, std::system_category(), fn);
+	os << "# " << Utils::utf8(corrs) << "\n";
+	for (const auto& token: doc) {
+		if (token.has_metadata("correction")) {
+			os << token.getWOCR() << ":"
+			   << token.metadata()["correction"]
+			   << "\n";
+		}
+	}
+	os.close();
+
+	if (doc.has_global_profile()) {
+		auto gp = dir + "/global_profile.txt";
+		os.open(gp);
+		if (not os.good())
+			throw std::system_error(errno, std::system_category(), gp);
+		os << "# " << Utils::utf8(gp) << "\n";
+		write(os, doc.global_profile());
+		os.close();
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -185,8 +210,8 @@ RecPrec::write(std::wostream& os, Class c, const Document& doc) const
 	};
 
 	for (const size_t id: classes_[static_cast<size_t>(c)]) {
-		os << "gt:  " << doc.at(id).metadata()["groundtruth"] << "\n";
-		os << "ocr: " << doc.at(id).getWOCR() << "\n";
+		os << "gt:   " << doc.at(id).metadata()["groundtruth"] << "\n";
+		os << "ocr:  " << doc.at(id).getWOCR() << "\n";
 		for (const auto& cand: CandRange(doc.at(id))) {
 			os << "cand: " << cand << "\n";
 		}
@@ -194,3 +219,22 @@ RecPrec::write(std::wostream& os, Class c, const Document& doc) const
 	os << "\n";
 }
 
+////////////////////////////////////////////////////////////////////////////////
+void
+RecPrec::write(std::wostream& os, const GlobalProfile& gp) const
+{
+	for (const auto& p: gp.histPatternProbabilities_) {
+		os << "hist:" << p.first.getLeft() << ":"
+		   << p.first.getRight() << ":"
+		   << p.second << ":"
+		   << gp.histPatternProbabilities_.getWeight(p.first)
+		   << "\n";
+	}
+	for (const auto& p: gp.ocrPatternProbabilities_) {
+		os << "ocr:" << p.first.getLeft() << ":"
+		   << p.first.getRight() << ":"
+		   << p.second << ":"
+		   << gp.ocrPatternProbabilities_.getWeight(p.first)
+		   << "\n";
+	}
+}

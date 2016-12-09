@@ -7,6 +7,7 @@
 #include <array>
 
 namespace OCRCorrection {
+	class GlobalProfile;
 
 	class RecPrec {
 	public:
@@ -79,6 +80,7 @@ namespace OCRCorrection {
 		static bool is_true_positive(const Token& token, ModeVeryStrict);
 
 		void write(std::wostream& os, Class c, const Document& doc) const;
+		void write(std::wostream& os, const GlobalProfile& gp) const;
 		std::vector<size_t>& operator[](Class c) noexcept {
 			return classes_[static_cast<size_t>(c)];
 		}
