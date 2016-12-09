@@ -125,12 +125,14 @@ GtDoc::add(const GtLine& line, Document& document) const
 	bool normal = false;
 	for (auto ofs = 0U; ofs < line.ocr().size();) {
 		const auto n = document.findBorder(line.ocr(), ofs, &normal);
-		if (n != std::wstring::npos and n >= ofs) {
+		if (normal and n != std::wstring::npos and n >= ofs) {
 			const auto idx = document.getNrOfTokens();
 			const auto e = n - ofs;
 
 			str.clear();
 			line.copy_ocr(ofs, e, std::back_inserter(str));
+			if (str.empty())
+				goto next;
 			document.pushBackToken(str, normal);
 
 			str.clear();
@@ -139,6 +141,7 @@ GtDoc::add(const GtLine& line, Document& document) const
 			document.at(idx).metadata()["groundtruth-lc"] =
 				Utils::tolower(str);
 		}
+next:
 		ofs = n;
 	}
 }

@@ -200,9 +200,9 @@ template<class Oit>
 void
 OCRCorrection::GtLine::copy_ocr(size_t b, size_t e, Oit o) const
 {
-	for (auto i = 0U; (b + i) != e; ++i) {
-		if (not std::next(trace_begin(), i)->is_deletion())
-			*o++ = *std::next(ocr_begin(), i);
+	for (auto i = 0U; i < e; ++i) {
+		if (not std::next(trace_begin(), b + i)->is_deletion())
+			*o++ = *std::next(ocr_begin(), b + i);
 	}
 }
 
@@ -211,9 +211,9 @@ template<class Oit>
 void
 OCRCorrection::GtLine::copy_gt(size_t b, size_t e, Oit o) const
 {
-	for (auto i = 0U; (b + i) != e; ++i) {
-		if (not std::next(trace_begin(), i)->is_insertion())
-			*o++ = *std::next(gt_begin(), i);
+	for (auto i = 0U; i < e; ++i) {
+		if (not std::next(trace_begin(), b + i)->is_insertion())
+			*o++ = *std::next(gt_begin(), b + i);
 	}
 }
 
