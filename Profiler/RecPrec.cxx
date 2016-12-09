@@ -53,7 +53,6 @@ RecPrec::has_ocr_errors(const Token& token)
 bool
 RecPrec::is_true_positive(const Token& token, ModeNormal)
 {
-	std::wcerr << "is_true_positive: " << token.getWOCR() << "\n";
 	return true;
 }
 
@@ -66,7 +65,7 @@ RecPrec::is_true_positive(const Token& token, ModeStrict)
 	using std::end;
 	CandidateRange r(token);
 	auto i = std::find_if(begin(r), end(r), [&token](const Candidate& cand) {
-		return token.metadata()["groundtruth"] == cand.getWord();
+		return token.metadata()["groundtruth-lc"] == cand.getWord();
 	});
 	return i != end(r);
 }
@@ -76,7 +75,7 @@ bool
 RecPrec::is_true_positive(const Token& token, ModeVeryStrict)
 {
 	CandidateRange r(token);
-	return token.metadata()["groundtruth"] == r.begin()->getWord();
+	return token.metadata()["groundtruth-lc"] == r.begin()->getWord();
 }
 
 
