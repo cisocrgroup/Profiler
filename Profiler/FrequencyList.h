@@ -142,13 +142,10 @@ namespace OCRCorrection {
 
 	float getBaseWordFrequency( std::wstring const& word ) const {
 	    float f = 0;
-	    if( baseWordFrequency_->lookup( word, &f) ) {
-		return f;
-	    }
-	    else {
-		// TRIVIAL SMOOTHING FOR BASEWORD FREQUENCIES
-		return 1;
-	    }
+	    baseWordFrequency_->lookup(word, &f);
+	    if (f <= 0)
+		f = 1; // TRIVIAL SMOOTHING FOR BASEWORD FREQUENCIES
+	    return f;
 	}
 
 	size_t getInterpretationCount( csl::Interpretation const& interp ) const {
