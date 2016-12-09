@@ -20,11 +20,13 @@ void
 Profiler::calculateNonAdaptiveCandidateSet(const Profiler_Token& t,
 		csl::DictSearch::CandidateSet& candidates)
 {
+	std::wcerr << "(Profiler) Calculating non adaptive profile for token "
+		   << t.getWOCR() << "\n";
 	dictSearch_.query(t.getWOCR_lc(), &candidates);
 	std::sort(candidates.begin(), candidates.end());
-	// for (const auto& cand: candidates) {
-	// 	std::wcerr << "(Profiler) NonAdaptive: " << cand << "\n";
-	// }
+	for (const auto& cand: candidates) {
+		std::wcerr << "(Profiler) NonAdaptive candidate: " << cand << "\n";
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -34,18 +36,19 @@ Profiler::calculateAdaptiveCandidateSet(const Profiler_Token& t,
 {
 	assert(config_.adaptive_);
 	assert(t.origin().has_metadata("correction"));
+	assert(t.origin().has_metadata("correction-lc"));
 
 	std::wcerr << "(Profiler) Calculating adaptive profile for token "
-		   << t.origin().metadata()["correction"] << " ("
-		   << t.getWOCR() << ")\n";
+		   << t.getWOCR() << " ("
+		   << t.origin().metadata()["correction"] << ")\n";
 	dictSearch_.query(t.getWOCR_lc(), &candidates);
 	candidates.discard_if([&t](const csl::Interpretation& i) {
-		return i.getBaseWord() != t.origin().metadata()["correction"] and
-			i.getWord() != t.origin().metadata()["correction"];
+		return i.getBaseWord() != t.origin().metadata()["correction-lc"] and
+			i.getWord() != t.origin().metadata()["correction-lc"];
 	});
-	// for (const auto& cand: candidates) {
-	// 	std::wcerr << "(Profiler) Adaptive: " << cand << "\n";
-	// }
+	for (const auto& cand: candidates) {
+		std::wcerr << "(Profiler) Adaptive candidate: " << cand << "\n";
+	}
 	if (not candidates.empty())
 		std::sort(candidates.begin(), candidates.end());
 	else
@@ -59,12 +62,12 @@ Profiler::createCandidatesWithCorrection(const Profiler_Token& t,
 {
 	assert(candidates.empty());
 	std::wcerr << "(Profiler) Calculating candidates from correction for token "
-		   << t.origin().metadata()["correction"] << " ("
-		   << t.getWOCR() << ")\n";
-	getAdaptiveHistGtLex().add(t.origin().metadata()["correction"],
+		   << t.getWOCR() << " ("
+		   << t.origin().metadata()["correction"] << ")\n";
+	getAdaptiveHistGtLex().add(t.origin().metadata()["correction-lc"],
 			t.getWOCR_lc(), candidates);
 	for (const auto& cand: candidates) {
-		std::wcerr << "(Profiler) AdaptiveGt: " << cand << "\n";
+		std::wcerr << "(Profiler) AdaptiveGt candidate: " << cand << "\n";
 	}
 }
 

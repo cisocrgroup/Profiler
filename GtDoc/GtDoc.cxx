@@ -136,6 +136,8 @@ GtDoc::add(const GtLine& line, Document& document) const
 			str.clear();
 			line.copy_gt(ofs, e, std::back_inserter(str));
 			document.at(idx).metadata()["groundtruth"] = str;
+			document.at(idx).metadata()["groundtruth-lc"] =
+				Utils::tolower(str);
 		}
 		ofs = n;
 	}
