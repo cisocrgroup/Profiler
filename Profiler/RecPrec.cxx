@@ -223,20 +223,27 @@ RecPrec::write(std::wostream& os, Class c, const Document& doc) const
 void
 RecPrec::write(std::wostream& os, const GlobalProfile& gp) const
 {
-	std::vector<std::pair<csl::Pattern, double>> hist, ocr;
+	using Pair = std::pair<csl::Pattern, double>;
+	std::vector<Pair> hist, ocr;
 	gp.histPatternProbabilities_.sortToVector(&hist);
+	std::sort(begin(ocr), end(ocr), [&gp](const Pair& a, const Pair& b) {
+		return gp.histPatternProbabilities_.getWeight(a.first) >
+			gp.histPatternProbabilities_.getWeight(b.first);
+	});
 	for (const auto& p: hist) {
 		os << "hist:" << p.first.getLeft() << ":"
 		   << p.first.getRight() << ":"
-		   << p.second << ":"
 		   << gp.histPatternProbabilities_.getWeight(p.first)
 		   << "\n";
 	}
 	gp.ocrPatternProbabilities_.sortToVector(&ocr);
+	std::sort(begin(ocr), end(ocr), [&gp](const Pair& a, const Pair& b) {
+		return gp.ocrPatternProbabilities_.getWeight(a.first) >
+			gp.ocrPatternProbabilities_.getWeight(b.first);
+	});
 	for (const auto& p: ocr) {
 		os << "ocr:" << p.first.getLeft() << ":"
 		   << p.first.getRight() << ":"
-		   << p.second << ":"
 		   << gp.ocrPatternProbabilities_.getWeight(p.first)
 		   << "\n";
 	}
