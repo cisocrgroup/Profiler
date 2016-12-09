@@ -7,21 +7,24 @@ using namespace OCRCorrection;
 double
 RecPrec::precision() const noexcept
 {
-	return (double)true_positives() / ((double)true_positives() + (double)false_positives());
+	return (double)true_positives() /
+		((double)true_positives() + (double)false_positives());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 double
 RecPrec::recall() const noexcept
 {
-	return (double)true_positives() / ((double)true_positives() + (double)false_negatives());
+	return (double)true_positives() /
+		((double)true_positives() + (double)false_negatives());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 double
 RecPrec::accuracy() const noexcept
 {
-	return ((double)true_positives() + (double) true_negatives()) / (double)sum();
+	return ((double)true_positives() + (double) true_negatives()) /
+		(double)sum();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -45,10 +48,12 @@ RecPrec::has_ocr_errors(const Token& token)
 		return not cand.getOCRTrace().empty();
 	});
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 bool
 RecPrec::is_true_positive(const Token& token, ModeNormal)
 {
+	std::wcerr << "is_true_positive: " << token.getWOCR() << "\n";
 	return true;
 }
 
@@ -80,9 +85,12 @@ void
 OCRCorrection::RecPrec::classify(const Document& doc)
 {
 	for (const auto& token: doc) {
-		// handle normal tokens without corrections
-		std::wcerr << "token " << token.getWOCR() << "\n";
-		std::wcerr << "corr " << token.has_metadata("correction") << "\n";
+		// each normal token must have a groundtruth attached to it
+		if (token.isNormal() and not token.has_metadata("groundtruth"))
+			throw std::runtime_error("cannot evaluate recall and "
+					"precision of tokens without groundtruth");
+
+		// handle normal tokens without any corrections
 		if (not token.has_metadata("correction") and token.isNormal()) {
 			const auto idx = token.getIndexInDocument();
 			(*this)[classify(token)].push_back(idx);
@@ -102,7 +110,8 @@ OCRCorrection::RecPrec::classify(const Token& token) const
 	case Mode::VeryStrict:
 		return classify(token, ModeVeryStrict());
 	default:
-		throw std::logic_error("default label in `switch(mode_)` encountered");
+		throw std::logic_error("default label in `switch(mode_)` "
+				"encountered");
 	}
 }
 
@@ -167,13 +176,17 @@ RecPrec::write(std::wostream& os, Class c, const Document& doc) const
 {
 	struct CandRange {
 		CandRange(const Token& token): token_(token) {}
-		Token::CandidateIterator begin() const {return token_.candidatesBegin();}
-		Token::CandidateIterator end() const {return token_.candidatesEnd();}
+		Token::CandidateIterator begin() const {
+			return token_.candidatesBegin();
+		}
+		Token::CandidateIterator end() const {
+			return token_.candidatesEnd();
+		}
 		const Token& token_;
 	};
 
 	for (const size_t id: classes_[static_cast<size_t>(c)]) {
-		os << "gt: " << doc.at(id).metadata()["groundtruth"] << "\n";
+		os << "gt:  " << doc.at(id).metadata()["groundtruth"] << "\n";
 		os << "ocr: " << doc.at(id).getWOCR() << "\n";
 		for (const auto& cand: CandRange(doc.at(id))) {
 			os << "cand: " << cand << "\n";
