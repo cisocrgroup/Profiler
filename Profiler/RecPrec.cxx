@@ -223,14 +223,17 @@ RecPrec::write(std::wostream& os, Class c, const Document& doc) const
 void
 RecPrec::write(std::wostream& os, const GlobalProfile& gp) const
 {
-	for (const auto& p: gp.histPatternProbabilities_) {
+	std::vector<std::pair<csl::Pattern, double>> hist, ocr;
+	gp.histPatternProbabilities_.sortToVector(&hist);
+	for (const auto& p: hist) {
 		os << "hist:" << p.first.getLeft() << ":"
 		   << p.first.getRight() << ":"
 		   << p.second << ":"
 		   << gp.histPatternProbabilities_.getWeight(p.first)
 		   << "\n";
 	}
-	for (const auto& p: gp.ocrPatternProbabilities_) {
+	gp.ocrPatternProbabilities_.sortToVector(&ocr);
+	for (const auto& p: ocr) {
 		os << "ocr:" << p.first.getLeft() << ":"
 		   << p.first.getRight() << ":"
 		   << p.second << ":"
