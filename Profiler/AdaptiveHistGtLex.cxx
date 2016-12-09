@@ -1,3 +1,4 @@
+#include "Utils/IStr.h"
 #include "AdaptiveHistGtLex.h"
 
 using namespace OCRCorrection;
@@ -22,7 +23,6 @@ AdaptiveHistGtLex::add(const std::wstring& gt, const std::wstring& ocr,
 	if (i == end(gt_)) {
 		i = gt_.emplace_hint(i, gt, lev(gt, ocr));
 	}
-	// std::wcerr << "(AdaptiveHistGtLex) add lev(" << gt << "," << ocr << ") = " << i->second << "\n";
 	add_candidate(gt, i->second, receiver);
 }
 
@@ -32,7 +32,7 @@ AdaptiveHistGtLex::doquery(const std::wstring& q, Receiver& receiver)
 {
 	bool res = false;
 	for (const auto& gt: gt_) {
-		auto d = lev(gt.first, q);
+		const auto d = lev(gt.first, q);
 		if (d <= max_lev_) {
 			// std::wcerr << "(AdaptiveHistGtLex) doquery lev("
 			// 	<< gt.first << "," << q << ") = " << d << "\n";
@@ -79,7 +79,7 @@ AdaptiveHistGtLex::lev(const std::wstring& a, const std::wstring& b)
 		size_t j = 0;
 		for (auto ib = begin(b); ib != end(b); ++ib, ++j) {
 			size_t upper = costs_[j + 1];
-			if (*ia == *ib) {
+			if (towupper(*ia) == towupper(*ib)) { // ignore case
 				costs_[j + 1] = corner;
 			} else {
 				size_t t(upper < corner ? upper : corner);

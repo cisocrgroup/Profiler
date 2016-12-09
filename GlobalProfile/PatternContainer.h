@@ -158,6 +158,12 @@ namespace OCRCorrection {
 	    return ( a.second > b.second ); // reverse ordering
 	}
 
+	std::map< csl::Pattern, double >::const_iterator begin() const noexcept {
+		return absoluteFreqs_.begin();
+	}
+	std::map< csl::Pattern, double >::const_iterator end() const noexcept {
+		return absoluteFreqs_.end();
+	}
     private:
 	/**
 	 * @brief An additiomal data member storing the absolute frequencies.

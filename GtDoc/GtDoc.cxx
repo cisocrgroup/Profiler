@@ -101,7 +101,7 @@ GtDoc::load(const std::string& file)
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-GtDoc::parse(Document& document)
+GtDoc::parse(Document& document) const
 {
 	document.clear();
 	for (const auto& line: lines_) {
@@ -111,16 +111,33 @@ GtDoc::parse(Document& document)
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-GtDoc::add(const GtLine& line, Document& document)
+GtDoc::parse(const std::string& file, Document& document)
 {
+	load(file);
+	parse(document);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void
+GtDoc::add(const GtLine& line, Document& document) const
+{
+	std::wstring str;
+	bool normal = false;
 	for (auto ofs = 0U; ofs < line.ocr().size();) {
-		bool normal = false;
 		const auto n = document.findBorder(line.ocr(), ofs, &normal);
 		if (n != std::wstring::npos and n >= ofs) {
 			const auto idx = document.getNrOfTokens();
-			document.pushBackToken(line.ocr().substr(ofs, n - ofs), normal);
-			tokens_.push_back(line.token(idx, ofs, n));
-			document.at(idx).setWCorr(tokens_[idx].gt());
+			const auto e = n - ofs;
+
+			str.clear();
+			line.copy_ocr(ofs, e, std::back_inserter(str));
+			document.pushBackToken(str, normal);
+
+			str.clear();
+			line.copy_gt(ofs, e, std::back_inserter(str));
+			document.at(idx).metadata()["groundtruth"] = str;
+			document.at(idx).metadata()["groundtruth-lc"] =
+				Utils::tolower(str);
 		}
 		ofs = n;
 	}

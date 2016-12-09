@@ -1,4 +1,5 @@
 #include <cmath>
+#include "GlobalProfile/GlobalProfile.h"
 #include "RecPrec.h"
 
 using namespace OCRCorrection;
@@ -7,21 +8,24 @@ using namespace OCRCorrection;
 double
 RecPrec::precision() const noexcept
 {
-	return (double)true_positives() / ((double)true_positives() + (double)false_positives());
+	return (double)true_positives() /
+		((double)true_positives() + (double)false_positives());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 double
 RecPrec::recall() const noexcept
 {
-	return (double)true_positives() / ((double)true_positives() + (double)false_negatives());
+	return (double)true_positives() /
+		((double)true_positives() + (double)false_negatives());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 double
 RecPrec::accuracy() const noexcept
 {
-	return ((double)true_positives() + (double) true_negatives()) / (double)sum();
+	return ((double)true_positives() + (double) true_negatives()) /
+		(double)sum();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -45,6 +49,7 @@ RecPrec::has_ocr_errors(const Token& token)
 		return not cand.getOCRTrace().empty();
 	});
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 bool
 RecPrec::is_true_positive(const Token& token, ModeNormal)
@@ -61,7 +66,7 @@ RecPrec::is_true_positive(const Token& token, ModeStrict)
 	using std::end;
 	CandidateRange r(token);
 	auto i = std::find_if(begin(r), end(r), [&token](const Candidate& cand) {
-		return token.metadata()[Metadata::Type::GroundTruth] == cand.getWord();
+		return token.metadata()["groundtruth-lc"] == cand.getWord();
 	});
 	return i != end(r);
 }
@@ -71,7 +76,7 @@ bool
 RecPrec::is_true_positive(const Token& token, ModeVeryStrict)
 {
 	CandidateRange r(token);
-	return token.metadata()[Metadata::Type::GroundTruth] == r.begin()->getWord();
+	return token.metadata()["groundtruth-lc"] == r.begin()->getWord();
 }
 
 
@@ -80,11 +85,13 @@ void
 OCRCorrection::RecPrec::classify(const Document& doc)
 {
 	for (const auto& token: doc) {
-		// handle normal tokens without corrections
-		std::wcerr << "token " << token.getWOCR() << "\n";
-		std::wcerr << "corr " << token.has_metadata(Metadata::Type::Correction) << "\n";
-		if (not token.has_metadata(Metadata::Type::Correction) and
-				token.isNormal()) {
+		// each normal token must have a groundtruth attached to it
+		if (token.isNormal() and not token.has_metadata("groundtruth"))
+			throw std::runtime_error("cannot evaluate recall and "
+					"precision of tokens without groundtruth");
+
+		// handle normal tokens without any corrections
+		if (not token.has_metadata("correction") and token.isNormal()) {
 			const auto idx = token.getIndexInDocument();
 			(*this)[classify(token)].push_back(idx);
 		}
@@ -103,7 +110,8 @@ OCRCorrection::RecPrec::classify(const Token& token) const
 	case Mode::VeryStrict:
 		return classify(token, ModeVeryStrict());
 	default:
-		throw std::logic_error("default label in `switch(mode_)` encountered");
+		throw std::logic_error("default label in `switch(mode_)` "
+				"encountered");
 	}
 }
 
@@ -116,6 +124,7 @@ OCRCorrection::RecPrec::write(const std::string& dir, const Document& doc) const
 	auto tn = dir + "/true_negative.txt";
 	auto fp = dir + "/false_positive.txt";
 	auto fn = dir + "/false_negative.txt";
+	auto corrs = dir + "/corrections.txt";
 
 	if (mkdir(dir.data(), 0752) != 0 and errno != EEXIST)
 		throw std::system_error(errno, std::system_category(), dir);
@@ -160,6 +169,29 @@ OCRCorrection::RecPrec::write(const std::string& dir, const Document& doc) const
 	os << "# " << Utils::utf8(fn) << "\n";
 	write(os, Class::FalseNegative, doc);
 	os.close();
+
+	os.open(corrs);
+	if (not os.good())
+		throw std::system_error(errno, std::system_category(), fn);
+	os << "# " << Utils::utf8(corrs) << "\n";
+	for (const auto& token: doc) {
+		if (token.has_metadata("correction")) {
+			os << token.getWOCR() << ":"
+			   << token.metadata()["correction"]
+			   << "\n";
+		}
+	}
+	os.close();
+
+	if (doc.has_global_profile()) {
+		auto gp = dir + "/global_profile.txt";
+		os.open(gp);
+		if (not os.good())
+			throw std::system_error(errno, std::system_category(), gp);
+		os << "# " << Utils::utf8(gp) << "\n";
+		write(os, doc.global_profile());
+		os.close();
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -168,14 +200,18 @@ RecPrec::write(std::wostream& os, Class c, const Document& doc) const
 {
 	struct CandRange {
 		CandRange(const Token& token): token_(token) {}
-		Token::CandidateIterator begin() const {return token_.candidatesBegin();}
-		Token::CandidateIterator end() const {return token_.candidatesEnd();}
+		Token::CandidateIterator begin() const {
+			return token_.candidatesBegin();
+		}
+		Token::CandidateIterator end() const {
+			return token_.candidatesEnd();
+		}
 		const Token& token_;
 	};
 
 	for (const size_t id: classes_[static_cast<size_t>(c)]) {
-		os << "gt: " << doc.at(id).metadata()[Metadata::Type::GroundTruth] << "\n";
-		os << "ocr: " << doc.at(id).getWOCR() << "\n";
+		os << "gt:   " << doc.at(id).metadata()["groundtruth"] << "\n";
+		os << "ocr:  " << doc.at(id).getWOCR() << "\n";
 		for (const auto& cand: CandRange(doc.at(id))) {
 			os << "cand: " << cand << "\n";
 		}
@@ -183,3 +219,25 @@ RecPrec::write(std::wostream& os, Class c, const Document& doc) const
 	os << "\n";
 }
 
+////////////////////////////////////////////////////////////////////////////////
+void
+RecPrec::write(std::wostream& os, const GlobalProfile& gp) const
+{
+	std::vector<std::pair<csl::Pattern, double>> hist, ocr;
+	gp.histPatternProbabilities_.sortToVector(&hist);
+	for (const auto& p: hist) {
+		os << "hist:" << p.first.getLeft() << ":"
+		   << p.first.getRight() << ":"
+		   << p.second << ":"
+		   << gp.histPatternProbabilities_.getWeight(p.first)
+		   << "\n";
+	}
+	gp.ocrPatternProbabilities_.sortToVector(&ocr);
+	for (const auto& p: ocr) {
+		os << "ocr:" << p.first.getLeft() << ":"
+		   << p.first.getRight() << ":"
+		   << p.second << ":"
+		   << gp.ocrPatternProbabilities_.getWeight(p.first)
+		   << "\n";
+	}
+}

@@ -191,7 +191,8 @@ namespace OCRCorrection {
 
     protected:
 	/**
-	 * @brief Returns a reference to the csl::DictSearch - object used by the Profiler.
+	 * @brief Returns a reference to the csl::DictSearch -
+	 * object used by the Profiler.
 	 *
 	 * This is not a const reference so it can be used to change the settings.
 	 */
@@ -208,7 +209,7 @@ namespace OCRCorrection {
 			csl::DictSearch::CandidateSet& candidates);
 	void calculateNonAdaptiveCandidateSet(const Profiler_Token& t,
 			csl::DictSearch::CandidateSet& candidates);
-	void createCandidatesFromGt(const Profiler_Token& t,
+	void createCandidatesWithCorrection(const Profiler_Token& t,
 		csl::DictSearch::CandidateSet& candidates);
 	AdaptiveHistGtLex& getAdaptiveHistGtLex();
 	AdaptiveHistGtLex* adaptive_hist_gt_lex_;

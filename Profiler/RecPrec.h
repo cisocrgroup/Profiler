@@ -7,6 +7,7 @@
 #include <array>
 
 namespace OCRCorrection {
+	class GlobalProfile;
 
 	class RecPrec {
 	public:
@@ -79,6 +80,7 @@ namespace OCRCorrection {
 		static bool is_true_positive(const Token& token, ModeVeryStrict);
 
 		void write(std::wostream& os, Class c, const Document& doc) const;
+		void write(std::wostream& os, const GlobalProfile& gp) const;
 		std::vector<size_t>& operator[](Class c) noexcept {
 			return classes_[static_cast<size_t>(c)];
 		}
@@ -94,7 +96,7 @@ template<class M>
 OCRCorrection::RecPrec::Class
 OCRCorrection::RecPrec::classify(const Token& token, M m)
 {
-	if (token.metadata()[Metadata::Type::GroundTruth] != token.getWOCR()) {
+	if (token.metadata()["groundtruth-lc"] != token.getWOCR_lc()) {
 		if (has_ocr_errors(token)) {
 			if (is_true_positive(token, m))
 				return Class::TruePositive;
@@ -110,4 +112,5 @@ OCRCorrection::RecPrec::classify(const Token& token, M m)
 			return Class::TrueNegative;
 	}
 }
+
 #endif // OCRCorrection_RecPrec_hpp__

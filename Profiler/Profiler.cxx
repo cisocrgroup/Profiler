@@ -68,6 +68,7 @@ namespace OCRCorrection {
 
     void Profiler::createProfile( Document& sourceDoc ) {
 	    doCreateProfile(sourceDoc);
+	    sourceDoc.set_global_profile(globalProfile_);
     }
 
     void Profiler::initGlobalOcrPatternProbs(int itn) {
@@ -249,11 +250,13 @@ namespace OCRCorrection {
 
 		    // throw away "short" candidates for "long" words
 		    if( cand->getWord().length() < 4 ) {
+			    // std::wcerr << "BAZ\n";
 			continue;
 		    }
 		    // throw away candidates containing a hyphen
 		    // Yes, there are such words in staticlex :-/
 		    if( cand->getWord().find( '-') != std::wstring::npos ) {
+			    // std::wcerr << "BAR\n";
 			continue;
 		    }
 
@@ -293,16 +296,29 @@ namespace OCRCorrection {
 			// 	       << cand->getWord() << "," << cand->getLevDistance()
 			// 	       << "+ocr" << *instruction << "\n";
 
-			if( instruction->size() > cand->getLevDistance() )
+			if( instruction->size() > cand->getLevDistance() ) {
+				// std::wcerr << "instruction->size(): "
+				// 	   << instruction->size() << "\n"
+				// 	   << "cand->getLevDistance(): "
+				// 	   << cand->getLevDistance() << "\n"
+				// 	   << "instructions:";
+				// for (const auto& i: *instruction) {
+				// 	std::wcerr << " " << i;
+				// }
+				// std::wcerr << "\nFOO\n";
 				continue;
+			}
 
 			Profiler_Interpretation current = Profiler_Interpretation( *cand );
 			current.setOCRTrace( *instruction );
 
 			current.setCombinedProbability( getCombinedProb( current ) );
 
-			    // std::wcerr << "(POFILER) current: " << current << "\n";
-			    // std::wcerr << "(POFILER) current.getOCRTrace(): " << current.getOCRTrace() << "\n";
+			    std::wcerr << "(Profiler) token: "
+				       << token->getWOCR() << "\n";
+			    std::wcerr << "(Profiler) current: " << current << "\n";
+			    std::wcerr << "(Profiler) current.getOCRTrace(): "
+				       << current.getOCRTrace() << "\n";
 
 			// Here, candidates with equal hist- and OCR-Trace are avoided!
 			// See the compare-operator above
@@ -492,9 +508,9 @@ namespace OCRCorrection {
 		    ( it->second / histCounter_.getNGramCount( strippedPattern.getLeft() ) ),  // its count / the ( stripped) left-hand-side's nGramCount
 		    it->second           // absolute freq
 		    );
-		std::wcerr << "globalProfile_.histPatternProbabilities_.setWeight( " << it->first.toString()
-			   <<", ( " << it->second << " / " << histCounter_.getNGramCount( strippedPattern.getLeft() ) << " ) )"
-			   << "=" << ( it->second / histCounter_.getNGramCount( strippedPattern.getLeft() ) ) << std::endl;
+		// std::wcerr << "globalProfile_.histPatternProbabilities_.setWeight( " << it->first.toString()
+		// 	   <<", ( " << it->second << " / " << histCounter_.getNGramCount( strippedPattern.getLeft() ) << " ) )"
+		// 	   << "=" << ( it->second / histCounter_.getNGramCount( strippedPattern.getLeft() ) ) << std::endl;
 	    }
 	    else {
 	    }
@@ -521,16 +537,16 @@ namespace OCRCorrection {
 
 
 		//
-		if( iterationNumber >= 3 ) {
-		    if( ocrPatternsInWords[it->first].size() < 2 ) {
-			std::wcout << it->first.toString() << "(" << it->second << ") only in ";
-			for( std::set< std::wstring >::const_iterator wit = ocrPatternsInWords[it->first].begin(); wit != ocrPatternsInWords[it->first].end(); ++wit ) {
-			    std::wcout << *wit << ",";
-			}
-			std::wcout << ", continue" << std::endl;
-			continue;
-		    }
-		}
+		// if( iterationNumber >= 3 ) {
+		//     if( ocrPatternsInWords[it->first].size() < 2 ) {
+		// 	std::wcout << it->first.toString() << "(" << it->second << ") only in ";
+		// 	for( std::set< std::wstring >::const_iterator wit = ocrPatternsInWords[it->first].begin(); wit != ocrPatternsInWords[it->first].end(); ++wit ) {
+		// 	    std::wcout << *wit << ",";
+		// 	}
+		// 	std::wcout << ", continue" << std::endl;
+		// 	continue;
+		//     }
+		// }
 
 
 		// the denominator for the relative freq (== probability) of the pattern
@@ -549,9 +565,9 @@ namespace OCRCorrection {
 			( it->second / denominator ), // its count / the left-hand-side's nGramCount
 			it->second );        // absolute freq
 
-		    std::wcout << "globalProfile_.ocrPatternProbabilities_.setWeight( " << it->first.toString()
-			       <<", ( " << it->second << " / " << ocrCounter_.getNGramCount( it->first.getLeft() ) << " ) )"
-			       << "=" << ( it->second / ocrCounter_.getNGramCount( it->first.getLeft() ) ) << std::endl;
+		//     std::wcout << "globalProfile_.ocrPatternProbabilities_.setWeight( " << it->first.toString()
+		// 	       <<", ( " << it->second << " / " << ocrCounter_.getNGramCount( it->first.getLeft() ) << " ) )"
+		// 	       << "=" << ( it->second / ocrCounter_.getNGramCount( it->first.getLeft() ) ) << std::endl;
 		}
 	    }
 	}

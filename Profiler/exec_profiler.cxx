@@ -13,6 +13,7 @@
 #include "SimpleOutputWriter.h"
 #include "GtDoc/GtDoc.h"
 #include "Profiler/RecPrec.h"
+#include "AutoCorrector/AutoCorrector.h"
 #include<IBMGroundtruth/IBMGTReader.h>
 #include<Getopt/Getopt.h>
 
@@ -45,6 +46,8 @@ void printHelp() {
                << std::endl
 	       << "[--strict yes|no|very]      set the strictness of the recprec evaluation"
                << std::endl
+	       << "[--autocorrect patterns]    Autocorrect a comma separated list of patterns. Tokens that match one of the given patterns are \"corrected\" with their groundtruth"
+	       << std::endl;
 	;
 }
 
@@ -71,6 +74,7 @@ int main( int argc, char const** argv ) {
     options.specifyOption( "adaptive", csl::Getopt::VOID );
     options.specifyOption( "recprec", csl::Getopt::STRING );
     options.specifyOption( "strict", csl::Getopt::STRING );
+    options.specifyOption( "autocorrect", csl::Getopt::STRING );
 
     try {
 	options.getOptionsAsSpecified( argc, argv );
@@ -169,33 +173,27 @@ int main( int argc, char const** argv ) {
 	if( options.getOption( "sourceFormat" ) == "TXT" ) {
             OCRCorrection::TXTReader reader;
             reader.parse( options.getOption( "sourceFile" ).c_str(), &document );
-            profiler.createProfile( document );
 	}
 	else if( options.getOption( "sourceFormat" ) == "DocXML" ) {
             OCRCorrection::DocXMLReader reader;
             reader.parse( options.getOption( "sourceFile" ), &document );
-	    profiler.createProfile( document );
 	}
 	else if( options.getOption( "sourceFormat" ) == "AltoXML" ) {
             OCRCorrection::AltoXMLReader reader;
             reader.parse( options.getOption( "sourceFile" ), &document );
-	    profiler.createProfile( document );
 	}
 	else if( options.getOption( "sourceFormat" ) == "ABBYY_XML_DIR" ) {
             OCRCorrection::AbbyyXmlParser reader;
 	    reader.parseDirToDocument( options.getOption( "sourceFile" ), options.getOption( "imageDir" ), &document );
-	    profiler.createProfile( document );
 	}
 	else if( options.getOption( "sourceFormat" ) == "IBM_GROUNDTRUTH" ) {
 	    OCRCorrection::IBMGTReader r;
 	    r.parse( options.getOption( "sourceFile" ).c_str(), &document );
-	    profiler.createProfile( document );
 	}
 	else if (options.getOption("sourceFormat") == "DocGt") {
 		OCRCorrection::GtDoc gtdoc;
 		gtdoc.load(options.getOption("sourceFile"));
 		gtdoc.parse(document);
-		profiler.createProfile(document);
 	}
 	else {
 	    std::wcerr << "Unknown sourceFormat! Use: profiler --help" << std::endl;
@@ -206,6 +204,18 @@ int main( int argc, char const** argv ) {
         std::wcerr << "Very strange: no sourceFormat given." << std::endl;
         return EXIT_FAILURE;
     }
+
+    if (options.hasOption("autocorrect")) {
+	    OCRCorrection::AutoCorrector corrector;
+	    corrector.add_patterns(options.getOption("autocorrect"));
+	    corrector(document);
+    }
+
+
+    //
+    // do profiling
+    //
+    profiler.createProfile(document);
 
 
     if (options.hasOption("simpleOutput")) {
