@@ -250,13 +250,13 @@ namespace OCRCorrection {
 
 		    // throw away "short" candidates for "long" words
 		    if( cand->getWord().length() < 4 ) {
-			    std::wcerr << "BAZ\n";
+			    // std::wcerr << "BAZ\n";
 			continue;
 		    }
 		    // throw away candidates containing a hyphen
 		    // Yes, there are such words in staticlex :-/
 		    if( cand->getWord().find( '-') != std::wstring::npos ) {
-			    std::wcerr << "BAR\n";
+			    // std::wcerr << "BAR\n";
 			continue;
 		    }
 
@@ -297,15 +297,15 @@ namespace OCRCorrection {
 			// 	       << "+ocr" << *instruction << "\n";
 
 			if( instruction->size() > cand->getLevDistance() ) {
-				std::wcerr << "instruction->size(): "
-					   << instruction->size() << "\n"
-					   << "cand->getLevDistance(): "
-					   << cand->getLevDistance() << "\n"
-					   << "instructions:";
-				for (const auto& i: *instruction) {
-					std::wcerr << " " << i;
-				}
-				std::wcerr << "\nFOO\n";
+				// std::wcerr << "instruction->size(): "
+				// 	   << instruction->size() << "\n"
+				// 	   << "cand->getLevDistance(): "
+				// 	   << cand->getLevDistance() << "\n"
+				// 	   << "instructions:";
+				// for (const auto& i: *instruction) {
+				// 	std::wcerr << " " << i;
+				// }
+				// std::wcerr << "\nFOO\n";
 				continue;
 			}
 
