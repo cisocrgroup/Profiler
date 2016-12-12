@@ -41,12 +41,12 @@ AutoCorrector::correct(Document& doc) const
 			throw std::runtime_error("Cannot autocorrect "
 					"without groundtruth");
 		for (const auto& p: patterns_) {
-			if (p.ocr and token.getWOCR_lc().find(p.pattern) !=
-					std::wstring::npos) {
+			if (p.ocr and token.getWOCR_lc().
+					find(p.pattern) != std::wstring::npos) {
 				correct(token);
 				break; // correct each token once
-			} else if (not p.ocr and token.metadata()["groundtruth-lc"].find(p.pattern) !=
-					std::wstring::npos) {
+			} else if (not p.ocr and token.metadata()["groundtruth-lc"].
+					find(p.pattern) != std::wstring::npos) {
 				correct(token);
 				break; // correct each token once
 			}
