@@ -45,14 +45,15 @@ RecPrec::has_ocr_errors(const Token& token)
 	using std::begin;
 	using std::end;
 	CandidateRange r(token);
-	return std::any_of(begin(r), end(r), [](const Candidate& cand) {
-		return not cand.getOCRTrace().empty();
-	});
+	if (not r.empty()) {
+		return not begin(r)->getOCRTrace().empty(); // empty ocr trace means no errors
+	}
+	return false; // no candidates means no errors
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool
-RecPrec::is_true_positive(const Token& token, ModeNormal)
+RecPrec::is_true_positive(const Token&, ModeNormal)
 {
 	return true;
 }
