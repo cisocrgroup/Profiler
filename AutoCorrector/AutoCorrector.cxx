@@ -21,7 +21,13 @@ AutoCorrector::add_patterns(const std::string& pats)
 void
 AutoCorrector::add_pattern(const std::string& pat)
 {
-	patterns_.push_back(Utils::tolower(Utils::utf8(pat)));
+	if (pat.find("gt:") == 0) {
+		patterns_.emplace_back(Utils::tolower(Utils::utf8(pat.substr(3))), false);
+	} else if (pat.find("ocr:") == 0) {
+		patterns_.emplace_back(Utils::tolower(Utils::utf8(pat.substr(4))), true);
+	} else {
+		patterns_.emplace_back(Utils::tolower(Utils::utf8(pat)), true);
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -34,17 +40,27 @@ AutoCorrector::correct(Document& doc) const
 		if (not token.has_metadata("groundtruth"))
 			throw std::runtime_error("Cannot autocorrect "
 					"without groundtruth");
-		for (const auto& pat: patterns_) {
-			if (token.getWOCR_lc().find(pat) != std::string::npos) {
-				token.metadata()["correction"] =
-					token.metadata()["groundtruth"];
-				token.metadata()["correction-lc"] =
-					token.metadata()["groundtruth-lc"];
-				std::wcout << "Correcting token " << token.getWOCR()
-					   << " with "
-					   << token.metadata()["correction"] << "\n";
+		for (const auto& p: patterns_) {
+			if (p.ocr and token.getWOCR_lc().find(p.pattern) !=
+					std::wstring::npos) {
+				correct(token);
+				break; // correct each token once
+			} else if (not p.ocr and token.metadata()["groundtruth-lc"].find(p.pattern) !=
+					std::wstring::npos) {
+				correct(token);
 				break; // correct each token once
 			}
 		}
 	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void
+AutoCorrector::correct(Token& token) const
+{
+	token.metadata()["correction"] = token.metadata()["groundtruth"];
+	token.metadata()["correction-lc"] = token.metadata()["groundtruth-lc"];
+	std::wcout << "Correcting token " << token.getWOCR()
+		   << " with "
+		   << token.metadata()["correction"] << "\n";
 }

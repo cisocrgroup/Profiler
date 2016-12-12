@@ -6,6 +6,7 @@
 
 namespace OCRCorrection {
 	class Document;
+	class Token;
 
 	class AutoCorrector {
 	public:
@@ -15,7 +16,13 @@ namespace OCRCorrection {
 		void correct(Document& doc) const;
 
 	private:
-		std::vector<std::wstring> patterns_;
+		void correct(Token& token) const;
+		struct Pattern {
+			Pattern(std::wstring p, bool o): pattern(std::move(p)), ocr(o) {}
+			std::wstring pattern;
+			bool ocr;
+		};
+		std::vector<Pattern> patterns_;
 	};
 }
 
