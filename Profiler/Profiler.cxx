@@ -102,7 +102,8 @@ namespace OCRCorrection {
 	config_.print( std::wcerr );
 
 	if( config_.nrOfIterations_ == 0 ) {
-	    std::wcerr << "OCRC::Profiler::createNonAdaptiveProfile: config says 0 iterations, so I do nothing." << std::endl;
+	    std::wcerr << "OCRC::Profiler::createNonAdaptiveProfile: config says 0 iterations, "
+		    "so I do nothing." << std::endl;
 	}
 
 	prepareDocument( sourceDoc );
@@ -158,7 +159,7 @@ namespace OCRCorrection {
 
 	std::wcout << "*** Iteration " << iterationNumber << " ***" << std::endl;
 
-	static_cast< csl::PatternProbabilities >( globalProfile_.ocrPatternProbabilities_ ).print( std::wcout );
+	// static_cast< csl::PatternProbabilities >( globalProfile_.ocrPatternProbabilities_ ).print( std::wcout );
 
 	globalProfile_.dictDistribution_.clear();
 
@@ -250,13 +251,11 @@ namespace OCRCorrection {
 
 		    // throw away "short" candidates for "long" words
 		    if( cand->getWord().length() < 4 ) {
-			    // std::wcerr << "BAZ\n";
 			continue;
 		    }
 		    // throw away candidates containing a hyphen
 		    // Yes, there are such words in staticlex :-/
 		    if( cand->getWord().find( '-') != std::wstring::npos ) {
-			    // std::wcerr << "BAR\n";
 			continue;
 		    }
 
@@ -268,7 +267,6 @@ namespace OCRCorrection {
 
 		    // std::wcerr << cand->toString() << std::endl;
 		    //std::wcerr<<"instructionComputer_.computeInstruction( " << cand->getWord() << ", " <<token->getWOCR_lc() <<", "<<&ocrInstructions<<" )"<<std::endl; // DEBUG
-
 		    // ocrInstructions is empty, if the ocr errors can be explained by std. lev. distance but not
 		    // by the distance defined with the patternWeights object. In that case, drop the candidate.
 		    if( ocrInstructions.empty() ) {
@@ -314,11 +312,11 @@ namespace OCRCorrection {
 
 			current.setCombinedProbability( getCombinedProb( current ) );
 
-			    std::wcerr << "(Profiler) token: "
-				       << token->getWOCR() << "\n";
-			    std::wcerr << "(Profiler) current: " << current << "\n";
-			    std::wcerr << "(Profiler) current.getOCRTrace(): "
-				       << current.getOCRTrace() << "\n";
+			//     std::wcerr << "(Profiler) token: "
+			// 	       << token->getWOCR() << "\n";
+			//     std::wcerr << "(Profiler) current: " << current << "\n";
+			//     std::wcerr << "(Profiler) current.getOCRTrace(): "
+			// 	       << current.getOCRTrace() << "\n";
 
 			// Here, candidates with equal hist- and OCR-Trace are avoided!
 			// See the compare-operator above
@@ -629,6 +627,10 @@ namespace OCRCorrection {
     double Profiler::getCombinedProb( Profiler_Interpretation& cand ) const {
 	// lang Probability
 	double langProb = freqList_.getLanguageProbability( cand );
+	// give each pattern at least a small probability
+	if (langProb == 0)
+		langProb = config_.ocrPatternStartProb_;
+	// std::wcerr << "LANGPROP: " << langProb << "\n";
 
 	cand.setLangProbability( langProb );
 

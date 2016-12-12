@@ -107,6 +107,7 @@ SET( OCRCORRECTION_SOURCES
 	     Token/TokenImageInfoBox.cxx
 	     GlobalProfile/GlobalProfileXMLReader.cxx
 	     GlobalProfile/PatternContainerXMLReader.cxx
+	     Pattern/Pattern.cxx
 	     GtDoc/GtDoc.cxx
 	     )
 

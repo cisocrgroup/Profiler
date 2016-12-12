@@ -131,8 +131,8 @@ namespace OCRCorrection {
 
 
 	float getLanguageProbability( csl::Interpretation const& interp ) const {
-// 	    std::wcerr << getInterpretationFrequency( interp ) << "/" << getNrOfTrainingTokens()
-// 		       << " = " << getInterpretationFrequency( interp ) / getNrOfTrainingTokens() << std::endl;
+ 	//    std::wcerr << getInterpretationFrequency( interp ) << "/" << getNrOfTrainingTokens()
+ 	//	       << " = " << getInterpretationFrequency( interp ) / getNrOfTrainingTokens() << std::endl;
 	    return getInterpretationFrequency( interp ) / getNrOfTrainingTokens();
 	}
 

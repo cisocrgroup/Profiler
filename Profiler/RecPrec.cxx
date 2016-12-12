@@ -130,18 +130,6 @@ OCRCorrection::RecPrec::write(const std::string& dir, const Document& doc) const
 		throw std::system_error(errno, std::system_category(), dir);
 
 	std::wofstream os;
-	os.open(info);
-	if (not os.good())
-		throw std::system_error(errno, std::system_category(), info);
-	os << "# " << Utils::utf8(info) << "\n"
-	   << "True positive:  " << true_positives() << "\n"
-	   << "True negative:  " << true_negatives() << "\n"
-	   << "False positive: " << false_positives() << "\n"
-	   << "False negative: " << false_negatives() << "\n"
-	   << "Precision:      " << precision() << "\n"
-	   << "Recall:         " << recall() << "\n";
-	os.close();
-
 	os.open(tp);
 	if (not os.good())
 		throw std::system_error(errno, std::system_category(), tp);
@@ -170,17 +158,35 @@ OCRCorrection::RecPrec::write(const std::string& dir, const Document& doc) const
 	write(os, Class::FalseNegative, doc);
 	os.close();
 
+	size_t normal = 0;
+	size_t corrections = 0;
 	os.open(corrs);
 	if (not os.good())
 		throw std::system_error(errno, std::system_category(), fn);
 	os << "# " << Utils::utf8(corrs) << "\n";
 	for (const auto& token: doc) {
+		++normal;
 		if (token.has_metadata("correction")) {
+			++corrections;
 			os << token.getWOCR() << ":"
 			   << token.metadata()["correction"]
 			   << "\n";
 		}
 	}
+	os.close();
+
+	os.open(info);
+	if (not os.good())
+		throw std::system_error(errno, std::system_category(), info);
+	os << "# " << Utils::utf8(info) << "\n"
+	   << "True positive:    " << true_positives() << "\n"
+	   << "True negative:    " << true_negatives() << "\n"
+	   << "False positive:   " << false_positives() << "\n"
+	   << "False negative:   " << false_negatives() << "\n"
+	   << "Precision:        " << precision() << "\n"
+	   << "Recall:           " << recall() << "\n"
+	   << "Normal tokens:    " << normal << "\n"
+	   << "Corrected tokens: " << corrections << "\n";
 	os.close();
 
 	if (doc.has_global_profile()) {

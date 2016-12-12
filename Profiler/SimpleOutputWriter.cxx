@@ -43,7 +43,8 @@ SimpleOutputWriter::writeNormalToken(const Token& token) const
 		somethingWasPrinted = true;
 		os_ << token.getIndexInDocument() << ","
 		    << token.getWOCR() << ","
-		    << cand << "\n";
+		    << cand << ","
+		    << "dict=" << cand.getDictModule().getName() << "\n";
 	}
         if (not somethingWasPrinted) {
                 os_ << token.getIndexInDocument() << ","

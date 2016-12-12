@@ -60,7 +60,7 @@ AutoCorrector::correct(Token& token) const
 {
 	token.metadata()["correction"] = token.metadata()["groundtruth"];
 	token.metadata()["correction-lc"] = token.metadata()["groundtruth-lc"];
-	std::wcout << "Correcting token " << token.getWOCR()
-		   << " with "
-		   << token.metadata()["correction"] << "\n";
+	// std::wcout << "Correcting token " << token.getWOCR()
+	// 	   << " with "
+	// 	   << token.metadata()["correction"] << "\n";
 }

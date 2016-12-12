@@ -162,6 +162,7 @@ namespace csl {
 	    for( PatternGraph::Replacements_t::const_iterator rightSide = patPos.getReplacements().begin();
 		 rightSide != patPos.getReplacements().end();
 		 ++rightSide ) {
+		    // std::wcerr << "current: " << rightSide->first << "," << rightSide->second << "\n";
 
 
 		// Here, take the "stripped" version of the pattern without wordBegin- or worEnd-markers
@@ -177,6 +178,8 @@ namespace csl {
 		     ++position, ++count ) {
 
 		    // check if maxNrOfPatterns_ is reached already
+			// std::wcerr << "max: " << maxNrOfPatterns_ << "\n";
+			// std::wcerr << "app: " << position->getNrOfPatternsApplied() << "\n";
 		    if( ( maxNrOfPatterns_ != Vaam::INFINITE ) && ( position->getNrOfPatternsApplied() == maxNrOfPatterns_ ) )
 			continue;
 

@@ -221,6 +221,8 @@ DictSearch::getMinCascadeRank() const
 	for( std::multimap< size_t, iDictModule* >::const_iterator dm = allDictModules_.begin();
 	     dm != allDictModules_.end();
 	     ++dm ) {
+		// std::wcerr << "cascade Rank: " << cascadeRank << "\n";
+		// std::wcerr << "current: " << dm->first << "\n";
 	    if( ((*dm).first) > cascadeRank ) {
 		if( foundAnswers ) {
 		    return true;
@@ -232,7 +234,10 @@ DictSearch::getMinCascadeRank() const
 
 //	    try {
 		answers->setCurrentDictModule( *( (*dm).second ) );
-		foundAnswers = ( (* (*dm).second ) ).query( query, answers );
+		// std::wcerr << "name: " << dm->second->getName() << "\n";
+		// std::wcerr << "query: " << query << "\n";
+		foundAnswers = dm->second->query(query, answers);
+		// foundAnswers = ( (* (*dm).second ) ).query( query, answers );
 // 	    } catch( std::exception& exc ) {
 // 		std::wcerr << "csl::DictSearch::query: caught exception: " << exc.what() << std::endl;
 // 	    }
