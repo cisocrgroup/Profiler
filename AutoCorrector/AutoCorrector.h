@@ -30,7 +30,6 @@ namespace OCRCorrection {
 			{}
 			bool match(const Token& token) const;
 			static bool match(It fb, It fe, It b, It e);
-			static bool match_here(It fb, It fe, It b, It e);
 
 			std::wstring gt, ocr;
 			double n;

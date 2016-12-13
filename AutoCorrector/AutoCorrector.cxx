@@ -98,46 +98,27 @@ AutoCorrector::correct(Token& token) const
 bool
 AutoCorrector::Pattern::match(const Token& token) const
 {
-	const auto b = token.getWOCR_lc().begin();
-	const auto e = token.getWOCR_lc().end();
-	if (ocr.empty())
-		return match(begin(gt), end(gt), b, e);
-	if (gt.empty())
-		return match(begin(ocr), end(ocr), b, e);
+	if (not token.has_metadata("groundtruth-lc"))
+		throw std::runtime_error("(AutoCorrector) Cannot auto correct "
+				"token without any ground truth data: " +
+				Utils::utf8(token.getWOCR_lc()));
+	if (ocr.size() != gt.size())
+		throw std::runtime_error("(AutoCorrection) Invalid pattern: " +
+				Utils::utf8(gt) + ":" + Utils::utf8(ocr));
+	if (ocr.size() > token.getWOCR_lc().size())
+		return false;
+	if (gt.size() > token.metadata()["groundtruth-lc"].size())
+		return false;
 
-	size_t n;
-	It ab, ae, bb, be;
-	if (gt.size() > ocr.size()) {
-		n = gt.size() - ocr.size();
-		ab = begin(gt);
-		ae = end(gt);
-		bb = begin(ocr);
-		be = end(ocr);
-	} else {
-		n = ocr.size() - gt.size();
-		ab = begin(ocr);
-		ae = end(ocr);
-		bb = begin(gt);
-		be = end(gt);
-	}
+	auto n = std::min(token.getWOCR_lc().size(),
+			token.metadata()["groundtruth-lc"].size());
+	auto d = n - gt.size();
+	auto ob = token.getWOCR_lc().begin();
+	auto gb = token.metadata()["groundtruth-lc"].begin();
 
-	for (auto i = b; i != e; ++i) {
-		if (match_here(ab, ae, i, e)) {
-			for (auto j = 0U; j <= n and i + j != e; ++j) {
-				if (match_here(bb, be, i + j, e))
-					return true;
-			}
-		}
-	}
-	return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool
-AutoCorrector::Pattern::match(It pb, It pe, It b, It e)
-{
-	for (; b != e; ++b) {
-		if (match_here(pb, pe, b, e))
+	for (auto i = ob, j = gb; i != (ob + d) and j != (gb + d); ++i, ++j) {
+		if (match(begin(ocr), end(ocr), i, ob + d) and
+				match(begin(gt), end(gt), j, gb + d))
 			return true;
 	}
 	return false;
@@ -145,7 +126,7 @@ AutoCorrector::Pattern::match(It pb, It pe, It b, It e)
 
 ////////////////////////////////////////////////////////////////////////////////
 bool
-AutoCorrector::Pattern::match_here(It pb, It pe, It b, It e)
+AutoCorrector::Pattern::match(It pb, It pe, It b, It e)
 {
 	for (; pb != pe and b != e; ++pb, ++b) {
 		if (*pb != L'.' and *pb != *b)
