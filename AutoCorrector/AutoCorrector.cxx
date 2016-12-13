@@ -53,7 +53,7 @@ AutoCorrector::correct(Document& doc, CorrectPercent) const
 		if (n <= 0)
 			break;
 		correct(token);
-		token.metadata()["auto_correction"] += L",first " + p;
+		token.metadata()["auto-correction"] += L",first " + p;
 		--n;
 	}
 }
@@ -72,7 +72,7 @@ AutoCorrector::correct(Document& doc, CorrectPatterns) const
 			if (p.match(token) and applications[i] > 0) {
 				correct(token);
 				--applications[i];
-				token.metadata()["auto_correction"] +=
+				token.metadata()["auto-correction"] +=
 					L"," + p.gt + L":" + p.ocr;
 			}
 			++i;
