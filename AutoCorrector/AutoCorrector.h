@@ -16,13 +16,22 @@ namespace OCRCorrection {
 		void correct(Document& doc) const;
 
 	private:
+		struct CorrectPercent {};
+		struct CorrectPatterns {};
+		void correct(Document& doc, CorrectPercent) const;
+		void correct(Document& doc, CorrectPatterns) const;
 		void correct(Token& token) const;
 		struct Pattern {
-			Pattern(std::wstring p, bool o): pattern(std::move(p)), ocr(o) {}
-			std::wstring pattern;
-			bool ocr;
+			Pattern(std::wstring g, std::wstring o, int p)
+				: gt(std::move(g))
+				, ocr(std::move(o))
+				, percent(static_cast<double>(p) / 100.0)
+			{}
+			std::wstring gt, ocr;
+			double percent;
 		};
 		std::vector<Pattern> patterns_;
+		double percent_;
 	};
 }
 

@@ -9,30 +9,29 @@ using namespace OCRCorrection;
 void
 AutoCorrector::add_patterns(const std::string& pats)
 {
-	std::smatch m;
-	if (std::regex_match(pats, m, std::regex(R"(first\s*(\d{1,2})%)"))) {
-		percent_ = (double) std::stoi(m[1]) / 100.0;
-	} else {
-		size_t i = -1;
-		do {
-			++i;
-			const auto pos = pats.find(",", i);
-			add_pattern(pats.substr(i, pos -i));
-			i = pos;
-		} while (i != std::string::npos);
-	}
+	size_t i = -1;
+	do {
+		++i;
+		const auto pos = pats.find(",", i);
+		add_pattern(pats.substr(i, pos -i));
+		i = pos;
+	} while (i != std::string::npos);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void
 AutoCorrector::add_pattern(const std::string& pat)
 {
-	if (pat.find("gt:") == 0) {
-		patterns_.emplace_back(Utils::tolower(Utils::utf8(pat.substr(3))), false);
-	} else if (pat.find("ocr:") == 0) {
-		patterns_.emplace_back(Utils::tolower(Utils::utf8(pat.substr(4))), true);
+	static const std::regex first(R"(first\s*(\d{1,2})%?)");
+	static const std::regex pattern(R"(([^:]*):([^:]*):(\d{1,2})%?)");
+	std::smatch m;
+	if (std::regex_match(pat, m, first)) {
+		percent_ = static_cast<double>(std::stoi(m[1])) / 100.0;
+	} else if (std::regex_match(pat, m, pattern)) {
+		patterns_.emplace_back(Utils::tolower(Utils::utf8(m[1])),
+				Utils::tolower(Utils::utf8(m[2])), std::stoi(m[3]));
 	} else {
-		patterns_.emplace_back(Utils::tolower(Utils::utf8(pat)), true);
+		throw std::runtime_error("(AutoCorrector) Invalid pattern: " + pat);
 	}
 }
 
@@ -40,10 +39,8 @@ AutoCorrector::add_pattern(const std::string& pat)
 void
 AutoCorrector::correct(Document& doc) const
 {
-	if (not patterns_.empty())
-		correct(doc, CorrectPatterns());
-	else
-		correct(doc, CorrectPercent());
+	correct(doc, CorrectPercent());
+	correct(doc, CorrectPatterns());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -63,24 +60,6 @@ AutoCorrector::correct(Document& doc, CorrectPercent) const
 void
 AutoCorrector::correct(Document& doc, CorrectPatterns) const
 {
-	for (auto& token: doc) {
-		if (not token.isNormal()) // skip not normal token
-			continue;
-		if (not token.has_metadata("groundtruth"))
-			throw std::runtime_error("Cannot autocorrect "
-					"without groundtruth");
-		for (const auto& p: patterns_) {
-			if (p.ocr and token.getWOCR_lc().
-					find(p.pattern) != std::wstring::npos) {
-				correct(token);
-				break; // correct each token once
-			} else if (not p.ocr and token.metadata()["groundtruth-lc"].
-					find(p.pattern) != std::wstring::npos) {
-				correct(token);
-				break; // correct each token once
-			}
-		}
-	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
