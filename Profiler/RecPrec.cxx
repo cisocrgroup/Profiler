@@ -222,6 +222,8 @@ RecPrec::write(std::wostream& os, Class c, const Document& doc) const
 	};
 
 	for (const size_t id: classes_[static_cast<size_t>(c)]) {
+		if (doc.at(id).has_metadata("file"))
+			os << "file: " << doc.at(id).metadata()["file"] << "\n";
 		os << "gt:   " << doc.at(id).metadata()["groundtruth"] << "\n";
 		os << "ocr:  " << doc.at(id).getWOCR() << "\n";
 		for (const auto& cand: CandRange(doc.at(id))) {

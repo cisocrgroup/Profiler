@@ -140,6 +140,8 @@ GtDoc::add(const GtLine& line, Document& document) const
 			document.at(idx).metadata()["groundtruth"] = str;
 			document.at(idx).metadata()["groundtruth-lc"] =
 				Utils::tolower(str);
+			document.at(idx).metadata()["file"] =
+				Utils::utf8(line.file());
 		}
 next:
 		ofs = n;
