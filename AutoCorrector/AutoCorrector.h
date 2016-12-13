@@ -25,10 +25,10 @@ namespace OCRCorrection {
 			Pattern(std::wstring g, std::wstring o, int p)
 				: gt(std::move(g))
 				, ocr(std::move(o))
-				, percent(static_cast<double>(p) / 100.0)
+				, n(p)
 			{}
 			std::wstring gt, ocr;
-			double percent;
+			double n;
 		};
 		std::vector<Pattern> patterns_;
 		double percent_;

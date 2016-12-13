@@ -23,7 +23,7 @@ void
 AutoCorrector::add_pattern(const std::string& pat)
 {
 	static const std::regex first(R"(first\s*(\d{1,2})%?)");
-	static const std::regex pattern(R"(([^:]*):([^:]*):(\d{1,2})%?)");
+	static const std::regex pattern(R"(([^:]*):([^:]*):(\d{1,2}))");
 	std::smatch m;
 	if (std::regex_match(pat, m, first)) {
 		percent_ = static_cast<double>(std::stoi(m[1])) / 100.0;
