@@ -74,6 +74,7 @@ AutoCorrector::correct(Document& doc, CorrectPatterns) const
 				--applications[i];
 				token.metadata()["auto-correction"] +=
 					L"," + p.gt + L":" + p.ocr;
+				break;
 			}
 			++i;
 		}
@@ -90,7 +91,7 @@ AutoCorrector::correct(Token& token) const
 	token.metadata()["correction"] = token.metadata()["groundtruth"];
 	token.metadata()["correction-lc"] = token.metadata()["groundtruth-lc"];
 	std::wcout << "Correcting token " << token.getWOCR()
-		   << " with "
+		   << " <- "
 		   << token.metadata()["correction"] << "\n";
 }
 
@@ -110,15 +111,14 @@ AutoCorrector::Pattern::match(const Token& token) const
 	if (gt.size() > token.metadata()["groundtruth-lc"].size())
 		return false;
 
-	auto n = std::min(token.getWOCR_lc().size(),
-			token.metadata()["groundtruth-lc"].size());
-	auto d = n - gt.size();
-	auto ob = token.getWOCR_lc().begin();
-	auto gb = token.metadata()["groundtruth-lc"].begin();
+	const auto ob = token.getWOCR_lc().begin();
+	const auto oe = token.getWOCR_lc().end();
+	const auto gb = token.metadata()["groundtruth-lc"].begin();
+	const auto ge = token.metadata()["groundtruth-lc"].end();
 
-	for (auto i = ob, j = gb; i != (ob + d) and j != (gb + d); ++i, ++j) {
-		if (match(begin(ocr), end(ocr), i, ob + d) and
-				match(begin(gt), end(gt), j, gb + d))
+	for (auto i = ob, j = gb; i != oe and j != ge; ++i, ++j) {
+		if (match(begin(ocr), end(ocr), i, oe) and
+				match(begin(gt), end(gt), j, ge))
 			return true;
 	}
 	return false;
@@ -132,5 +132,5 @@ AutoCorrector::Pattern::match(It pb, It pe, It b, It e)
 		if (*pb != L'.' and *pb != *b)
 			return false;
 	}
-	return true;
+	return pb == pe;
 }
