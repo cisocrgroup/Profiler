@@ -23,8 +23,8 @@ AdaptiveLex::add(const std::wstring& gt, const std::wstring& ocr,
 {
 	auto i = LEX.find(gt);
 	if (i == end(LEX)) {
-		std::wcerr << "(AdaptiveLex) adding "
-			   << gt << ":" << ocr << "\n";
+		// std::wcerr << "(AdaptiveLex) adding "
+		// 	      << gt << ":" << ocr << "\n";
 		i = LEX.emplace_hint(i, gt, lev(gt, ocr));
 	}
 	add_candidate(gt, i->second, receiver);
