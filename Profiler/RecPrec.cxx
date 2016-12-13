@@ -92,7 +92,8 @@ OCRCorrection::RecPrec::classify(const Document& doc)
 					"precision of tokens without groundtruth");
 
 		// handle normal tokens without any corrections
-		if (not token.has_metadata("correction") and token.isNormal()) {
+		if (not token.has_metadata("correction") and token.isNormal() and
+				token.getWOCR().size() > 3 /* long */) {
 			const auto idx = token.getIndexInDocument();
 			(*this)[classify(token)].push_back(idx);
 		}
@@ -230,7 +231,6 @@ RecPrec::write(std::wostream& os, Class c, const Document& doc) const
 			os << "cand: " << cand << "\n";
 		}
 	}
-	os << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
