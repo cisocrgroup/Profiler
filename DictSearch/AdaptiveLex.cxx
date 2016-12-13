@@ -5,7 +5,7 @@ using namespace OCRCorrection;
 
 ////////////////////////////////////////////////////////////////////////////////
 const std::wstring AdaptiveLex::NAME = L"adaptive_lex";
-std::map<std::pair<std::wstring, std::wstring>, size_t> AdaptiveLex::CACHE;
+std::map<std::tuple<std::wstring, std::wstring>, size_t> AdaptiveLex::CACHE;
 std::unordered_map<std::wstring, size_t> AdaptiveLex::LEX;
 std::vector<size_t> AdaptiveLex::COSTS;
 
@@ -36,11 +36,14 @@ AdaptiveLex::doquery(const std::wstring& q, Receiver& receiver)
 {
 	bool res = false;
 	for (const auto& gt: LEX) {
-		const auto d = lev(gt.first, q);
-		if (d <= max_lev_) {
+		auto i = CACHE.find(std::tie(gt.first, q));
+		if (i == end(CACHE))
+			i = CACHE.emplace_hint(i, std::tie(gt.first, q), lev(gt.first, q));
+		assert(i != end(CACHE));
+		if (i->second <= max_lev_) {
 			// std::wcerr << "(AdaptiveLex) doquery lev("
 			// 	<< gt.first << "," << q << ") = " << d << "\n";
-			add_candidate(gt.first, d, receiver);
+			add_candidate(gt.first, i->second, receiver);
 			res = true;
 		}
 	}

@@ -29,7 +29,7 @@ namespace OCRCorrection {
 
 		const size_t max_lev_;
 
-		static std::map<std::pair<std::wstring, std::wstring>, size_t> CACHE;
+		static std::map<std::tuple<std::wstring, std::wstring>, size_t> CACHE;
 		static std::unordered_map<std::wstring, size_t> LEX;
 		static std::vector<size_t> COSTS;
 		static const std::wstring NAME;
