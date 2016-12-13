@@ -1,4 +1,4 @@
-#include "AdaptiveLex.h"
+#include "DictSearch/AdaptiveLex.h"
 #include "Profiler.h"
 
 using namespace OCRCorrection;
