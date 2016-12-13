@@ -48,10 +48,12 @@ void
 AutoCorrector::correct(Document& doc, CorrectPercent) const
 {
 	int n = static_cast<int>(doc.getNrOfTokens() * percent_);
+	auto p = std::to_wstring(static_cast<int>(percent_ * 100)) + L"%";
 	for (auto& token: doc) {
 		if (n <= 0)
 			break;
 		correct(token);
+		token.metadata()["auto_correction"] += L",first " + p;
 		--n;
 	}
 }
@@ -65,12 +67,15 @@ AutoCorrector::correct(Document& doc, CorrectPatterns) const
 			[](const Pattern& p) {return p.n;});
 
 	for (auto& token: doc) {
-		for (size_t i = 0; i < patterns_.size(); ++i) {
-			if (patterns_[i].match(token) and applications[i] > 0) {
+		size_t i = 0;
+		for (const auto& p: patterns_) {
+			if (p.match(token) and applications[i] > 0) {
 				correct(token);
 				--applications[i];
-				// don't break here; use every pattern
+				token.metadata()["auto_correction"] +=
+					L"," + p.gt + L":" + p.ocr;
 			}
+			++i;
 		}
 	}
 }
