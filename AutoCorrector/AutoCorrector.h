@@ -22,11 +22,16 @@ namespace OCRCorrection {
 		void correct(Document& doc, CorrectPatterns) const;
 		void correct(Token& token) const;
 		struct Pattern {
+			using It = std::wstring::const_iterator;
 			Pattern(std::wstring g, std::wstring o, int p)
 				: gt(std::move(g))
 				, ocr(std::move(o))
 				, n(p)
 			{}
+			bool match(const Token& token) const;
+			static bool match(It fb, It fe, It b, It e);
+			static bool match_here(It fb, It fe, It b, It e);
+
 			std::wstring gt, ocr;
 			double n;
 		};
