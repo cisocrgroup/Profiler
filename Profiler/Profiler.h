@@ -33,7 +33,7 @@
 
 namespace OCRCorrection {
 
-	class AdaptiveHistGtLex; // fwd
+	class AdaptiveLex; // fwd
 
 
 
@@ -211,8 +211,6 @@ namespace OCRCorrection {
 			csl::DictSearch::CandidateSet& candidates);
 	void createCandidatesWithCorrection(const Profiler_Token& t,
 		csl::DictSearch::CandidateSet& candidates);
-	AdaptiveHistGtLex& getAdaptiveHistGtLex();
-	AdaptiveHistGtLex* adaptive_hist_gt_lex_;
 
 	void initGlobalOcrPatternProbs(int itn);
 

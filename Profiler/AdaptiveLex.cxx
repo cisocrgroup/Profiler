@@ -1,40 +1,44 @@
 #include "Utils/IStr.h"
-#include "AdaptiveHistGtLex.h"
+#include "AdaptiveLex.h"
 
 using namespace OCRCorrection;
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::wstring AdaptiveHistGtLex::NAME_ = L"adaptive_hist_gt";
+const std::wstring AdaptiveLex::NAME = L"adaptive_lex";
+std::map<std::pair<std::wstring, std::wstring>, size_t> AdaptiveLex::CACHE;
+std::unordered_map<std::wstring, size_t> AdaptiveLex::LEX;
+std::vector<size_t> AdaptiveLex::COSTS;
 
 ////////////////////////////////////////////////////////////////////////////////
-AdaptiveHistGtLex::AdaptiveHistGtLex(size_t rank, size_t max_lev)
+AdaptiveLex::AdaptiveLex(size_t rank, size_t max_lev)
 	: DictModule(rank)
-	, costs_()
 	, max_lev_(max_lev)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-AdaptiveHistGtLex::add(const std::wstring& gt, const std::wstring& ocr,
+AdaptiveLex::add(const std::wstring& gt, const std::wstring& ocr,
 		Receiver& receiver)
 {
-	auto i = gt_.find(gt);
-	if (i == end(gt_)) {
-		i = gt_.emplace_hint(i, gt, lev(gt, ocr));
+	auto i = LEX.find(gt);
+	if (i == end(LEX)) {
+		std::wcerr << "(AdaptiveLex) adding "
+			   << gt << ":" << ocr << "\n";
+		i = LEX.emplace_hint(i, gt, lev(gt, ocr));
 	}
 	add_candidate(gt, i->second, receiver);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool
-AdaptiveHistGtLex::doquery(const std::wstring& q, Receiver& receiver)
+AdaptiveLex::doquery(const std::wstring& q, Receiver& receiver)
 {
 	bool res = false;
-	for (const auto& gt: gt_) {
+	for (const auto& gt: LEX) {
 		const auto d = lev(gt.first, q);
 		if (d <= max_lev_) {
-			// std::wcerr << "(AdaptiveHistGtLex) doquery lev("
+			// std::wcerr << "(AdaptiveLex) doquery lev("
 			// 	<< gt.first << "," << q << ") = " << d << "\n";
 			add_candidate(gt.first, d, receiver);
 			res = true;
@@ -45,7 +49,7 @@ AdaptiveHistGtLex::doquery(const std::wstring& q, Receiver& receiver)
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-AdaptiveHistGtLex::add_candidate(const std::wstring& gt, size_t lev,
+AdaptiveLex::add_candidate(const std::wstring& gt, size_t lev,
 		Receiver& receiver)
 {
 	csl::Interpretation i;
@@ -53,40 +57,40 @@ AdaptiveHistGtLex::add_candidate(const std::wstring& gt, size_t lev,
 	i.setBaseWord(gt.data());
 	i.setBaseWordScore(0);
 	i.setLevDistance(lev);
-	// std::wcerr << "(AdaptiveHistGtLex) Interpretation: " << i << "\n";
+	// std::wcerr << "(AdaptiveLex) Interpretation: " << i << "\n";
 	static_cast<csl::iInterpretationReceiver&>(receiver).receive(i);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 size_t
-AdaptiveHistGtLex::lev(const std::wstring& a, const std::wstring& b)
+AdaptiveLex::lev(const std::wstring& a, const std::wstring& b)
 {
 	const size_t m(a.size());
 	const size_t n(b.size());
 
 	if (m == 0) return n;
 	if (n == 0) return m;
-	costs_.resize(n + 1);
+	COSTS.resize(n + 1);
 
 	for (auto k = 0U; k <= n; ++k)
-		costs_[k] = k;
+		COSTS[k] = k;
 
 	size_t i = 0;
 	for (auto ia = begin(a); ia != end(a); ++ia, ++i) {
-		costs_[0] = i + 1;
+		COSTS[0] = i + 1;
 		size_t corner = i;
 
 		size_t j = 0;
 		for (auto ib = begin(b); ib != end(b); ++ib, ++j) {
-			size_t upper = costs_[j + 1];
+			size_t upper = COSTS[j + 1];
 			if (towupper(*ia) == towupper(*ib)) { // ignore case
-				costs_[j + 1] = corner;
+				COSTS[j + 1] = corner;
 			} else {
 				size_t t(upper < corner ? upper : corner);
-				costs_[j + 1] = (costs_[j] < t ? costs_[j] : t) + 1;
+				COSTS[j + 1] = (COSTS[j] < t ? COSTS[j] : t) + 1;
 			}
 			corner = upper;
 		}
 	}
-	return costs_[n];
+	return COSTS[n];
 }

@@ -1,4 +1,4 @@
-#include "AdaptiveHistGtLex.h"
+#include "AdaptiveLex.h"
 #include "Profiler.h"
 
 using namespace OCRCorrection;
@@ -58,6 +58,7 @@ Profiler::calculateAdaptiveCandidateSet(const Profiler_Token& t,
 		std::sort(candidates.begin(), candidates.end());
 	else
 		createCandidatesWithCorrection(t, candidates);
+	assert(not candidates.empty());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -69,24 +70,10 @@ Profiler::createCandidatesWithCorrection(const Profiler_Token& t,
 	// std::wcerr << "(Profiler) Calculating candidates from correction for token "
 	// 	   << t.getWOCR() << " ("
 	// 	   << t.origin().metadata()["correction"] << ")\n";
-	getAdaptiveHistGtLex().add(t.origin().metadata()["correction-lc"],
+	AdaptiveLex::add(t.origin().metadata()["correction-lc"],
 			t.getWOCR_lc(), candidates);
 	// for (const auto& cand: candidates) {
 	// 	std::wcerr << "(Profiler) AdaptiveGt candidate: " << cand << "\n";
 	// }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-AdaptiveHistGtLex&
-Profiler::getAdaptiveHistGtLex()
-{
-	if (not adaptive_hist_gt_lex_) {
-		std::unique_ptr<AdaptiveHistGtLex> lex(
-				new AdaptiveHistGtLex(
-					dictSearch_.getMaxCascadeRank() + 1, 2));
-		dictSearch_.addDictModule(*lex);
-		adaptive_hist_gt_lex_ = lex.get();
-		lex.release(); // lex is managed by dictSearch
-	}
-	return *adaptive_hist_gt_lex_;
-}

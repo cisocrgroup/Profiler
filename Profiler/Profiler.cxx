@@ -8,7 +8,6 @@
 namespace OCRCorrection {
 
     Profiler::Profiler() :
-	adaptive_hist_gt_lex_(nullptr),
     	freqList_(),
     	baseWordFrequencyDic_( 0 ),
     	htmlStream_( 0 )
