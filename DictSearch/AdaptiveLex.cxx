@@ -1,7 +1,7 @@
 #include "Utils/IStr.h"
 #include "AdaptiveLex.h"
 
-using namespace OCRCorrection;
+using namespace csl;
 
 ////////////////////////////////////////////////////////////////////////////////
 const std::wstring AdaptiveLex::NAME = L"adaptive_lex";

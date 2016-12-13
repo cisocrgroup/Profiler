@@ -1,8 +1,10 @@
 #ifndef CSL_DICTSEARCH_CXX
 #define CSL_DICTSEARCH_CXX CSL_DICTSEARCH_CXX
 
+#include "AdaptiveLex.h" // must be included before DictSearch.h
 #include "./DictSearch.h"
 #include "Utils/Utils.h"
+
 namespace csl {
 
     DictSearch::DictSearch() :
@@ -119,6 +121,12 @@ namespace csl {
 
 
 
+	    }
+	    // adaptive dictionaries
+	    else if (iniConf.getstring(*it + ":dict_type") == std::string("adaptive")) {
+		    auto ocr_errors = iniConf.getint(*it + ":ocrErrors");
+		    std::unique_ptr<AdaptiveLex> adm(new AdaptiveLex(cascadeRank, ocr_errors));
+		    addDictModule(*adm.release());
 	    }
 	    else {
 		throw exceptions::cslException( "csl::DictSearch::readConfiguration: unknown dict_type for dictionary " + *it );

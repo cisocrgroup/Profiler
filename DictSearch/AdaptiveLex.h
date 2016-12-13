@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include "DictSearch.h"
 
-namespace OCRCorrection {
+namespace csl {
 	class AdaptiveLex: public csl::DictSearch::iDictModule {
 	public:
 		using DictModule = csl::DictSearch::iDictModule;

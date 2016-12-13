@@ -70,7 +70,7 @@ Profiler::createCandidatesWithCorrection(const Profiler_Token& t,
 	// std::wcerr << "(Profiler) Calculating candidates from correction for token "
 	// 	   << t.getWOCR() << " ("
 	// 	   << t.origin().metadata()["correction"] << ")\n";
-	AdaptiveLex::add(t.origin().metadata()["correction-lc"],
+	csl::AdaptiveLex::add(t.origin().metadata()["correction-lc"],
 			t.getWOCR_lc(), candidates);
 	// for (const auto& cand: candidates) {
 	// 	std::wcerr << "(Profiler) AdaptiveGt candidate: " << cand << "\n";
