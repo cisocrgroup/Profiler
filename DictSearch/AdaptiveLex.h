@@ -2,7 +2,7 @@
 #define OCRC_AdaptiveLex_hpp__
 
 #include <unordered_map>
-#include "DictSearch/DictSearch.h"
+#include "DictSearch.h"
 
 namespace OCRCorrection {
 	class AdaptiveLex: public csl::DictSearch::iDictModule {
