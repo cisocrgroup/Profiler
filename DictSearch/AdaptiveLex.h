@@ -18,6 +18,7 @@ namespace csl {
 		}
 		static void add(const std::wstring& gt, const std::wstring& ocr,
 				Receiver& receiver);
+		static void write(const std::string& out);
 
 	private:
 		bool doquery(const std::wstring& q, Receiver& res);

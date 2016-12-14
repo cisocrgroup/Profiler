@@ -1,3 +1,4 @@
+#include <unordered_set>
 #include "Utils/IStr.h"
 #include "AdaptiveLex.h"
 
@@ -96,4 +97,28 @@ AdaptiveLex::lev(const std::wstring& a, const std::wstring& b)
 		}
 	}
 	return COSTS[n];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void
+AdaptiveLex::write(const std::string& file)
+{
+	std::wifstream is(file);
+	std::unordered_set<std::wstring> dict;
+	if (is.good()) {
+		std::wstring line;
+		while (std::getline(is, line))
+			dict.insert(line);
+	}
+	is.close();
+
+	for (const auto& gt: LEX)
+		dict.insert(gt.first);
+
+	std::wofstream os(file);
+	if (not os.good())
+		throw std::system_error(errno, std::system_category(), file);
+	for (const auto& entry: dict)
+		os << entry << "\n";
+	os.close();
 }
