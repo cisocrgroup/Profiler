@@ -59,6 +59,16 @@ namespace OCRCorrection {
 	freqList_.loadFromFile( iniConf.getstring( "language_model:freqListFile" ),
 				iniConf.getstring( "language_model:patternWeightsFile" ) );
 
+	if (iniConf.hasKey("adaptive_profiling:writeAdaptiveDictionary")) {
+		config_.writeAdaptiveDictionary_ =
+			iniConf.getbool("adaptive_profiling:writeAdaptiveDictionary");
+		if (config_.writeAdaptiveDictionary_) {
+			config_.adaptiveDictionaryPath_ =
+				iniConf.getstring("adaptive_profiling:adaptiveDictionaryPath");
+		}
+	}
+
+
 	dictSearch_.readConfiguration( iniConf );
 
 	htmlWriter_.readConfiguration( iniConf );

@@ -128,8 +128,17 @@ namespace OCRCorrection {
 	/**
 	 * @brief Enable/disable adaptive profiling
 	 */
-	void setAdaptive(bool adaptive) {
+	void setAdaptive(bool adaptive) noexcept {
 		config_.adaptive_ = adaptive;
+	}
+	bool adaptive() const noexcept {
+		return config_.adaptive_;
+	}
+	bool writeAdaptiveDictionary() const noexcept {
+		return config_.writeAdaptiveDictionary_;
+	}
+	const std::string& getAdaptiveDictionaryPath() const noexcept {
+		return config_.adaptiveDictionaryPath_;
 	}
 
 	/**
@@ -353,7 +362,10 @@ namespace OCRCorrection {
 		resetHistPatternProbabilities_( true ),
 		resetOCRPatternProbabilities_( true ),
 		donttouch_hyphenation_( true ),
-		donttouch_lineborders_( false)
+		donttouch_lineborders_( false),
+		adaptiveDictionaryPath_(),
+		writeAdaptiveDictionary_(false),
+		adaptive_(false)
 		{
 		}
 
@@ -408,11 +420,14 @@ namespace OCRCorrection {
 	     */
 	    bool resetOCRPatternProbabilities_;
 
-	    bool adaptive_;
 
 	    bool donttouch_hyphenation_;
 
 	    bool donttouch_lineborders_;
+
+	    std::string adaptiveDictionaryPath_;
+	    bool writeAdaptiveDictionary_;
+	    bool adaptive_;
 
 	    void print( std::wostream& os = std::wcout ) {
 		os << "number of iterations:           " << nrOfIterations_ << std::endl
@@ -432,6 +447,9 @@ namespace OCRCorrection {
 		   << std::endl
 		   << "donttouch_hyphenation_:         " << donttouch_hyphenation_ << std::endl
 		   << "donttouch_lineborders_:         " << donttouch_lineborders_ << std::endl
+		   << "writeAdaptiveDictionary:        " << writeAdaptiveDictionary_ << std::endl
+		   << "adaptiveDictionaryPath:         " << Utils::utf8(adaptiveDictionaryPath_)
+		   << std::endl
 		   << "adaptive_:                      " << adaptive_ << std::endl
 		    ;
 	    }
