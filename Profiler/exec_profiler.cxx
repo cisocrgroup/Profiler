@@ -218,7 +218,7 @@ int main( int argc, char const** argv ) {
     //
     profiler.createProfile(document);
     if (profiler.adaptive() and profiler.writeAdaptiveDictionary()) {
-	    OCRCorrection::AdaptiveLex::write(profiler.getAdaptiveDictionaryPath());
+	    csl::AdaptiveLex::write(profiler.getAdaptiveDictionaryPath());
     }
 
     if (options.hasOption("simpleOutput")) {
