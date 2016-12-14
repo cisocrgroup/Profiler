@@ -14,6 +14,7 @@
 #include "GtDoc/GtDoc.h"
 #include "Profiler/RecPrec.h"
 #include "AutoCorrector/AutoCorrector.h"
+#include "DictSearch/AdaptiveLex.h"
 #include<IBMGroundtruth/IBMGTReader.h>
 #include<Getopt/Getopt.h>
 
@@ -216,7 +217,9 @@ int main( int argc, char const** argv ) {
     // do profiling
     //
     profiler.createProfile(document);
-
+    if (profiler.adaptive() and profiler.writeAdaptiveDictionary()) {
+	    OCRCorrection::AdaptiveLex::write(profiler.getAdaptiveDictionaryPath());
+    }
 
     if (options.hasOption("simpleOutput")) {
             OCRCorrection::SimpleOutputWriter(std::wcout, document).write();

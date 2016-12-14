@@ -33,10 +33,6 @@
 
 namespace OCRCorrection {
 
-	class AdaptiveLex; // fwd
-
-
-
     /**
      * @brief Read the {@link profiler_manual Profiler manual} to find out more about the purpose and use of the Profiler.
      *        Class Profiler analyzes an ocr-ed historical text
