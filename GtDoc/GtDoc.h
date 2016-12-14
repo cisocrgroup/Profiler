@@ -166,6 +166,8 @@ namespace OCRCorrection {
 		void parse(const std::string& file, Document& document);
 
 	private:
+		static void copy_gt_token(size_t ofs, size_t e,
+				const GtLine& line, std::wstring& out);
 		void add(const GtLine& line, Document& document) const;
 
 		Lines lines_;

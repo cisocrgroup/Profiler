@@ -136,7 +136,7 @@ GtDoc::add(const GtLine& line, Document& document) const
 			document.pushBackToken(str, normal);
 
 			str.clear();
-			line.copy_gt(ofs, e, std::back_inserter(str));
+			copy_gt_token(ofs, e, line, str);
 			document.at(idx).metadata()["groundtruth"] = str;
 			document.at(idx).metadata()["groundtruth-lc"] =
 				Utils::tolower(str);
@@ -146,6 +146,29 @@ GtDoc::add(const GtLine& line, Document& document) const
 next:
 		ofs = n;
 	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void
+GtDoc::copy_gt_token(size_t ofs, size_t e, const GtLine& line, std::wstring& out)
+{
+	while (ofs > 0) {
+		const auto i = ofs - 1;
+		if (line.gt().at(i) != L'~' and
+				not Document::isWord(line.gt().at(i))) {
+			break;
+		}
+		--ofs;
+	}
+	while ((ofs + e) < line.gt().size()) {
+		const auto i = ofs + e;
+		if (line.gt().at(i) != L'~' and
+				not Document::isWord(line.gt().at(i))) {
+			break;
+		}
+		++e;
+	}
+	line.copy_gt(ofs, e, std::back_inserter(out));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
