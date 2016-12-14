@@ -16,6 +16,9 @@ namespace OCRCorrection {
 		bool has(const std::string& s) const noexcept {
 			return map_.count(s);
 		}
+		void erase(const std::string& s) {
+			map_.erase(s);
+		}
 
 	private:
 		std::map<std::string, std::wstring, IStrCmp> map_;
