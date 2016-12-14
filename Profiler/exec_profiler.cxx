@@ -13,7 +13,7 @@
 #include "SimpleOutputWriter.h"
 #include "GtDoc/GtDoc.h"
 #include "Profiler/RecPrec.h"
-#include "AutoCorrector/AutoCorrector.h"
+#include "GtDoc/AutoCorrector.h"
 #include "DictSearch/AdaptiveLex.h"
 #include<IBMGroundtruth/IBMGTReader.h>
 #include<Getopt/Getopt.h>

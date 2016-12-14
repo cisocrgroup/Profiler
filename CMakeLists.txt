@@ -83,7 +83,6 @@ add_subdirectory(tools)
 
 ###### TO DO: Move this (and all related headers and sources) to a separate folder ##########
 SET( OCRCORRECTION_SOURCES
-	     AutoCorrector/AutoCorrector.cxx
              Utils/Utils.cxx
 	     Document/Document.cxx
 	     CorrectionSystem/CorrectionSystem.cxx
@@ -108,6 +107,7 @@ SET( OCRCORRECTION_SOURCES
 	     GlobalProfile/PatternContainerXMLReader.cxx
 	     Pattern/Pattern.cxx
 	     GtDoc/GtDoc.cxx
+	     GtDoc/AutoCorrector.cxx
 	     )
 
 add_library( OCRCorrection STATIC ${OCRCORRECTION_SOURCES})
