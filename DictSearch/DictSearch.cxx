@@ -125,7 +125,9 @@ namespace csl {
 	    // adaptive dictionaries
 	    else if (iniConf.getstring(*it + ":dict_type") == std::string("adaptive")) {
 		    auto ocr_errors = iniConf.getint(*it + ":ocrErrors");
-		    std::unique_ptr<AdaptiveLex> adm(new AdaptiveLex(cascadeRank, ocr_errors));
+		    std::unique_ptr<AdaptiveLex> adm(new AdaptiveLex(
+					    OCRCorrection::Utils::utf8(*it),
+					    cascadeRank, ocr_errors));
 		    addDictModule(*adm.release());
 	    }
 	    else {

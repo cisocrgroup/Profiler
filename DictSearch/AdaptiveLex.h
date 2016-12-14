@@ -10,11 +10,9 @@ namespace csl {
 		using DictModule = csl::DictSearch::iDictModule;
 		using Receiver = csl::DictSearch::iResultReceiver;
 
-		static const std::wstring& name() noexcept {return NAME;}
-
-		AdaptiveLex(size_t rank, size_t max_lev_);
+		AdaptiveLex(std::wstring name, size_t rank, size_t max_lev_);
 		virtual ~AdaptiveLex() noexcept override = default;
-		virtual const std::wstring& getName() const override {return name();}
+		virtual const std::wstring& getName() const override {return name_;}
 		virtual bool query(const std::wstring& q, Receiver* res) override {
 			return doquery(q, *res);
 		}
@@ -27,12 +25,12 @@ namespace csl {
 		static void add_candidate(const std::wstring& gt, size_t lev,
 				Receiver& receiver);
 
+		const std::wstring name_;
 		const size_t max_lev_;
 
 		static std::map<std::tuple<std::wstring, std::wstring>, size_t> CACHE;
 		static std::unordered_map<std::wstring, size_t> LEX;
 		static std::vector<size_t> COSTS;
-		static const std::wstring NAME;
 	};
 }
 

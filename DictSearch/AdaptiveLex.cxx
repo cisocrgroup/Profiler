@@ -4,14 +4,14 @@
 using namespace csl;
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::wstring AdaptiveLex::NAME = L"adaptive_lex";
 std::map<std::tuple<std::wstring, std::wstring>, size_t> AdaptiveLex::CACHE;
 std::unordered_map<std::wstring, size_t> AdaptiveLex::LEX;
 std::vector<size_t> AdaptiveLex::COSTS;
 
 ////////////////////////////////////////////////////////////////////////////////
-AdaptiveLex::AdaptiveLex(size_t rank, size_t max_lev)
+AdaptiveLex::AdaptiveLex(std::wstring name, size_t rank, size_t max_lev)
 	: DictModule(rank)
+	, name_(std::move(name))
 	, max_lev_(max_lev)
 {
 }
