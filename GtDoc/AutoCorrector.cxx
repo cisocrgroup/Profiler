@@ -71,10 +71,6 @@ AutoCorrector::correct(GtDoc& doc, CorrectPercent) const
 void
 AutoCorrector::correct(GtDoc& doc, CorrectPatterns) const
 {
-	std::vector<int> applications(patterns_.size());
-	std::transform(begin(patterns_), end(patterns_), begin(applications),
-			[](const Pattern& p) {return p.n;});
-
 	for (const auto& p: patterns_) {
 		auto n = p.n;
 		for (auto& line: doc.lines()) {
