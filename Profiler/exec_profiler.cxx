@@ -263,10 +263,14 @@ int main( int argc, char const** argv ) {
 
 
     } catch ( OCRCorrection::OCRCException& exc ) {
-            std::wcerr << "OCRC::Profiler: Caught OCRCException:" << OCRCorrection::Utils::utf8(exc.what()) << std::endl;
+            std::wcerr << "OCRC::Profiler: Caught OCRCException:"
+		       << OCRCorrection::Utils::utf8(exc.what())
+		       << std::endl;
         return EXIT_FAILURE;
     } catch ( csl::exceptions::cslException& exc ) {
-            std::wcerr << "OCRC::Profiler: Caught cslException: " << OCRCorrection::Utils::utf8(exc.what()) << std::endl;
+            std::wcerr << "OCRC::Profiler: Caught cslException: "
+		       << OCRCorrection::Utils::utf8(exc.what())
+		       << std::endl;
         return EXIT_FAILURE;
     }
     catch( std::exception& exc ) {
