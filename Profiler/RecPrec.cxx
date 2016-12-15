@@ -1,3 +1,4 @@
+#include <iomanip>
 #include <cmath>
 #include "GlobalProfile/GlobalProfile.h"
 #include "RecPrec.h"
@@ -188,9 +189,9 @@ OCRCorrection::RecPrec::write(const std::string& dir, const Document& doc) const
 	   << "True negative:    " << true_negatives() << "\n"
 	   << "False positive:   " << false_positives() << "\n"
 	   << "False negative:   " << false_negatives() << "\n"
-	   << "Precision:        " << precision() << "\n"
-	   << "Recall:           " << recall() << "\n"
-	   << "Evaluated tokens: " << normal << "\n"
+	   << "Precision:        " << std::setprecision(4) << precision() << "\n"
+	   << "Recall:           " << std::setprecision(4) << recall() << "\n"
+	   << "Evaluated tokens: " << sum() << "\n"
 	   << "Corrected tokens: " << corrections << "\n";
 	os.close();
 
