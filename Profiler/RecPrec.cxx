@@ -190,7 +190,7 @@ OCRCorrection::RecPrec::write(const std::string& dir, const Document& doc) const
 	   << "False negative:   " << false_negatives() << "\n"
 	   << "Precision:        " << precision() << "\n"
 	   << "Recall:           " << recall() << "\n"
-	   << "Normal tokens:    " << normal << "\n"
+	   << "Evaluated tokens: " << normal << "\n"
 	   << "Corrected tokens: " << corrections << "\n";
 	os.close();
 
