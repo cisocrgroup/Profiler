@@ -23,8 +23,8 @@ AutoCorrector::add_patterns(const std::string& pats)
 void
 AutoCorrector::add_pattern(const std::string& pat)
 {
-	static const std::regex first(R"(first\s*(\d{1,2})%?)");
-	static const std::regex trainset(R"(train\s*set\s*(\d{1,2})%?)");
+	static const std::regex first(R"(first\s*0*(\d{1,2})%?)");
+	static const std::regex trainset(R"(train\s*set\s*0*(\d{1,2})%?)");
 	static const std::regex pattern(R"(([^:]*):([^:]*):(\d{1,2}))");
 	std::smatch m;
 	if (std::regex_match(pat, m, first)) {
