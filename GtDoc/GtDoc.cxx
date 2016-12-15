@@ -4,7 +4,6 @@
 #include <unicode/uchar.h>
 #include <fstream>
 #include "Utils/Utils.h"
-#include "Document/Document.h"
 #include "GtDoc.h"
 
 using namespace OCRCorrection;
@@ -33,58 +32,46 @@ EditOperation::fromChar(wchar_t c)
 GtLine::GtLine(const std::string& file, const std::wstring& gt,
 		const std::wstring& ops, const std::wstring& ocr)
 	: file_(file)
-	, gt_(gt)
-	, ocr_(ocr)
-	, trace_(gt.size())
+	, chars_(gt.size())
 {
-	std::copy(begin(ops), end(ops), begin(trace_));
-	if (gt_.size() != trace_.size() or gt_.size() != ocr_.size()) {
+	if (gt.size() != ops.size() or gt.size() != ocr.size()) {
 		throw std::runtime_error("(GtLine) gt, ops and ocr do "
-				"not have the same length");
+				"not all have the same length");
+	}
+	chars_.reserve(gt.size());
+	for (size_t i = 0; i < gt.size(); ++i) {
+		chars_[i] = GtChar(gt[i], ocr[i], ocr[i], ops[i]);
 	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::wstring
-GtToken::gt() const
+void
+GtLine::parse(Document& doc) const
 {
-	std::wstring res;
-	res.reserve(size());
-	for (auto i = 0; (i + b_) != e_; ++i) {
-		if (not std::next(trace_begin(), i)->is_insertion())
-			res.push_back(*(std::next(gt_begin(), i)));
-	}
-	return res;
-}
+	std::wstring gt, cor, ocr;
+	each_token([&](range r) {
+		gt.clear();
+		cor.clear();
+		ocr.clear();
+		bool normal = true;
+		std::for_each(r.first, r.second, [&](const GtChar& c) {
+			if (c.copy_ocr())
+				ocr.push_back(c.ocr);
+			if (c.copy_gt())
+				gt.push_back(c.gt);
+			if (c.copy_cor())
+				cor.push_back(c.cor);
+			normal &= c.is_normal();
+		});
 
-////////////////////////////////////////////////////////////////////////////////
-Trace
-GtToken::trace() const
-{
-	Trace trace(size());
-	std::copy(trace_begin(), trace_end(), begin(trace));
-	return trace;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-std::wstring
-GtToken::ocr() const
-{
-	std::wstring res;
-	res.reserve(size());
-	for (auto i = 0; (i + b_) != e_; ++i) {
-		if (not std::next(trace_begin(), i)->is_deletion())
-			res.push_back(*(std::next(ocr_begin(), i)));
-	}
-	return res;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool
-GtToken::is_ok() const noexcept
-{
-	return std::all_of(trace_begin(), trace_end(), [](const EditOperation& op) {
-		return op.is_none();
+		const auto idx = doc.getNrOfTokens();
+		doc.pushBackToken(ocr, normal);
+		doc.at(idx).metadata()["groundtruth"] = gt;
+		doc.at(idx).metadata()["groundtruth-lc"] = Utils::tolower(gt);
+		if (normal and ocr.size() > 3 and cor == gt) {
+			doc.at(idx).metadata()["correction"] = cor;
+			doc.at(idx).metadata()["correction-lc"] = Utils::tolower(cor);
+		}
 	});
 }
 
@@ -105,7 +92,7 @@ GtDoc::parse(Document& document) const
 {
 	document.clear();
 	for (const auto& line: lines_) {
-		add(line, document);
+		line.parse(document);
 	}
 }
 
@@ -115,74 +102,6 @@ GtDoc::parse(const std::string& file, Document& document)
 {
 	load(file);
 	parse(document);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void
-GtDoc::add(const GtLine& line, Document& document) const
-{
-	std::wstring str;
-	bool normal = false;
-	for (auto ofs = 0U; ofs < line.ocr().size();) {
-		const auto n = document.findBorder(line.ocr(), ofs, &normal);
-		if (normal and n != std::wstring::npos and n >= ofs) {
-			const auto idx = document.getNrOfTokens();
-			const auto e = n - ofs;
-
-			str.clear();
-			line.copy_ocr(ofs, e, std::back_inserter(str));
-			if (str.empty())
-				goto next;
-			document.pushBackToken(str, normal);
-
-			str.clear();
-			copy_gt_token(ofs, e, line, str);
-			document.at(idx).metadata()["groundtruth"] = str;
-			document.at(idx).metadata()["groundtruth-lc"] =
-				Utils::tolower(str);
-			document.at(idx).metadata()["file"] =
-				Utils::utf8(line.file());
-		}
-next:
-		ofs = n;
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void
-GtDoc::copy_gt_token(size_t ofs, size_t e, const GtLine& line, std::wstring& out)
-{
-	while (ofs > 0) {
-		const auto i = ofs - 1;
-		if (line.gt().at(i) != L'~' and
-				not Document::isWord(line.gt().at(i))) {
-			break;
-		}
-		--ofs;
-	}
-	while ((ofs + e) < line.gt().size()) {
-		const auto i = ofs + e;
-		if (line.gt().at(i) != L'~' and
-				not Document::isWord(line.gt().at(i))) {
-			break;
-		}
-		++e;
-	}
-	line.copy_gt(ofs, e, std::back_inserter(out));
-}
-
-////////////////////////////////////////////////////////////////////////////////
-std::wostream&
-OCRCorrection::operator<<(std::wostream& os, const EditOperation& op)
-{
-	return os << static_cast<wchar_t>(op);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-std::wostream&
-OCRCorrection::operator<<(std::wostream& os, const GtLine& line)
-{
-	return os << Utils::utf8(line.file()) << "\n" << line.token();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -213,46 +132,6 @@ OCRCorrection::operator>>(std::wistream& is, GtLine& line)
 	line = GtLine(Utils::utf8(file), remove_dottet_circles(gt),
 			trace, remove_dottet_circles(ocr));
 	return std::getline(is, file); // read empty line;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-std::wostream&
-OCRCorrection::operator<<(std::wostream& os, const GtToken& token)
-{
-	os << Utils::utf8(token.file()) << "\n";
-	for (wchar_t c: token.gt_range()) {
-		if (u_charType(c) == U_NON_SPACING_MARK)
-			os << L'◌';
-		os << c;
-	}
-	os << "\n";
-	std::copy(token.trace_begin(), token.trace_end(),
-			std::ostream_iterator<wchar_t, wchar_t>(os));
-	os << "\n";
-	for (wchar_t c: token.ocr_range()) {
-		if (u_charType(c) == U_NON_SPACING_MARK)
-			os << L'◌';
-		os << c;
-	}
-	return os;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-std::wostream&
-OCRCorrection::operator<<(std::wostream& os, const Trace& trace)
-{
-	std::copy(begin(trace), end(trace),
-			std::ostream_iterator<wchar_t, wchar_t>(os));
-	return os;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-std::wostream&
-OCRCorrection::operator<<(std::wostream& os, const GtDoc& doc)
-{
-	for (const auto& line: doc.lines())
-		os << line << "\n";
-	return os;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

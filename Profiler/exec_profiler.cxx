@@ -194,6 +194,11 @@ int main( int argc, char const** argv ) {
 	else if (options.getOption("sourceFormat") == "DocGt") {
 		OCRCorrection::GtDoc gtdoc;
 		gtdoc.load(options.getOption("sourceFile"));
+	    if (options.hasOption("autocorrect")) {
+		    OCRCorrection::AutoCorrector corrector;
+		    corrector.add_patterns(options.getOption("autocorrect"));
+		    corrector(gtdoc);
+	    }
 		gtdoc.parse(document);
 	}
 	else {
@@ -206,11 +211,6 @@ int main( int argc, char const** argv ) {
         return EXIT_FAILURE;
     }
 
-    if (options.hasOption("autocorrect")) {
-	    OCRCorrection::AutoCorrector corrector;
-	    corrector.add_patterns(options.getOption("autocorrect"));
-	    corrector(document);
-    }
 
 
     //
