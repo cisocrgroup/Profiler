@@ -29,7 +29,7 @@ AutoCorrector::add_pattern(const std::string& pat)
 	std::smatch m;
 	if (std::regex_match(pat, m, first)) {
 		first_ = std::stoi(m[1]);
-	} else if (std::regex_match(pat, m, pattern)) {
+	} else if (std::regex_match(pat, m, trainset)) {
 		trainset_ = std::stoi(m[1]);
 	} else if (std::regex_match(pat, m, pattern)) {
 		patterns_.emplace_back(Utils::tolower(Utils::utf8(m[1])),
