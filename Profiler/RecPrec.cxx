@@ -1,3 +1,4 @@
+#include <iomanip>
 #include <cmath>
 #include "GlobalProfile/GlobalProfile.h"
 #include "RecPrec.h"
@@ -91,9 +92,7 @@ OCRCorrection::RecPrec::classify(const Document& doc)
 			throw std::runtime_error("cannot evaluate recall and "
 					"precision of tokens without groundtruth");
 
-		// handle normal tokens without any corrections
-		if (not token.has_metadata("correction") and token.isNormal() and
-				token.getWOCR().size() > 3 /* long */) {
+		if (token.has_metadata("eval") and token.metadata()["eval"] == L"true") {
 			const auto idx = token.getIndexInDocument();
 			(*this)[classify(token)].push_back(idx);
 		}
@@ -190,9 +189,9 @@ OCRCorrection::RecPrec::write(const std::string& dir, const Document& doc) const
 	   << "True negative:    " << true_negatives() << "\n"
 	   << "False positive:   " << false_positives() << "\n"
 	   << "False negative:   " << false_negatives() << "\n"
-	   << "Precision:        " << precision() << "\n"
-	   << "Recall:           " << recall() << "\n"
-	   << "Normal tokens:    " << normal << "\n"
+	   << "Precision:        " << std::setprecision(4) << precision() << "\n"
+	   << "Recall:           " << std::setprecision(4) << recall() << "\n"
+	   << "Evaluated tokens: " << sum() << "\n"
 	   << "Corrected tokens: " << corrections << "\n";
 	os.close();
 

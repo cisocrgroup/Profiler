@@ -352,6 +352,9 @@ namespace OCRCorrection {
 	bool has_metadata(const std::string& s) const noexcept {
 		return metadata_ ? metadata_->has(s) : false;
 	}
+	void erase_metadata(const std::string& s) const noexcept {
+		if (metadata_) metadata_->erase(s);
+	}
 
 	//@}
 

@@ -13,7 +13,7 @@
 #include "SimpleOutputWriter.h"
 #include "GtDoc/GtDoc.h"
 #include "Profiler/RecPrec.h"
-#include "AutoCorrector/AutoCorrector.h"
+#include "GtDoc/AutoCorrector.h"
 #include "DictSearch/AdaptiveLex.h"
 #include<IBMGroundtruth/IBMGTReader.h>
 #include<Getopt/Getopt.h>
@@ -194,6 +194,11 @@ int main( int argc, char const** argv ) {
 	else if (options.getOption("sourceFormat") == "DocGt") {
 		OCRCorrection::GtDoc gtdoc;
 		gtdoc.load(options.getOption("sourceFile"));
+	    if (options.hasOption("autocorrect")) {
+		    OCRCorrection::AutoCorrector corrector;
+		    corrector.add_patterns(options.getOption("autocorrect"));
+		    corrector(gtdoc);
+	    }
 		gtdoc.parse(document);
 	}
 	else {
@@ -206,11 +211,6 @@ int main( int argc, char const** argv ) {
         return EXIT_FAILURE;
     }
 
-    if (options.hasOption("autocorrect")) {
-	    OCRCorrection::AutoCorrector corrector;
-	    corrector.add_patterns(options.getOption("autocorrect"));
-	    corrector(document);
-    }
 
 
     //
@@ -263,10 +263,14 @@ int main( int argc, char const** argv ) {
 
 
     } catch ( OCRCorrection::OCRCException& exc ) {
-            std::wcerr << "OCRC::Profiler: Caught OCRCException:" << OCRCorrection::Utils::utf8(exc.what()) << std::endl;
+            std::wcerr << "OCRC::Profiler: Caught OCRCException:"
+		       << OCRCorrection::Utils::utf8(exc.what())
+		       << std::endl;
         return EXIT_FAILURE;
     } catch ( csl::exceptions::cslException& exc ) {
-            std::wcerr << "OCRC::Profiler: Caught cslException: " << OCRCorrection::Utils::utf8(exc.what()) << std::endl;
+            std::wcerr << "OCRC::Profiler: Caught cslException: "
+		       << OCRCorrection::Utils::utf8(exc.what())
+		       << std::endl;
         return EXIT_FAILURE;
     }
     catch( std::exception& exc ) {

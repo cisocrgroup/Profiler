@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <tuple>
+#include "Document/Document.h"
 
 namespace OCRCorrection {
 	class EditOperation {
@@ -24,6 +25,7 @@ namespace OCRCorrection {
 		}
 		Type getType() const noexcept {return type_;}
 		bool is_none() const noexcept {return type_ == Type::None;}
+		bool is_error() const noexcept {return type_ != Type::None;}
 		bool is_substitution() const noexcept {return type_ == Type::Substitution;}
 		bool is_deletion() const noexcept {return type_ == Type::Deletion;}
 		bool is_insertion() const noexcept {return type_ == Type::Insertion;}
@@ -32,189 +34,108 @@ namespace OCRCorrection {
 		static Type fromChar(wchar_t c);
 		Type type_;
 	};
-	using Trace = std::vector<EditOperation>;
-	class GtToken;
+
+	struct GtChar {
+		GtChar() = default;
+		GtChar(wchar_t g, wchar_t o, wchar_t c, EditOperation e)
+			: gt(g), ocr(o), cor(o), op(e), eval(true), corrected(false) {}
+		bool is_error() const noexcept {return not op.is_none();}
+		void correct() noexcept {cor = gt; corrected = true;}
+		void uncorrect() noexcept {cor = ocr; corrected = false;}
+		bool copy_gt() const noexcept {return gt != L'~' or op.is_none();}
+		bool copy_ocr() const noexcept {return ocr != L'~' or op.is_none();}
+		bool copy_cor() const noexcept {return cor != L'~' or op.is_none();}
+		bool is_normal() const noexcept {return copy_cor() and Document::isWord(cor);}
+
+		wchar_t gt, ocr, cor;
+		EditOperation op;
+		bool eval, corrected;
+	};
 
 	class GtLine {
 	public:
-		using str_const_iterator = std::wstring::const_iterator;
-		using trace_const_iterator = Trace::const_iterator;
-		template<class It>
-		class Range {
-		public:
-			Range(It b, It e): b_(b), e_(e) {}
-			It begin() const noexcept {return b_;}
-			It end() const noexcept {return e_;}
-		private:
-			const It b_, e_;
-		};
-		using ConstStringRange = Range<str_const_iterator>;
-		using ConstTraceRange = Range<trace_const_iterator>;
+		using Chars = std::vector<GtChar>;
+		using const_iterator = Chars::const_iterator;
+		using iterator = Chars::iterator;
+		using range = std::pair<const_iterator, const_iterator>;
 
-		GtLine(): file_(), gt_(), ocr_(), trace_() {}
+		GtLine(): file_(), chars_() {}
 		GtLine(const std::string& file,const std::wstring& gt,
 				const std::wstring& ops, const std::wstring& ocr);
-		str_const_iterator gt_begin() const noexcept {return gt_.begin();}
-		str_const_iterator gt_end() const noexcept {return gt_.end();}
-		ConstStringRange gt_range() const noexcept {
-			return {gt_begin(), gt_end()};
-		}
-		str_const_iterator ocr_begin() const noexcept {return ocr_.begin();}
-		str_const_iterator ocr_end() const noexcept {return ocr_.end();}
-		ConstStringRange ocr_range() const noexcept {
-			return {ocr_begin(), ocr_end()};
-		}
-		trace_const_iterator trace_begin() const noexcept {
-			return trace_.begin();
-		}
-		trace_const_iterator trace_end() const noexcept {
-			return trace_.end();
-		}
-		ConstTraceRange trace_range() const noexcept {
-			return {trace_begin(), trace_end()};
-		}
-		inline GtToken token(size_t id, size_t b, size_t e) const noexcept;
-		inline GtToken token() const noexcept;
+		const_iterator begin() const noexcept {return chars_.begin();}
+		const_iterator end() const noexcept {return chars_.end();}
+		iterator begin() noexcept {return chars_.begin();}
+		iterator end() noexcept {return chars_.end();}
 
-
-		size_t size() const noexcept {return gt_.size();}
-		bool empty() const noexcept {return gt_.empty();}
+		size_t size() const noexcept {return chars_.size();}
+		bool empty() const noexcept {return chars_.empty();}
 		const std::string& file() const noexcept {return file_;}
-		const std::wstring& gt() const noexcept {return gt_;}
-		const std::wstring& ocr() const noexcept {return ocr_;}
-		const Trace& trace() const noexcept {return trace_;}
-
-		template<class Oit>
-		void copy_ocr(size_t b, size_t e, Oit o) const;
-		template<class Oit>
-		void copy_gt(size_t b, size_t e, Oit o) const;
-
+		void parse(Document& doc) const;
+		template<class F>
+		void each_token(F f) const;
 
 	private:
 		std::string file_;
-		std::wstring gt_, ocr_;
-		Trace trace_;
+		Chars chars_;
 	};
 
-	class GtToken {
-	public:
-		using trace_const_iterator = GtLine::trace_const_iterator;
-		using str_const_iterator = GtLine::str_const_iterator;
-		using ConstStringRange = GtLine::ConstStringRange;
-		using ConstTraceRange = GtLine::ConstTraceRange;
-
-		GtToken(): id_(0), b_(0), e_(0), line_(nullptr) {}
-		GtToken(size_t id, size_t b, size_t e, const GtLine* line)
-			: id_(id), b_(b), e_(e), line_(line)
-		{}
-		trace_const_iterator trace_begin() const noexcept {
-			return line_->trace_begin() + b_;
-		}
-		trace_const_iterator trace_end() const noexcept {
-			return line_->trace_begin() + e_;
-		}
-		ConstTraceRange trace_range() const noexcept {
-			return {trace_begin(), trace_end()};
-		}
-		str_const_iterator gt_begin() const noexcept {
-			return line_->gt_begin() + b_;
-		}
-		str_const_iterator gt_end() const noexcept {
-			return line_->gt_begin() + e_;
-		}
-		ConstStringRange gt_range() const noexcept {
-			return {gt_begin(), gt_end()};
-		}
-		str_const_iterator ocr_begin() const noexcept {
-			return line_->ocr_begin() + b_;
-		}
-		str_const_iterator ocr_end() const noexcept {
-			return line_->ocr_begin() + e_;
-		}
-		ConstStringRange ocr_range() const noexcept {
-			return {ocr_begin(), ocr_end()};
-		}
-		size_t size() const noexcept {return e_ - b_;}
-		bool empty() const noexcept {return b_ == e_;}
-
-		const std::string& file() const noexcept {
-			return line_->file();
-		}
-		std::wstring gt() const;
-		Trace trace() const;
-		std::wstring ocr() const;
-		bool is_ok() const noexcept;
-		bool is_error() const noexcept {return not is_ok();}
-
-	private:
-		size_t id_, b_, e_;
-		const GtLine* line_;
-	};
-
-	class Document;
 	class GtDoc {
 	public:
 		using Lines = std::vector<GtLine>;
-		using Tokens = std::vector<GtToken>;
 
-		void clear() {lines_.clear(); tokens_.clear();}
+		void clear() {lines_.clear();}
 		const Lines& lines() const noexcept {return lines_;}
 		Lines& lines() noexcept {return lines_;}
-		const Tokens& tokens() const noexcept {return tokens_;}
 		void load(const std::string& file);
-		void parse(Document& document) const;
-		void parse(const std::string& file, Document& document);
+		void parse(Document& doc) const;
+		void parse(const std::string& file, Document& doc);
 
 	private:
-		void add(const GtLine& line, Document& document) const;
-
 		Lines lines_;
-		Tokens tokens_;
 	};
 
-	std::wostream& operator<<(std::wostream& os, const EditOperation& op);
-	std::wostream& operator<<(std::wostream& os, const GtLine& line);
+	template<class It, class G> It eot(It b, It e, G g);
+
 	std::wistream& operator>>(std::wistream& is, GtLine& line);
-	std::wostream& operator<<(std::wostream& os, const GtToken& token);
-	std::wostream& operator<<(std::wostream& os, const Trace& trace);
-	std::wostream& operator<<(std::wostream& os, const GtDoc& doc);
 	std::wistream& operator>>(std::wistream& is, GtDoc& doc);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OCRCorrection::GtToken
-OCRCorrection::GtLine::token() const noexcept
-{
-	return token(0, 0, size());
-}
-
-////////////////////////////////////////////////////////////////////////////////
-OCRCorrection::GtToken
-OCRCorrection::GtLine::token(size_t id, size_t b, size_t e) const noexcept
-{
-	return GtToken(id, b, e, this);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-template<class Oit>
+template<class F>
 void
-OCRCorrection::GtLine::copy_ocr(size_t b, size_t e, Oit o) const
+OCRCorrection::GtLine::each_token(F f) const
 {
-	for (auto i = 0U; i < e; ++i) {
-		if (not std::next(trace_begin(), b + i)->is_deletion())
-			*o++ = *std::next(ocr_begin(), b + i);
+	const auto b = begin();
+	const auto e = end();
+	for (auto i = b; i != e;) {
+		auto t = eot(i, e, [](const GtChar& c) {return c.cor;});
+		f({i, t});
+		i = t;
 	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-template<class Oit>
-void
-OCRCorrection::GtLine::copy_gt(size_t b, size_t e, Oit o) const
+template<class It, class G>
+It
+OCRCorrection::eot(It b, It e, G g)
 {
-	for (auto i = 0U; i < e; ++i) {
-		if (not std::next(trace_begin(), b + i)->is_insertion())
-			*o++ = *std::next(gt_begin(), b + i);
-	}
+	if (b == e)
+		return e;
+
+	if (Document::isSpace(b->cor))
+		return std::find_if(std::next(b), e, [g](const GtChar& c) {
+			return g(c) != L'~' and not Document::isSpace(g(c));
+		});
+	else if (Document::isWord(b->cor))
+		return std::find_if(std::next(b), e, [g](const GtChar& c) {
+			return g(c) != L'~' and not Document::isWord(g(c));
+		});
+	else
+		return std::find_if(std::next(b), e, [g](const GtChar& c) {
+			return g(c) != L'~' and (
+					Document::isWord(g(c)) or
+					Document::isSpace(g(c)));
+		});
 }
 
 #endif // OCRCorrection_GtDoc_hpp__
