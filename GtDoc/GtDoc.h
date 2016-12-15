@@ -73,6 +73,8 @@ namespace OCRCorrection {
 		void parse(Document& doc) const;
 		template<class F>
 		void each_token(F f) const;
+		template<class F, class G>
+		void each_token(G g, F f) const;
 
 	private:
 		std::string file_;
@@ -98,6 +100,20 @@ namespace OCRCorrection {
 
 	std::wistream& operator>>(std::wistream& is, GtLine& line);
 	std::wistream& operator>>(std::wistream& is, GtDoc& doc);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+template<class F, class G>
+void
+OCRCorrection::GtLine::each_token(G g, F f) const
+{
+	const auto b = begin();
+	const auto e = end();
+	for (auto i = b; i != e;) {
+		auto t = eot(i, e, g);
+		f({i, t});
+		i = t;
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
