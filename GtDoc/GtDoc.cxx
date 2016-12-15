@@ -48,12 +48,14 @@ GtLine::GtLine(const std::string& file, const std::wstring& gt,
 void
 GtLine::parse(Document& doc) const
 {
+	static const wchar_t* boolean[] = {L"false", L"true"};
 	std::wstring gt, cor, ocr;
 	each_token([&](range r) {
 		gt.clear();
 		cor.clear();
 		ocr.clear();
 		bool normal = true;
+		bool eval = true;
 		std::for_each(r.first, r.second, [&](const GtChar& c) {
 			if (c.copy_ocr())
 				ocr.push_back(c.ocr);
@@ -62,6 +64,7 @@ GtLine::parse(Document& doc) const
 			if (c.copy_cor())
 				cor.push_back(c.cor);
 			normal &= c.is_normal();
+			eval &= c.eval;
 		});
 
 		const auto idx = doc.getNrOfTokens();
@@ -71,6 +74,8 @@ GtLine::parse(Document& doc) const
 		if (normal and ocr.size() > 3 and cor == gt) {
 			doc.at(idx).metadata()["correction"] = cor;
 			doc.at(idx).metadata()["correction-lc"] = Utils::tolower(cor);
+
+			doc.at(idx).metadata()["eval"] = boolean[not not eval];
 		}
 	});
 }

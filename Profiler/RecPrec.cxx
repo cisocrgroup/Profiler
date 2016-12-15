@@ -91,9 +91,7 @@ OCRCorrection::RecPrec::classify(const Document& doc)
 			throw std::runtime_error("cannot evaluate recall and "
 					"precision of tokens without groundtruth");
 
-		// handle normal tokens without any corrections
-		if (not token.has_metadata("correction") and token.isNormal() and
-				token.getWOCR().size() > 3 /* long */) {
+		if (token.has_metadata("eval") and token.metadata()["eval"] == L"true") {
 			const auto idx = token.getIndexInDocument();
 			(*this)[classify(token)].push_back(idx);
 		}
