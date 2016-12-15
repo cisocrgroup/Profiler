@@ -26,6 +26,7 @@ AutoCorrector::add_pattern(const std::string& pat)
 	static const std::regex first(R"(first\s*0*(\d{1,2})%?)");
 	static const std::regex testset(R"(test\s*set\s*0*(\d{1,2})%?)");
 	static const std::regex pattern(R"(([^:]*):([^:]*):(\d{1,2}))");
+	static const std::regex file(R"(file\s*(.*))");
 	std::smatch m;
 	if (std::regex_match(pat, m, first)) {
 		first_ = std::stoi(m[1]);
@@ -34,6 +35,8 @@ AutoCorrector::add_pattern(const std::string& pat)
 	} else if (std::regex_match(pat, m, pattern)) {
 		patterns_.emplace_back(Utils::tolower(Utils::utf8(m[1])),
 				Utils::tolower(Utils::utf8(m[2])), std::stoi(m[3]));
+	} else if (std::regex_match(pat, m, file)) {
+		suggestions_ = read_suggestions(m[1]);
 	} else {
 		throw std::runtime_error("(AutoCorrector) Invalid pattern: " + pat);
 	}
@@ -120,5 +123,40 @@ AutoCorrector::Pattern::correct(GtLine& line) const
 		});
 		std::for_each(b.base(), ee, [](GtChar& c) {c.correct();});
 	}
+}
+////////////////////////////////////////////////////////////////////////////////
+AutoCorrector::Suggestions
+AutoCorrector::read_suggestions(const std::string& path)
+{
+	static const std::regex ocrerrb(R"(\s*<ocr_error>\s*)");
+	static const std::regex ocrerre(R"(\s*</ocr_error>\s*)");
+	static const std::regex pat(R"xx(\s*<pattern.*absFrequency="(\d+.*?)".*)xx");
+	static const std::regex type(R"xx(\s*<type.*wOCR_lc="(.*?)".*)xx");
+
+	std::ifstream is(path);
+	if (is.good())
+		throw std::system_error(errno, std::system_category(), path);
+
+	Suggestions suggestions;
+	bool in_ocr_errors = false;
+	int current_freq = 0;
+	// this is bad. VERY BAD
+	std::string line;
+	while (std::getline(is, line)) {
+		if (std::regex_match(line, ocrerrb))
+			in_ocr_errors = true;
+		else if (std::regex_match(line, ocrerre))
+			in_ocr_errors = false;
+		if (not in_ocr_errors)
+			continue;
+
+		std::smatch m;
+		if (std::regex_match(line, m, pat)) {
+			current_freq = std::stoi(m[1]);
+		} else if (std::regex_match(line, m, type)) {
+			suggestions[current_freq].insert(Utils::utf8(m[1]));
+		}
+	}
+	return suggestions;
 }
 

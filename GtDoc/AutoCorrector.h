@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <unordered_set>
 
 namespace OCRCorrection {
 	class GtDoc;
@@ -16,10 +17,13 @@ namespace OCRCorrection {
 		void correct(GtDoc& doc) const;
 
 	private:
+		using Suggestions = std::map<int,
+		      std::unordered_set<std::wstring>>;
 		struct CorrectPercent {};
 		struct CorrectPatterns {};
 		void correct(GtDoc& doc, CorrectPercent) const;
 		void correct(GtDoc& doc, CorrectPatterns) const;
+		static Suggestions read_suggestions(const std::string& str);
 		struct Pattern {
 			using It = std::wstring::const_iterator;
 			Pattern(std::wstring g, std::wstring o, int p)
@@ -33,6 +37,7 @@ namespace OCRCorrection {
 			double n;
 		};
 		std::vector<Pattern> patterns_;
+		Suggestions suggestions_;
 		int testset_, first_;
 	};
 }
