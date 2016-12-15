@@ -66,6 +66,7 @@ namespace OCRCorrection {
 		const_iterator end() const noexcept {return chars_.end();}
 		iterator begin() noexcept {return chars_.begin();}
 		iterator end() noexcept {return chars_.end();}
+		void correct(range r);
 
 		size_t size() const noexcept {return chars_.size();}
 		bool empty() const noexcept {return chars_.empty();}

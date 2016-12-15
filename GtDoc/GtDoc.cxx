@@ -46,6 +46,25 @@ GtLine::GtLine(const std::string& file, const std::wstring& gt,
 
 ////////////////////////////////////////////////////////////////////////////////
 void
+GtLine::correct(range r)
+{
+	auto ofsb = std::distance(const_iterator(begin()), r.first);
+	auto ofse = std::distance(const_iterator(begin()), r.second);
+	auto b = std::next(begin(), ofsb);
+	auto e = std::next(begin(), ofse);
+
+	auto f = [](const GtChar& c) {return c.is_normal();};
+	auto tb = std::find_if(std::reverse_iterator<iterator>(begin()),
+			std::reverse_iterator<iterator>(b), f);
+	auto te = std::find_if(e, end(), f);
+
+	if (te != end())
+		te = std::next(te); // correct including the separator
+	std::for_each(tb.base(), te, [](GtChar& c){c.correct();});
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void
 GtLine::parse(Document& doc) const
 {
 	static const wchar_t* boolean[] = {L"false", L"true"};
