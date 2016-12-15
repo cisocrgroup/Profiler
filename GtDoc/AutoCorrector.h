@@ -33,7 +33,7 @@ namespace OCRCorrection {
 			double n;
 		};
 		std::vector<Pattern> patterns_;
-		int trainset_, first_;
+		int testset_, first_;
 	};
 }
 

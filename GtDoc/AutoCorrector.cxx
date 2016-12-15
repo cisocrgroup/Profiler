@@ -24,13 +24,13 @@ void
 AutoCorrector::add_pattern(const std::string& pat)
 {
 	static const std::regex first(R"(first\s*0*(\d{1,2})%?)");
-	static const std::regex trainset(R"(train\s*set\s*0*(\d{1,2})%?)");
+	static const std::regex testset(R"(test\s*set\s*0*(\d{1,2})%?)");
 	static const std::regex pattern(R"(([^:]*):([^:]*):(\d{1,2}))");
 	std::smatch m;
 	if (std::regex_match(pat, m, first)) {
 		first_ = std::stoi(m[1]);
-	} else if (std::regex_match(pat, m, trainset)) {
-		trainset_ = std::stoi(m[1]);
+	} else if (std::regex_match(pat, m, testset)) {
+		testset_ = std::stoi(m[1]);
 	} else if (std::regex_match(pat, m, pattern)) {
 		patterns_.emplace_back(Utils::tolower(Utils::utf8(m[1])),
 				Utils::tolower(Utils::utf8(m[2])), std::stoi(m[3]));
@@ -53,9 +53,9 @@ AutoCorrector::correct(GtDoc& doc, CorrectPercent) const
 {
 	// X% of tokens are in X% of lines
 	const int firstn = (doc.lines().size() * first_) / 100;
-	const int trainsetn = (doc.lines().size() * trainset_) / 100;
+	const int testsetn = (doc.lines().size() * testset_) / 100;
 
-	for (auto i = 0; i < trainsetn; ++i) {
+	for (auto i = 0; i < testsetn; ++i) {
 		auto b = doc.lines()[i].begin();
 		auto e = doc.lines()[i].end();
 		std::for_each(b, e, [](GtChar& c) {c.eval = false;});
@@ -71,11 +71,11 @@ AutoCorrector::correct(GtDoc& doc, CorrectPercent) const
 void
 AutoCorrector::correct(GtDoc& doc, CorrectPatterns) const
 {
-	const int n = (doc.lines().size() * trainset_) / 100;
+	const int n = (doc.lines().size() * testset_) / 100;
 
 	for (const auto& p: patterns_) {
 		// auto n = p.n; // ignore n
-		// apply correction only to lines in the trainset
+		// apply correction only to lines in the testset
 		for (auto i = 0; i < n; ++i) {
 			auto& line = doc.lines().at(i);
 			p.correct(line);
