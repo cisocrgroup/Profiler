@@ -71,11 +71,13 @@ AutoCorrector::correct(GtDoc& doc, CorrectPercent) const
 void
 AutoCorrector::correct(GtDoc& doc, CorrectPatterns) const
 {
+	const int n = (doc.lines().size() * trainset_) / 100;
+
 	for (const auto& p: patterns_) {
-		auto n = p.n;
-		for (auto& line: doc.lines()) {
-			if (n-- <= 0)
-				break;
+		// auto n = p.n; // ignore n
+		// apply correction only to lines in the trainset
+		for (auto i = 0; i < n; ++i) {
+			auto& line = doc.lines().at(i);
 			p.correct(line);
 		}
 	}
