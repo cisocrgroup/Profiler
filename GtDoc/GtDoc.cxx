@@ -56,6 +56,7 @@ GtLine::parse(Document& doc) const
 		ocr.clear();
 		bool normal = true;
 		bool eval = true;
+		bool corrected = false;
 		std::for_each(r.first, r.second, [&](const GtChar& c) {
 			if (c.copy_ocr())
 				ocr.push_back(c.ocr);
@@ -65,18 +66,31 @@ GtLine::parse(Document& doc) const
 				cor.push_back(c.cor);
 			normal &= c.is_normal();
 			eval &= c.eval;
+			corrected |= c.corrected;
 		});
 
 		const auto idx = doc.getNrOfTokens();
 		doc.pushBackToken(ocr, normal);
 		doc.at(idx).metadata()["groundtruth"] = gt;
 		doc.at(idx).metadata()["groundtruth-lc"] = Utils::tolower(gt);
-		if (normal and ocr.size() > 3 and cor == gt) {
+		doc.at(idx).metadata()["eval"] = boolean[not not eval];
+
+		if (not normal or ocr.size() < 4) {
+			doc.at(idx).metadata()["eval"] = boolean[0];
+		}
+		if (normal and ocr.size() > 3 and corrected) {
 			doc.at(idx).metadata()["correction"] = cor;
 			doc.at(idx).metadata()["correction-lc"] = Utils::tolower(cor);
-
-			doc.at(idx).metadata()["eval"] = boolean[not not eval];
 		}
+
+		// std::wcerr << "Adding token: " << doc.at(idx).getWOCR_lc() << "\n"
+		// 	   << "normal:       " << doc.at(idx).isNormal() << "\n"
+		// 	   << "eval:         " << doc.at(idx).metadata()["eval"] << "\n"
+		// 	   << "gt:           " << doc.at(idx).metadata()["groundtruth-lc"] << "\n";
+		// if (doc.at(idx).has_metadata("correction")) {
+		// 	std::wcerr << "cor:          "
+		// 		   << doc.at(idx).metadata()["correction-lc"] << "\n";
+		// }
 	});
 }
 

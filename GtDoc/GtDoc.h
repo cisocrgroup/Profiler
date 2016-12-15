@@ -109,7 +109,7 @@ OCRCorrection::GtLine::each_token(F f) const
 	const auto e = end();
 	for (auto i = b; i != e;) {
 		auto t = eot(i, e, [](const GtChar& c) {return c.cor;});
-		f({i, e});
+		f({i, t});
 		i = t;
 	}
 }

@@ -443,10 +443,11 @@ namespace OCRCorrection {
 		   << std::endl
 		   << "donttouch_hyphenation_:         " << donttouch_hyphenation_ << std::endl
 		   << "donttouch_lineborders_:         " << donttouch_lineborders_ << std::endl
-		   << "writeAdaptiveDictionary:        " << writeAdaptiveDictionary_ << std::endl
-		   << "adaptiveDictionaryPath:         " << Utils::utf8(adaptiveDictionaryPath_)
 		   << std::endl
+		   << "writeAdaptiveDictionary:        " << writeAdaptiveDictionary_ << std::endl
+		   << "adaptiveDictionaryPath:         " << Utils::utf8(adaptiveDictionaryPath_) << std::endl
 		   << "adaptive_:                      " << adaptive_ << std::endl
+		   << std::endl
 		    ;
 	    }
 

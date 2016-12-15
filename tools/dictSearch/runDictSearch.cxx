@@ -57,6 +57,7 @@ int main( int argc, char const** argv ) {
 
 #ifndef CSL_DICTSEARCH_PRINTNONE
 	std::sort( candSet.begin(), candSet.end() ); // sort candidates following a very coarse order relation
+	std::wcout << query << "\n";
 	if( candSet.empty() ) {
 	    std::wcout<<"--NONE--"<<std::endl;
 	}
