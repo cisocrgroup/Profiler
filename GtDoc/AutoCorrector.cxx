@@ -48,6 +48,7 @@ AutoCorrector::correct(GtDoc& doc) const
 {
 	correct(doc, CorrectPercent());
 	correct(doc, CorrectPatterns());
+	correct(doc, CorrectSuggestions());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -112,18 +113,39 @@ AutoCorrector::Pattern::correct(GtLine& line) const
 		if (p != e)
 			continue;
 
-		// found the pattern
-		auto b = std::find_if(std::reverse_iterator<GtLine::iterator>(i),
-				std::reverse_iterator<GtLine::iterator>(lb),
-				[](const GtChar& c) {
-			return Document::isSpace(c.gt);
-		});
-		auto ee = std::find_if(i, le, [](const GtChar& c) {
-				return Document::isSpace(c.gt);
-		});
-		std::for_each(b.base(), ee, [](GtChar& c) {c.correct();});
+		line.correct(GtLine::range(i, j));
 	}
 }
+
+////////////////////////////////////////////////////////////////////////////////
+void
+AutoCorrector::correct(GtDoc& doc, CorrectSuggestions) const
+{
+	const int n = (doc.lines().size() * testset_) / 100;
+
+	for (const auto& s: suggestions_) {
+		// apply correction only to lines in the testset
+		for (auto i = 0; i < n; ++i) {
+			auto& line = doc.lines().at(i);
+			correct(line, s.second);
+		}
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void
+AutoCorrector::correct(GtLine& line, const Candidates& cands) const
+{
+	std::wstring buf;
+	static const auto g = [](const GtChar& c) {return c.ocr;};
+	line.each_token(g, [&](GtLine::range r) {
+		std::transform(r.first, r.second, std::back_inserter(buf),
+				[](const GtChar& c) { return towlower(c.ocr); });
+		if (cands.count(buf))
+			line.correct(r);
+	});
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 AutoCorrector::Suggestions
 AutoCorrector::read_suggestions(const std::string& path)

@@ -17,12 +17,15 @@ namespace OCRCorrection {
 		void correct(GtDoc& doc) const;
 
 	private:
-		using Suggestions = std::map<int,
-		      std::unordered_set<std::wstring>>;
+		using Candidates = std::unordered_set<std::wstring>;
+		using Suggestions = std::map<int, Candidates>;
 		struct CorrectPercent {};
 		struct CorrectPatterns {};
+		struct CorrectSuggestions {};
 		void correct(GtDoc& doc, CorrectPercent) const;
 		void correct(GtDoc& doc, CorrectPatterns) const;
+		void correct(GtDoc& doc, CorrectSuggestions) const;
+		void correct(GtLine& line, const Candidates& cands) const;
 		static Suggestions read_suggestions(const std::string& str);
 		struct Pattern {
 			using It = std::wstring::const_iterator;
