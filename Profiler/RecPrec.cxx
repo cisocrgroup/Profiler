@@ -169,8 +169,8 @@ OCRCorrection::RecPrec::write(const std::string& dir, const Document& doc) const
 		++normal;
 		if (token.has_metadata("correction")) {
 			++corrections;
-			os << token.getWOCR() << ":"
-			   << token.metadata()["correction"];
+			os << token.metadata()["correction"] << ":"
+			   << token.getWOCR();
 			if (token.candidatesBegin() != token.candidatesEnd()) {
 				os << "," << *token.candidatesBegin();
 			}
