@@ -7,6 +7,9 @@
 using namespace OCRCorrection;
 
 ////////////////////////////////////////////////////////////////////////////////
+static bool eligible(GtLine::range r) noexcept;
+
+////////////////////////////////////////////////////////////////////////////////
 void
 AutoCorrector::add_patterns(const std::string& pats)
 {
@@ -26,7 +29,8 @@ AutoCorrector::add_pattern(const std::string& pat)
 	static const std::regex first(R"(first\s*0*(\d{1,2})%?)");
 	static const std::regex testset(R"(test\s*set\s*0*(\d{1,2})%?)");
 	static const std::regex pattern(R"(([^:]*):([^:]*):(\d{1,2}))");
-	static const std::regex file(R"(file\s*(.*))");
+	static const std::regex ranked(R"(ranked\s*(.*))");
+	static const std::regex each(R"(each\s*(.*))");
 	std::smatch m;
 	if (std::regex_match(pat, m, first)) {
 		first_ = std::stoi(m[1]);
@@ -35,10 +39,15 @@ AutoCorrector::add_pattern(const std::string& pat)
 	} else if (std::regex_match(pat, m, pattern)) {
 		patterns_.emplace_back(Utils::tolower(Utils::utf8(m[1])),
 				Utils::tolower(Utils::utf8(m[2])), std::stoi(m[3]));
-	} else if (std::regex_match(pat, m, file)) {
+	} else if (std::regex_match(pat, m, ranked)) {
 		suggestions_ = read_suggestions(m[1]);
+		ranked_ = true;
+	} else if (std::regex_match(pat, m, each)) {
+		suggestions_ = read_suggestions(m[1]);
+		each_ = true;
 	} else {
-		throw std::runtime_error("(AutoCorrector) Invalid pattern: " + pat);
+		throw std::runtime_error(
+				"(AutoCorrector) Invalid pattern: " + pat);
 	}
 }
 
@@ -48,7 +57,10 @@ AutoCorrector::correct(GtDoc& doc) const
 {
 	correct(doc, CorrectPercent());
 	correct(doc, CorrectPatterns());
-	correct(doc, CorrectSuggestions());
+	if (each_)
+		correct(doc, CorrectSuggestionsEach());
+	else if (ranked_)
+		correct(doc, CorrectSuggestionsRanked());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -56,8 +68,8 @@ void
 AutoCorrector::correct(GtDoc& doc, CorrectPercent) const
 {
 	// X% of tokens are in X% of lines
-	const int firstn = (doc.lines().size() * first_) / 100;
-	const int testsetn = (doc.lines().size() * testset_) / 100;
+	const int firstn = first_size(doc);
+	const int testsetn = testset_size(doc);
 
 	for (auto i = 0; i < testsetn; ++i) {
 		auto b = doc.lines()[i].begin();
@@ -75,7 +87,7 @@ AutoCorrector::correct(GtDoc& doc, CorrectPercent) const
 void
 AutoCorrector::correct(GtDoc& doc, CorrectPatterns) const
 {
-	const int n = (doc.lines().size() * testset_) / 100;
+	const int n = testset_size(doc);
 
 	for (const auto& p: patterns_) {
 		// auto n = p.n; // ignore n
@@ -119,30 +131,54 @@ AutoCorrector::Pattern::correct(GtLine& line) const
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-AutoCorrector::correct(GtDoc& doc, CorrectSuggestions) const
+AutoCorrector::correct(GtDoc& doc, CorrectSuggestionsRanked) const
 {
-	const int n = (doc.lines().size() * testset_) / 100;
+	const int n = testset_size(doc);
+	int ntokens = tokens_size(doc);
 
 	for (const auto& s: suggestions_) {
-		// apply correction only to lines in the testset
-		for (auto i = 0; i < n; ++i) {
-			auto& line = doc.lines().at(i);
-			correct(line, s.second);
+		if (ntokens <= 0)
+			break;
+		for (auto i = 0; i < n and ntokens > 0; ++i) {
+			correct(doc.lines().at(i), ntokens, s.second);
 		}
 	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-AutoCorrector::correct(GtLine& line, const Candidates& cands) const
+AutoCorrector::correct(GtDoc& doc, CorrectSuggestionsEach) const
 {
-	std::wstring buf;
+	const int n = testset_size(doc);
+	int ntokens = tokens_size(doc);
+
+	for (auto i = 0; i < n and ntokens > 0; ++i) {
+		for (const auto& s: suggestions_) {
+			if (ntokens <= 0)
+				break;
+			correct(doc.lines().at(i), ntokens, s.second);
+		}
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void
+AutoCorrector::correct(GtLine& line, int& n, const Candidates& cands) const
+{
+	static std::wstring buf;
 	static const auto g = [](const GtChar& c) {return c.ocr;};
 	line.each_token(g, [&](GtLine::range r) {
+		if (n <= 0)
+			return;
+		if (not eligible(r))
+			return;
+		buf.clear();
 		std::transform(r.first, r.second, std::back_inserter(buf),
-				[](const GtChar& c) { return towlower(c.ocr); });
-		if (cands.count(buf))
+				[](const GtChar& c) {return towlower(c.ocr);});
+		if (cands.count(buf)) {
 			line.correct(r);
+			--n;
+		}
 	});
 }
 
@@ -152,7 +188,8 @@ AutoCorrector::read_suggestions(const std::string& path)
 {
 	static const std::regex ocrerrb(R"(\s*<ocr_error>\s*)");
 	static const std::regex ocrerre(R"(\s*</ocr_error>\s*)");
-	static const std::regex pat(R"xx(\s*<pattern.*absFrequency="(\d+.*?)".*)xx");
+	static const std::regex pat(
+			R"xx(\s*<pattern.*absFrequency="(\d+.*?)".*)xx");
 	static const std::regex type(R"xx(\s*<type.*wOCR_lc="(.*?)".*)xx");
 
 	std::ifstream is(path);
@@ -162,7 +199,7 @@ AutoCorrector::read_suggestions(const std::string& path)
 	Suggestions suggestions;
 	bool in_ocr_errors = false;
 	int current_freq = 0;
-	// this is bad. VERY BAD
+	// this is bad. VERY BAD.
 	std::string line;
 	while (std::getline(is, line)) {
 		if (std::regex_match(line, ocrerrb))
@@ -182,3 +219,40 @@ AutoCorrector::read_suggestions(const std::string& path)
 	return suggestions;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+int
+AutoCorrector::testset_size(const GtDoc& doc) const
+{
+	return (doc.lines().size() * testset_) / 100;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+int
+AutoCorrector::first_size(const GtDoc& doc) const
+{
+	return (doc.lines().size() * first_) / 100;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+int
+AutoCorrector::tokens_size(const GtDoc& doc) const
+{
+	const auto n = testset_size(doc);
+	int ntokens = 0;
+	for (auto i = 0; i < n; ++i) {
+		doc.lines().at(i).each_token([&](GtLine::range r) {
+			if (eligible(r))
+				++ntokens;
+		});
+	}
+	return (ntokens * first_) / 100;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool
+eligible(GtLine::range r) noexcept
+{
+	static const auto normal = [](const GtChar& c) {return c.is_normal();};
+	return std::distance(r.first, r.second) > 3 and
+				std::all_of(r.first, r.second, normal);
+}
