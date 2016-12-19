@@ -57,7 +57,7 @@ namespace OCRCorrection {
 
 		void write(const std::string& path, const Document& doc) const;
 		void classify(const Document& doc);
-		Class classify(const Token& token) const;
+		void classify(const Token& token);
 
 	private:
 		struct ModeNormal{};
@@ -73,8 +73,9 @@ namespace OCRCorrection {
 			bool empty() const noexcept {return b_ == e_;}
 			Token::CandidateIterator b_, e_;
 		};
+		Class get_class(const Token& token) const;
 		template<class M>
-		static Class classify(const Token& token, M);
+		static Class get_class(const Token& token, M);
 		static bool is_true_positive(const Token& token, ModeNormal);
 		static bool is_true_positive(const Token& token, ModeStrict);
 		static bool is_true_positive(const Token& token, ModeVeryStrict);
@@ -88,13 +89,14 @@ namespace OCRCorrection {
 
 		std::array<std::vector<size_t>, 4> classes_;
 		Mode mode_;
+		int ntestset_, nevalset_, nx_;
 	};
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 template<class M>
 OCRCorrection::Evaluator::Class
-OCRCorrection::Evaluator::classify(const Token& token, M m)
+OCRCorrection::Evaluator::get_class(const Token& token, M m)
 {
 	if (token.metadata()["groundtruth-lc"] != token.getWOCR_lc()) {
 		if (has_ocr_errors(token)) {

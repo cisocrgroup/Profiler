@@ -64,14 +64,12 @@ GtLine::correct(range r)
 	auto b = std::next(begin(), ofsb);
 	auto e = std::next(begin(), ofse);
 
-	auto f = [](const GtChar& c) {return c.is_normal();};
-	auto tb = std::find_if(std::reverse_iterator<iterator>(begin()),
-			std::reverse_iterator<iterator>(b), f);
-	auto te = std::find_if(e, end(), f);
+	auto tb = bot_gt(begin(), b);
+	auto te = eot_gt(e, end());
 
 	if (te != end())
 		te = std::next(te); // correct including the separator
-	std::for_each(tb.base(), te, [](GtChar& c){c.correct();});
+	std::for_each(tb, te, [](GtChar& c){c.correct();});
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -79,36 +77,37 @@ void
 GtLine::parse(Document& doc) const
 {
 	static const wchar_t* boolean[] = {L"false", L"true"};
-	std::wstring gt, cor, ocr;
-	each_token([&](range r) {
+	static std::wstring gt, cor, ocr;
+	each_token_cor([&](range r) {
 		gt.clear();
 		cor.clear();
 		ocr.clear();
-		bool normal = true;
-		bool eval = true;
-		bool corrected = false;
+		const bool corrected = r.corrected();
+		const bool evaluate = r.evaluate();
+		const bool normal = r.normal();
+
 		std::for_each(r.b, r.e, [&](const GtChar& c) {
 			if (c.copy_ocr())
 				ocr.push_back(c.ocr);
-			if (c.copy_gt())
-				gt.push_back(c.gt);
 			if (c.copy_cor())
 				cor.push_back(c.cor);
-			normal &= c.is_normal();
-			eval &= c.eval;
-			corrected |= c.corrected;
 		});
+		auto bb = bot_gt(begin(), r.b);
+		auto ee = eot_gt(r.e, end());
+		std::for_each(r.b, r.e, [&](const GtChar& c) {
+			if (c.copy_gt())
+				gt.push_back(c.gt);
+		});
+
 
 		const auto idx = doc.getNrOfTokens();
 		doc.pushBackToken(ocr, normal);
 		doc.at(idx).metadata()["groundtruth"] = gt;
 		doc.at(idx).metadata()["groundtruth-lc"] = Utils::tolower(gt);
-		doc.at(idx).metadata()["eval"] = boolean[not not eval];
+		doc.at(idx).metadata()["eval"] = boolean[not not evaluate];
+		doc.at(idx).metadata()["touch"] = boolean[not not r.touch()];
 
-		if (not normal or ocr.size() < 4) {
-			doc.at(idx).metadata()["eval"] = boolean[0];
-		}
-		if (normal and ocr.size() > 3 and corrected) {
+		if (corrected) {
 			doc.at(idx).metadata()["correction"] = cor;
 			doc.at(idx).metadata()["correction-lc"] = Utils::tolower(cor);
 		}
@@ -122,6 +121,13 @@ GtLine::parse(Document& doc) const
 		// 		   << doc.at(idx).metadata()["correction-lc"] << "\n";
 		// }
 	});
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool
+GtToken::corrected() const noexcept
+{
+	return std::any_of(b, e, [](const GtChar& c) {return c.corrected;});
 }
 
 ////////////////////////////////////////////////////////////////////////////////

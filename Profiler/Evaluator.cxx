@@ -87,29 +87,44 @@ void
 Evaluator::classify(const Document& doc)
 {
 	for (const auto& token: doc) {
-		// each normal token must have a groundtruth attached to it
-		if (token.isNormal() and not token.has_metadata("groundtruth"))
-			throw std::runtime_error("cannot evaluate recall and "
-					"precision of tokens without groundtruth");
-
-		if (token.has_metadata("eval") and token.metadata()["eval"] == L"true") {
-			const auto idx = token.getIndexInDocument();
-			(*this)[classify(token)].push_back(idx);
-		}
+		classify(token);
 	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Evaluator::Class
-Evaluator::classify(const Token& token) const
+void
+Evaluator::classify(const Token& token)
 {
+	// each normal token must have a groundtruth attached to it
+	if (token.isNormal() and not token.has_metadata("groundtruth"))
+		throw std::runtime_error("cannot evaluate recall and "
+				"precision of tokens without groundtruth");
+
+	// update counts
+	if (token.metadata()["eval"] == L"true")
+		++nevalset_;
+	else if (token.metadata()["eval"] == L"false")
+		++ntestset_;
+	if (token.has_metadata("correction"))
+		++nx_;
+
+	const auto idx = token.getIndexInDocument();
+	(*this)[get_class(token)].push_back(idx);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+Evaluator::Class
+Evaluator::get_class(const Token& token) const
+{
+
+
 	switch (mode_) {
 	case Mode::Normal:
-		return classify(token, ModeNormal());
+		return get_class(token, ModeNormal());
 	case Mode::Strict:
-		return classify(token, ModeStrict());
+		return get_class(token, ModeStrict());
 	case Mode::VeryStrict:
-		return classify(token, ModeVeryStrict());
+		return get_class(token, ModeVeryStrict());
 	default:
 		throw std::logic_error("default label in `switch(mode_)` "
 				"encountered");

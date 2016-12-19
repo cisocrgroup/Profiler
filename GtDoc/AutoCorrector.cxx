@@ -57,7 +57,7 @@ AutoCorrector::correct(GtDoc& doc)
 		line.each_token(G, [&](GtLine::range r) {
 			if (c < n_) {
 				line.set_eval(r, false);
-				if (r.eligible())
+				if (r.touch())
 					c++;
 			}
 		});
@@ -78,7 +78,7 @@ AutoCorrector::correct(GtDoc& doc, CorrectPercent) const
 	for (auto& line: doc.lines()) {
 		line.each_token(G, [&](GtLine::range r) {
 			if (c < nx_) {
-				if (r.eligible()) {
+				if (r.touch()) {
 					c++;
 					line.correct(r);
 				}
@@ -99,7 +99,7 @@ AutoCorrector::correct(GtDoc& doc, CorrectSuggestionsRanked) const
 			if (c >= nx_)
 				break;
 			line.each_token(G, [&](GtLine::range r) {
-				if (c <= nx_ and r.eligible()) {
+				if (c <= nx_ and r.touch()) {
 					correct(line, r, s.second);
 					c++;
 				}
@@ -120,7 +120,7 @@ AutoCorrector::correct(GtDoc& doc, CorrectSuggestionsEach) const
 			if (c >= nx_)
 				break;
 			line.each_token(G, [&](GtLine::range r) {
-				if (c <= nx_ and r.eligible()) {
+				if (c <= nx_ and r.touch()) {
 					correct(line, r, s.second);
 					c++;
 				}
@@ -208,8 +208,8 @@ AutoCorrector::calculate_number_of_tokens(const GtDoc& doc) const
 {
 	int n = 0;
 	for (const auto& line: doc.lines()) {
-		line.each_token([&](GtLine::range r) {
-			if (r.eligible())
+		line.each_token_ocr([&](GtLine::range r) {
+			if (r.touch())
 				++n;
 		});
 	}
