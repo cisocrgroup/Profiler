@@ -84,7 +84,7 @@ Evaluator::is_true_positive(const Token& token, ModeVeryStrict)
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-OCRCorrection::Evaluator::classify(const Document& doc)
+Evaluator::classify(const Document& doc)
 {
 	for (const auto& token: doc) {
 		// each normal token must have a groundtruth attached to it
@@ -100,8 +100,8 @@ OCRCorrection::Evaluator::classify(const Document& doc)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OCRCorrection::Evaluator::Class
-OCRCorrection::Evaluator::classify(const Token& token) const
+Evaluator::Class
+Evaluator::classify(const Token& token) const
 {
 	switch (mode_) {
 	case Mode::Normal:
@@ -118,7 +118,7 @@ OCRCorrection::Evaluator::classify(const Token& token) const
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-OCRCorrection::Evaluator::write(const std::string& dir, const Document& doc) const
+Evaluator::write(const std::string& dir, const Document& doc) const
 {
 	auto info = dir + "/info.txt";
 	auto tp = dir + "/true_positive.txt";
