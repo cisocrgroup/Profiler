@@ -52,12 +52,14 @@ namespace OCRCorrection {
 		bool eval, corrected;
 	};
 
+	struct GtToken;
+
 	class GtLine {
 	public:
 		using Chars = std::vector<GtChar>;
 		using const_iterator = Chars::const_iterator;
 		using iterator = Chars::iterator;
-		using range = std::pair<const_iterator, const_iterator>;
+		using range = GtToken;
 
 		GtLine(): file_(), chars_() {}
 		GtLine(const std::string& file,const std::wstring& gt,
@@ -67,6 +69,7 @@ namespace OCRCorrection {
 		iterator begin() noexcept {return chars_.begin();}
 		iterator end() noexcept {return chars_.end();}
 		void correct(range r);
+		void set_eval(range r, bool eval);
 
 		size_t size() const noexcept {return chars_.size();}
 		bool empty() const noexcept {return chars_.empty();}
@@ -80,6 +83,19 @@ namespace OCRCorrection {
 	private:
 		std::string file_;
 		Chars chars_;
+	};
+
+	struct GtToken {
+		using const_iterator = GtLine::const_iterator;
+		GtToken(const_iterator begin, const_iterator end)
+			: b(begin), e(end) {}
+
+		bool eligible() const noexcept {return normal() and size() > 3;}
+		bool normal() const noexcept;
+		bool evaluate() const noexcept;
+		size_t size() const noexcept {return std::distance(b, e);}
+		bool empty() const noexcept {return b == e;}
+		const_iterator b, e;
 	};
 
 	class GtDoc {

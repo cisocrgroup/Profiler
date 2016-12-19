@@ -46,10 +46,21 @@ GtLine::GtLine(const std::string& file, const std::wstring& gt,
 
 ////////////////////////////////////////////////////////////////////////////////
 void
+GtLine::set_eval(range r, bool eval)
+{
+	auto ofsb = std::distance(const_iterator(begin()), r.b);
+	auto ofse = std::distance(const_iterator(begin()), r.e);
+	auto b = std::next(begin(), ofsb);
+	auto e = std::next(begin(), ofse);
+	std::for_each(b, e, [&eval](GtChar& c) {c.eval = eval;});
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void
 GtLine::correct(range r)
 {
-	auto ofsb = std::distance(const_iterator(begin()), r.first);
-	auto ofse = std::distance(const_iterator(begin()), r.second);
+	auto ofsb = std::distance(const_iterator(begin()), r.b);
+	auto ofse = std::distance(const_iterator(begin()), r.e);
 	auto b = std::next(begin(), ofsb);
 	auto e = std::next(begin(), ofse);
 
@@ -76,7 +87,7 @@ GtLine::parse(Document& doc) const
 		bool normal = true;
 		bool eval = true;
 		bool corrected = false;
-		std::for_each(r.first, r.second, [&](const GtChar& c) {
+		std::for_each(r.b, r.e, [&](const GtChar& c) {
 			if (c.copy_ocr())
 				ocr.push_back(c.ocr);
 			if (c.copy_gt())
@@ -111,6 +122,20 @@ GtLine::parse(Document& doc) const
 		// 		   << doc.at(idx).metadata()["correction-lc"] << "\n";
 		// }
 	});
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool
+GtToken::normal() const noexcept
+{
+	return std::all_of(b, e, [](const GtChar& c) {return c.is_normal();});
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool
+GtToken::evaluate() const noexcept
+{
+	return std::all_of(b, e, [](const GtChar& c) {return c.eval;});
 }
 
 ////////////////////////////////////////////////////////////////////////////////

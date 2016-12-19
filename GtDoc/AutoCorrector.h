@@ -8,13 +8,14 @@
 namespace OCRCorrection {
 	class GtDoc;
 	class GtLine;
+	class GtToken;
 
 	class AutoCorrector {
 	public:
 		void add_patterns(const std::string& pat);
 		void add_pattern(const std::string& pat);
-		void operator()(GtDoc& doc) const {correct(doc);}
-		void correct(GtDoc& doc) const;
+		void operator()(GtDoc& doc) {correct(doc);}
+		void correct(GtDoc& doc);
 
 	private:
 		using Candidates = std::unordered_set<std::wstring>;
@@ -24,29 +25,16 @@ namespace OCRCorrection {
 		struct CorrectSuggestionsRanked {};
 		struct CorrectSuggestionsEach {};
 		void correct(GtDoc& doc, CorrectPercent) const;
-		void correct(GtDoc& doc, CorrectPatterns) const;
 		void correct(GtDoc& doc, CorrectSuggestionsEach) const;
 		void correct(GtDoc& doc, CorrectSuggestionsRanked) const;
-		void correct(GtLine& line, int& n, const Candidates& cands) const;
+		bool correct(GtLine& line, GtToken t, const Candidates& cands) const;
 		static Suggestions read_suggestions(const std::string& str);
-		int testset_size(const GtDoc& doc) const;
-		int first_size(const GtDoc& doc) const;
-		int tokens_size(const GtDoc& doc) const;
-		struct Pattern {
-			using It = std::wstring::const_iterator;
-			Pattern(std::wstring g, std::wstring o, int p)
-				: gt(std::move(g))
-				, ocr(std::move(o))
-				, n(p)
-			{}
-			void correct(GtLine& line) const;
+		int calculate_testset_size(const GtDoc& doc) const;
+		int calculate_corrections_size(const GtDoc& doc) const;
+		int calculate_number_of_tokens(const GtDoc& doc) const;
 
-			std::wstring gt, ocr;
-			double n;
-		};
-		std::vector<Pattern> patterns_;
 		Suggestions suggestions_;
-		int testset_, first_;
+		int testset_, first_, nx_, n_;
 		bool ranked_, each_;
 	};
 }
