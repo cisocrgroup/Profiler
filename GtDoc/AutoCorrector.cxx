@@ -100,8 +100,8 @@ AutoCorrector::correct(GtDoc& doc, CorrectSuggestionsRanked) const
 				break;
 			line.each_token(G, [&](GtLine::range r) {
 				if (c <= nx_ and r.eligible()) {
-					if (correct(line, r, s.second))
-						c++;
+					correct(line, r, s.second);
+					c++;
 				}
 			});
 		}
@@ -121,8 +121,8 @@ AutoCorrector::correct(GtDoc& doc, CorrectSuggestionsEach) const
 				break;
 			line.each_token(G, [&](GtLine::range r) {
 				if (c <= nx_ and r.eligible()) {
-					if (correct(line, r, s.second))
-						c++;
+					correct(line, r, s.second);
+					c++;
 				}
 			});
 		}
