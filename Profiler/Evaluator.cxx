@@ -1,13 +1,13 @@
 #include <iomanip>
 #include <cmath>
 #include "GlobalProfile/GlobalProfile.h"
-#include "RecPrec.h"
+#include "Evaluator.h"
 
 using namespace OCRCorrection;
 
 ////////////////////////////////////////////////////////////////////////////////
 double
-RecPrec::precision() const noexcept
+Evaluator::precision() const noexcept
 {
 	return (double)true_positives() /
 		((double)true_positives() + (double)false_positives());
@@ -15,7 +15,7 @@ RecPrec::precision() const noexcept
 
 ////////////////////////////////////////////////////////////////////////////////
 double
-RecPrec::recall() const noexcept
+Evaluator::recall() const noexcept
 {
 	return (double)true_positives() /
 		((double)true_positives() + (double)false_negatives());
@@ -23,7 +23,7 @@ RecPrec::recall() const noexcept
 
 ////////////////////////////////////////////////////////////////////////////////
 double
-RecPrec::accuracy() const noexcept
+Evaluator::accuracy() const noexcept
 {
 	return ((double)true_positives() + (double) true_negatives()) /
 		(double)sum();
@@ -31,7 +31,7 @@ RecPrec::accuracy() const noexcept
 
 ////////////////////////////////////////////////////////////////////////////////
 double
-RecPrec::f_measure(double beta) const noexcept
+Evaluator::f_measure(double beta) const noexcept
 {
 	const auto beta_square = std::pow(beta, 2);
 	const auto p = precision();
@@ -41,7 +41,7 @@ RecPrec::f_measure(double beta) const noexcept
 
 ////////////////////////////////////////////////////////////////////////////////
 bool
-RecPrec::has_ocr_errors(const Token& token)
+Evaluator::has_ocr_errors(const Token& token)
 {
 	using std::begin;
 	using std::end;
@@ -54,14 +54,14 @@ RecPrec::has_ocr_errors(const Token& token)
 
 ////////////////////////////////////////////////////////////////////////////////
 bool
-RecPrec::is_true_positive(const Token&, ModeNormal)
+Evaluator::is_true_positive(const Token&, ModeNormal)
 {
 	return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool
-RecPrec::is_true_positive(const Token& token, ModeStrict)
+Evaluator::is_true_positive(const Token& token, ModeStrict)
 {
 
 	using std::begin;
@@ -75,7 +75,7 @@ RecPrec::is_true_positive(const Token& token, ModeStrict)
 
 ////////////////////////////////////////////////////////////////////////////////
 bool
-RecPrec::is_true_positive(const Token& token, ModeVeryStrict)
+Evaluator::is_true_positive(const Token& token, ModeVeryStrict)
 {
 	CandidateRange r(token);
 	return token.metadata()["groundtruth-lc"] == r.begin()->getWord();
@@ -84,7 +84,7 @@ RecPrec::is_true_positive(const Token& token, ModeVeryStrict)
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-OCRCorrection::RecPrec::classify(const Document& doc)
+OCRCorrection::Evaluator::classify(const Document& doc)
 {
 	for (const auto& token: doc) {
 		// each normal token must have a groundtruth attached to it
@@ -100,8 +100,8 @@ OCRCorrection::RecPrec::classify(const Document& doc)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OCRCorrection::RecPrec::Class
-OCRCorrection::RecPrec::classify(const Token& token) const
+OCRCorrection::Evaluator::Class
+OCRCorrection::Evaluator::classify(const Token& token) const
 {
 	switch (mode_) {
 	case Mode::Normal:
@@ -118,7 +118,7 @@ OCRCorrection::RecPrec::classify(const Token& token) const
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-OCRCorrection::RecPrec::write(const std::string& dir, const Document& doc) const
+OCRCorrection::Evaluator::write(const std::string& dir, const Document& doc) const
 {
 	auto info = dir + "/info.txt";
 	auto tp = dir + "/true_positive.txt";
@@ -208,7 +208,7 @@ OCRCorrection::RecPrec::write(const std::string& dir, const Document& doc) const
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-RecPrec::write(std::wostream& os, Class c, const Document& doc) const
+Evaluator::write(std::wostream& os, Class c, const Document& doc) const
 {
 	struct CandRange {
 		CandRange(const Token& token): token_(token) {}
@@ -234,7 +234,7 @@ RecPrec::write(std::wostream& os, Class c, const Document& doc) const
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-RecPrec::write(std::wostream& os, const GlobalProfile& gp) const
+Evaluator::write(std::wostream& os, const GlobalProfile& gp) const
 {
 	using Pair = std::pair<csl::Pattern, double>;
 	std::vector<Pair> hist, ocr;

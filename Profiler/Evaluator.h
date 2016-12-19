@@ -1,5 +1,5 @@
-#ifndef OCRCorrection_RecPrec_hpp__
-#define OCRCorrection_RecPrec_hpp__
+#ifndef OCRCorrection_Evaluator_hpp__
+#define OCRCorrection_Evaluator_hpp__
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -9,7 +9,7 @@
 namespace OCRCorrection {
 	class GlobalProfile;
 
-	class RecPrec {
+	class Evaluator {
 	public:
 		enum class Class {
 			TruePositive,
@@ -22,7 +22,7 @@ namespace OCRCorrection {
 			Strict,
 			VeryStrict,
 		};
-		RecPrec(): classes_(), mode_(Mode::Normal) {}
+		Evaluator(): classes_(), mode_(Mode::Normal) {}
 		const std::vector<size_t>& operator[](Class c) const noexcept {
 			return classes_[static_cast<size_t>(c)];
 		}
@@ -93,8 +93,8 @@ namespace OCRCorrection {
 
 ////////////////////////////////////////////////////////////////////////////////
 template<class M>
-OCRCorrection::RecPrec::Class
-OCRCorrection::RecPrec::classify(const Token& token, M m)
+OCRCorrection::Evaluator::Class
+OCRCorrection::Evaluator::classify(const Token& token, M m)
 {
 	if (token.metadata()["groundtruth-lc"] != token.getWOCR_lc()) {
 		if (has_ocr_errors(token)) {
@@ -113,4 +113,4 @@ OCRCorrection::RecPrec::classify(const Token& token, M m)
 	}
 }
 
-#endif // OCRCorrection_RecPrec_hpp__
+#endif // OCRCorrection_Evaluator_hpp__

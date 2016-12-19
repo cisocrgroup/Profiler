@@ -12,7 +12,7 @@
 #include <AltoXML/AltoXMLReader.h>
 #include "SimpleOutputWriter.h"
 #include "GtDoc/GtDoc.h"
-#include "Profiler/RecPrec.h"
+#include "Profiler/Evaluator.h"
 #include "GtDoc/AutoCorrector.h"
 #include "DictSearch/AdaptiveLex.h"
 #include<IBMGroundtruth/IBMGTReader.h>
@@ -43,9 +43,9 @@ void printHelp() {
 	       << std::endl
 	       << "[--adaptive]                Use adaptive profiler, that uses correction information"
                << std::endl
-	       << "[--recprec <out-dir>]       Calculate recall and precision of the profiler and write results to <out-dir>"
+	       << "[--evaluate <out-dir>]       Calculate recall and precision of the profiler and write results to <out-dir>"
                << std::endl
-	       << "[--strict yes|no|very]      set the strictness of the recprec evaluation"
+	       << "[--strict yes|no|very]      set the strictness of the evaluation"
                << std::endl
 	       << "[--autocorrect patterns]    Autocorrect a comma separated list of patterns. Tokens that match one of the given patterns are \"corrected\" with their groundtruth"
 	       << std::endl;
@@ -73,7 +73,7 @@ int main( int argc, char const** argv ) {
     options.specifyOption( "createConfigFile", csl::Getopt::VOID );
     options.specifyOption( "simpleOutput", csl::Getopt::VOID );
     options.specifyOption( "adaptive", csl::Getopt::VOID );
-    options.specifyOption( "recprec", csl::Getopt::STRING );
+    options.specifyOption( "evaluate", csl::Getopt::STRING );
     options.specifyOption( "strict", csl::Getopt::STRING );
     options.specifyOption( "autocorrect", csl::Getopt::STRING );
 
@@ -224,20 +224,20 @@ int main( int argc, char const** argv ) {
     if (options.hasOption("simpleOutput")) {
             OCRCorrection::SimpleOutputWriter(std::wcout, document).write();
     }
-    if (options.hasOption("recprec")) {
-  	OCRCorrection::RecPrec recprec;
+    if (options.hasOption("evaluate")) {
+  	OCRCorrection::Evaluator eval;
   	if (options.hasOption("strict")) {
   		if (options.getOption("strict") == "no")
-  			recprec.set_mode(OCRCorrection::RecPrec::Mode::Normal);
+  			eval.set_mode(OCRCorrection::Evaluator::Mode::Normal);
   		else if (options.getOption("strict") == "yes")
-  			recprec.set_mode(OCRCorrection::RecPrec::Mode::Strict);
+  			eval.set_mode(OCRCorrection::Evaluator::Mode::Strict);
   		else if (options.getOption("strict") == "very")
-  			recprec.set_mode(OCRCorrection::RecPrec::Mode::VeryStrict);
+  			eval.set_mode(OCRCorrection::Evaluator::Mode::VeryStrict);
   		else
   			throw std::runtime_error("Invalid strict mode given");
   	}
-  	recprec.classify(document);
-  	recprec.write(options.getOption("recprec"), document);
+  	eval.classify(document);
+  	eval.write(options.getOption("evaluate"), document);
   }
 
 
