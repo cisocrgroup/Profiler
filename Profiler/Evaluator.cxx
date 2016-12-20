@@ -15,28 +15,18 @@ Evaluator::precision() const noexcept
 
 ////////////////////////////////////////////////////////////////////////////////
 double
-Evaluator::recall() const noexcept
+Evaluator::recall_objective() const noexcept
 {
 	return (double)true_positives() /
-		((double)true_positives() + (double)false_negatives());
+		((double)true_positives() + (double)false_negatives_objective());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 double
-Evaluator::accuracy() const noexcept
+Evaluator::recall_fair() const noexcept
 {
-	return ((double)true_positives() + (double) true_negatives()) /
-		(double)sum();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-double
-Evaluator::f_measure(double beta) const noexcept
-{
-	const auto beta_square = std::pow(beta, 2);
-	const auto p = precision();
-	const auto r = recall();
-	return (p * r) / ((beta_square * p) + r);
+	return (double)true_positives() /
+		((double)true_positives() + (double)false_negatives_fair());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -50,6 +40,19 @@ Evaluator::has_ocr_errors(const Token& token)
 		return not begin(r)->getOCRTrace().empty(); // empty ocr trace means no errors
 	}
 	return false; // no candidates means no errors
+}
+
+////////////////////////////////////////////////////////////////////////////////
+Evaluator::Class
+Evaluator::get_false_negative(const Token& token)
+{
+	if (token.metadata()["touch"] == L"true")
+		return Class::FalseNegativeFair;
+	else if (token.metadata()["touch"] == L"false")
+		return Class::FalseNegativeObjective;
+	else
+		throw std::runtime_error("Invalid metadata for `value`: " +
+				Utils::utf8(token.metadata()["touch"]));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -136,10 +139,11 @@ void
 Evaluator::write(const std::string& dir, const Document& doc) const
 {
 	auto info = dir + "/info.txt";
-	auto tp = dir + "/true_positive.txt";
-	auto tn = dir + "/true_negative.txt";
-	auto fp = dir + "/false_positive.txt";
-	auto fn = dir + "/false_negative.txt";
+	auto tp = dir + "/true_positives.txt";
+	auto tn = dir + "/true_negatives.txt";
+	auto fp = dir + "/false_positives.txt";
+	auto fnf = dir + "/false_negatives_fair.txt";
+	auto fno = dir + "/false_negatives_objective.txt";
 	auto corrs = dir + "/corrections.txt";
 
 	if (mkdir(dir.data(), 0752) != 0 and errno != EEXIST)
@@ -167,18 +171,25 @@ Evaluator::write(const std::string& dir, const Document& doc) const
 	write(os, Class::FalsePositive, doc);
 	os.close();
 
-	os.open(fn);
+	os.open(fnf);
 	if (not os.good())
-		throw std::system_error(errno, std::system_category(), fn);
-	os << "# " << Utils::utf8(fn) << "\n";
-	write(os, Class::FalseNegative, doc);
+		throw std::system_error(errno, std::system_category(), fnf);
+	os << "# " << Utils::utf8(fnf) << "\n";
+	write(os, Class::FalseNegativeFair, doc);
+	os.close();
+
+	os.open(fno);
+	if (not os.good())
+		throw std::system_error(errno, std::system_category(), fno);
+	os << "# " << Utils::utf8(fno) << "\n";
+	write(os, Class::FalseNegativeObjective, doc);
 	os.close();
 
 	size_t normal = 0;
 	size_t corrections = 0;
 	os.open(corrs);
 	if (not os.good())
-		throw std::system_error(errno, std::system_category(), fn);
+		throw std::system_error(errno, std::system_category(), corrs);
 	os << "# " << Utils::utf8(corrs) << "\n";
 	for (const auto& token: doc) {
 		++normal;
@@ -200,14 +211,16 @@ Evaluator::write(const std::string& dir, const Document& doc) const
 	if (not os.good())
 		throw std::system_error(errno, std::system_category(), info);
 	os << "# " << Utils::utf8(info) << "\n"
-	   << "True positive:    " << true_positives() << "\n"
-	   << "True negative:    " << true_negatives() << "\n"
-	   << "False positive:   " << false_positives() << "\n"
-	   << "False negative:   " << false_negatives() << "\n"
-	   << "Precision:        " << std::setprecision(4) << precision() << "\n"
-	   << "Recall:           " << std::setprecision(4) << recall() << "\n"
-	   << "Evaluated tokens: " << sum() << "\n"
-	   << "Corrected tokens: " << corrections << "\n";
+	   << "True positive:             " << true_positives() << "\n"
+	   << "True negative:             " << true_negatives() << "\n"
+	   << "False positive:            " << false_positives() << "\n"
+	   << "False negatives_fair:      " << false_negatives_fair() << "\n"
+	   << "False negatives_objective: " << false_negatives_objective() << "\n"
+	   << "Precision:                 " << std::setprecision(4) << precision() << "\n"
+	   << "Recall (fair):             " << std::setprecision(4) << recall_fair() << "\n"
+	   << "Recall (objective):        " << std::setprecision(4) << recall_objective() << "\n"
+	   //<< "Evaluated tokens:          " << sum() << "\n"
+	   << "Corrected tokens:          " << corrections << "\n";
 	os.close();
 
 	if (doc.has_global_profile()) {

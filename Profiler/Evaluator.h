@@ -15,7 +15,8 @@ namespace OCRCorrection {
 			TruePositive,
 			TrueNegative,
 			FalsePositive,
-			FalseNegative,
+			FalseNegativeObjective,
+			FalseNegativeFair,
 		};
 		enum class Mode {
 			Normal,
@@ -35,14 +36,12 @@ namespace OCRCorrection {
 		size_t false_positives() const noexcept {
 			return (*this)[Class::FalsePositive].size();
 		}
-		size_t false_negatives() const noexcept {
-			return (*this)[Class::FalseNegative].size();
+		size_t false_negatives_fair() const noexcept {
+			return (*this)[Class::FalseNegativeFair].size();
 		}
-		size_t sum() const noexcept {
-			return true_positives() +
-				true_negatives() +
-				false_positives() +
-				false_negatives();
+		size_t false_negatives_objective() const noexcept {
+			return (*this)[Class::FalseNegativeObjective].size() +
+				false_negatives_fair();
 		}
 		void clear() noexcept {
 			std::fill(begin(classes_), end(classes_),
@@ -51,9 +50,8 @@ namespace OCRCorrection {
 		void set_mode(Mode mode) {mode_ = mode;}
 
 		double precision() const noexcept;
-		double recall() const noexcept;
-		double accuracy() const noexcept;
-		double f_measure(double beta = 1) const noexcept;
+		double recall_fair() const noexcept;
+		double recall_objective() const noexcept;
 
 		void write(const std::string& path, const Document& doc) const;
 		void classify(const Document& doc);
@@ -76,6 +74,7 @@ namespace OCRCorrection {
 		Class get_class(const Token& token) const;
 		template<class M>
 		static Class get_class(const Token& token, M);
+		static Class get_false_negative(const Token& token);
 		static bool is_true_positive(const Token& token, ModeNormal);
 		static bool is_true_positive(const Token& token, ModeStrict);
 		static bool is_true_positive(const Token& token, ModeVeryStrict);
@@ -103,9 +102,9 @@ OCRCorrection::Evaluator::get_class(const Token& token, M m)
 			if (is_true_positive(token, m))
 				return Class::TruePositive;
 			else
-				return Class::FalseNegative;
+				return get_false_negative(token);
 		} else {
-			return Class::FalseNegative;
+			return get_false_negative(token);
 		}
 	} else {
 		if (has_ocr_errors(token))
