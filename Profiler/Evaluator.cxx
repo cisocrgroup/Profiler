@@ -211,17 +211,17 @@ Evaluator::write(const std::string& dir, const Document& doc) const
 	if (not os.good())
 		throw std::system_error(errno, std::system_category(), info);
 	os << "# " << Utils::utf8(info) << "\n"
-	   << "True positive:             " << true_positives() << "\n"
-	   << "True negative:             " << true_negatives() << "\n"
-	   << "False positive:            " << false_positives() << "\n"
-	   << "False negatives_fair:      " << false_negatives_fair() << "\n"
-	   << "False negatives_objective: " << false_negatives_objective() << "\n"
-	   << "Precision:                 " << std::setprecision(4) << precision() << "\n"
-	   << "Recall (fair):             " << std::setprecision(4) << recall_fair() << "\n"
-	   << "Recall (objective):        " << std::setprecision(4) << recall_objective() << "\n"
-	   << "Evaluated tokens:          " << neval_ << "\n"
-	   << "Not evaluated tokens:      " << ntest_ << "\n"
-	   << "Corrected tokens:          " << nx_ << "\n";
+	   << "True positive:               " << true_positives() << "\n"
+	   << "True negative:               " << true_negatives() << "\n"
+	   << "False positive:              " << false_positives() << "\n"
+	   << "False negatives (fair):      " << false_negatives_fair() << "\n"
+	   << "False negatives (objective): " << false_negatives_objective() << "\n"
+	   << "Precision:                   " << std::setprecision(4) << precision() << "\n"
+	   << "Recall (fair):               " << std::setprecision(4) << recall_fair() << "\n"
+	   << "Recall (objective):          " << std::setprecision(4) << recall_objective() << "\n"
+	   << "Evaluated tokens:            " << neval_ << "\n"
+	   << "Not evaluated tokens:        " << ntest_ << "\n"
+	   << "Corrected tokens:            " << nx_ << "\n";
 	os.close();
 
 	if (doc.has_global_profile()) {
