@@ -98,16 +98,18 @@ Evaluator::classify(const Document& doc)
 void
 Evaluator::classify(const Token& token)
 {
-	// each normal token must have a groundtruth attached to it
-	if (token.isNormal() and not token.has_metadata("groundtruth"))
+	// skip spaces
+	if (token.isSpace())
+		return;
+	if (not token.has_metadata("groundtruth"))
 		throw std::runtime_error("cannot evaluate recall and "
-				"precision of tokens without groundtruth");
+				"precision of tokens without any groundtruth");
 
 	// update counts
 	if (token.metadata()["eval"] == L"true")
-		++nevalset_;
+		++neval_;
 	else if (token.metadata()["eval"] == L"false")
-		++ntestset_;
+		++ntest_;
 	if (token.has_metadata("correction"))
 		++nx_;
 
@@ -119,8 +121,6 @@ Evaluator::classify(const Token& token)
 Evaluator::Class
 Evaluator::get_class(const Token& token) const
 {
-
-
 	switch (mode_) {
 	case Mode::Normal:
 		return get_class(token, ModeNormal());
@@ -219,8 +219,9 @@ Evaluator::write(const std::string& dir, const Document& doc) const
 	   << "Precision:                 " << std::setprecision(4) << precision() << "\n"
 	   << "Recall (fair):             " << std::setprecision(4) << recall_fair() << "\n"
 	   << "Recall (objective):        " << std::setprecision(4) << recall_objective() << "\n"
-	   //<< "Evaluated tokens:          " << sum() << "\n"
-	   << "Corrected tokens:          " << corrections << "\n";
+	   << "Evaluated tokens:          " << neval_ << "\n"
+	   << "Not evaluated tokens:      " << ntest_ << "\n"
+	   << "Corrected tokens:          " << nx_ << "\n";
 	os.close();
 
 	if (doc.has_global_profile()) {

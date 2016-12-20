@@ -88,7 +88,7 @@ namespace OCRCorrection {
 
 		std::array<std::vector<size_t>, 4> classes_;
 		Mode mode_;
-		int ntestset_, nevalset_, nx_;
+		int ntest_, neval_, nx_;
 	};
 }
 
