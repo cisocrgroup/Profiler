@@ -40,36 +40,8 @@ GtLine::GtLine(const std::string& file, const std::wstring& gt,
 	}
 	chars_.reserve(gt.size());
 	for (size_t i = 0; i < gt.size(); ++i) {
-		chars_[i] = GtChar(gt[i], ocr[i], ocr[i], ops[i]);
+		chars_[i] = GtChar(gt[i], ocr[i], ops[i]);
 	}
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void
-GtLine::set_eval(range r, bool eval)
-{
-	auto ofsb = std::distance(const_iterator(begin()), r.b);
-	auto ofse = std::distance(const_iterator(begin()), r.e);
-	auto b = std::next(begin(), ofsb);
-	auto e = std::next(begin(), ofse);
-	std::for_each(b, e, [&eval](GtChar& c) {c.eval = eval;});
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void
-GtLine::correct(range r)
-{
-	auto ofsb = std::distance(const_iterator(begin()), r.b);
-	auto ofse = std::distance(const_iterator(begin()), r.e);
-	auto b = std::next(begin(), ofsb);
-	auto e = std::next(begin(), ofse);
-
-	auto tb = bot_gt(begin(), b);
-	auto te = eot_gt(e, end());
-
-	if (te != end())
-		te = std::next(te); // correct including the separator
-	std::for_each(tb, te, [](GtChar& c){c.correct();});
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -77,40 +49,26 @@ void
 GtLine::parse(Document& doc) const
 {
 	static const wchar_t* boolean[] = {L"false", L"true"};
-	static std::wstring gt, cor, ocr;
-	each_token_cor([&](range r) {
-		gt.clear();
-		cor.clear();
+	static std::wstring gt, ocr;
+	each_token_ocr([&](range r) {
 		ocr.clear();
-		const bool corrected = r.corrected();
-		const bool evaluate = r.evaluate();
-		const bool normal = r.normal();
-
 		std::for_each(r.b, r.e, [&](const GtChar& c) {
 			if (c.copy_ocr())
 				ocr.push_back(c.ocr);
-			if (c.copy_cor())
-				cor.push_back(c.cor);
 		});
+
+		gt.clear();
 		auto bb = bot_gt(begin(), r.b);
-		auto ee = eot_gt(r.e, end());
-		std::for_each(r.b, r.e, [&](const GtChar& c) {
+		auto ee = eot_gt(r.b, end());
+		std::for_each(bb, ee, [&](const GtChar& c) {
 			if (c.copy_gt())
 				gt.push_back(c.gt);
 		});
 
-
 		const auto idx = doc.getNrOfTokens();
-		doc.pushBackToken(ocr, normal);
+		doc.pushBackToken(ocr, r.normal());
 		doc.at(idx).metadata()["groundtruth"] = gt;
 		doc.at(idx).metadata()["groundtruth-lc"] = Utils::tolower(gt);
-		doc.at(idx).metadata()["eval"] = boolean[not not evaluate];
-		doc.at(idx).metadata()["touch"] = boolean[not not r.touch()];
-
-		if (corrected) {
-			doc.at(idx).metadata()["correction"] = cor;
-			doc.at(idx).metadata()["correction-lc"] = Utils::tolower(cor);
-		}
 
 		// std::wcerr << "Adding token: " << doc.at(idx).getWOCR_lc() << "\n"
 		// 	   << "normal:       " << doc.at(idx).isNormal() << "\n"
@@ -125,23 +83,9 @@ GtLine::parse(Document& doc) const
 
 ////////////////////////////////////////////////////////////////////////////////
 bool
-GtToken::corrected() const noexcept
-{
-	return std::any_of(b, e, [](const GtChar& c) {return c.corrected;});
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool
 GtToken::normal() const noexcept
 {
 	return std::all_of(b, e, [](const GtChar& c) {return c.is_normal();});
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool
-GtToken::evaluate() const noexcept
-{
-	return std::all_of(b, e, [](const GtChar& c) {return c.eval;});
 }
 
 ////////////////////////////////////////////////////////////////////////////////

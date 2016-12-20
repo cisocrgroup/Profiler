@@ -37,19 +37,15 @@ namespace OCRCorrection {
 
 	struct GtChar {
 		GtChar() = default;
-		GtChar(wchar_t g, wchar_t o, wchar_t c, EditOperation e)
-			: gt(g), ocr(o), cor(o), op(e), eval(true), corrected(false) {}
+		GtChar(wchar_t g, wchar_t o, EditOperation e)
+			: gt(g), ocr(o), op(e) {}
 		bool is_error() const noexcept {return not op.is_none();}
-		void correct() noexcept {cor = gt; corrected = true;}
-		void uncorrect() noexcept {cor = ocr; corrected = false;}
 		bool copy_gt() const noexcept {return gt != L'~' or op.is_none();}
 		bool copy_ocr() const noexcept {return ocr != L'~' or op.is_none();}
-		bool copy_cor() const noexcept {return cor != L'~' or op.is_none();}
-		bool is_normal() const noexcept {return copy_cor() and Document::isWord(cor);}
+		bool is_normal() const noexcept {return copy_ocr() and Document::isWord(ocr);}
 
-		wchar_t gt, ocr, cor;
+		wchar_t gt, ocr;
 		EditOperation op;
-		bool eval, corrected;
 	};
 
 	struct GtToken;
@@ -68,8 +64,6 @@ namespace OCRCorrection {
 		const_iterator end() const noexcept {return chars_.end();}
 		iterator begin() noexcept {return chars_.begin();}
 		iterator end() noexcept {return chars_.end();}
-		void correct(range r);
-		void set_eval(range r, bool eval);
 
 		size_t size() const noexcept {return chars_.size();}
 		bool empty() const noexcept {return chars_.empty();}
@@ -79,8 +73,6 @@ namespace OCRCorrection {
 		void each_token_gt(F f) const;
 		template<class F>
 		void each_token_ocr(F f) const;
-		template<class F>
-		void each_token_cor(F f) const;
 		template<class F, class G>
 		void each_token(G g, F f) const;
 
@@ -96,8 +88,6 @@ namespace OCRCorrection {
 
 		bool touch() const noexcept {return normal() and size() > 3;}
 		bool normal() const noexcept;
-		bool evaluate() const noexcept;
-		bool corrected() const noexcept;
 		size_t size() const noexcept {return std::distance(b, e);}
 		bool empty() const noexcept {return b == e;}
 		const_iterator b, e;
@@ -121,11 +111,9 @@ namespace OCRCorrection {
 	template<class It, class G> It eot(It b, It e, G g);
 	template<class It> It eot_gt(It b, It e);
 	template<class It> It eot_ocr(It b, It e);
-	template<class It> It eot_cor(It b, It e);
 	template<class It, class G> It bot(It b, It e, G g);
 	template<class It> It bot_gt(It b, It e);
 	template<class It> It bot_ocr(It b, It e);
-	template<class It> It bot_cor(It b, It e);
 
 	std::wistream& operator>>(std::wistream& is, GtLine& line);
 	std::wistream& operator>>(std::wistream& is, GtDoc& doc);
@@ -140,20 +128,10 @@ OCRCorrection::GtLine::each_token(G g, F f) const
 	const auto e = end();
 	for (auto i = b; i != e;) {
 		auto t = eot(i, e, g);
-		if (std::none_of(i, t, [g](const GtChar& c){return iswspace(g(c));}))
-			f({i, t});
+		f({i, t});
 		i = t;
 	}
 }
-
-////////////////////////////////////////////////////////////////////////////////
-template<class F>
-void
-OCRCorrection::GtLine::each_token_cor(F f) const
-{
-	each_token([](const GtChar& c){return c.cor;}, f);
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 template<class F>
@@ -169,14 +147,6 @@ void
 OCRCorrection::GtLine::each_token_ocr(F f) const
 {
 	each_token([](const GtChar& c){return c.ocr;}, f);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-template<class It>
-It
-OCRCorrection::eot_cor(It b, It e)
-{
-	return eot(b, e, [](const GtChar& c) {return c.cor;});
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -203,11 +173,11 @@ OCRCorrection::eot(It b, It e, G g)
 	if (b == e)
 		return e;
 
-	if (Document::isSpace(b->cor))
+	if (Document::isSpace(g(*b)))
 		return std::find_if(std::next(b), e, [g](const GtChar& c) {
 			return g(c) != L'~' and not Document::isSpace(g(c));
 		});
-	else if (Document::isWord(b->cor))
+	else if (Document::isWord(g(*b)))
 		return std::find_if(std::next(b), e, [g](const GtChar& c) {
 			return g(c) != L'~' and not Document::isWord(g(c));
 		});
@@ -217,14 +187,6 @@ OCRCorrection::eot(It b, It e, G g)
 					Document::isWord(g(c)) or
 					Document::isSpace(g(c)));
 		});
-}
-
-////////////////////////////////////////////////////////////////////////////////
-template<class It>
-It
-OCRCorrection::bot_cor(It b, It e)
-{
-	return bot(b, e, [](const GtChar& c) {return c.cor;});
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -251,13 +213,13 @@ OCRCorrection::bot(It b, It e, G g)
 	if (b == e)
 		return e;
 
-	if (Document::isSpace(b->cor))
+	if (Document::isSpace(g(*b)))
 		return std::find_if(std::reverse_iterator<It>(e),
 				std::reverse_iterator<It>(b),
 				[g](const GtChar& c) {
 			return g(c) != L'~' and not Document::isSpace(g(c));
 		}).base();
-	else if (Document::isWord(b->cor))
+	else if (Document::isWord(g(*b)))
 		return std::find_if(std::reverse_iterator<It>(e),
 				std::reverse_iterator<It>(b),
 				[g](const GtChar& c) {

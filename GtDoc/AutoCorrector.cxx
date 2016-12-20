@@ -1,11 +1,9 @@
 #include <regex>
 #include "AutoCorrector.h"
 #include "Document/Document.h"
-#include "GtDoc.h"
 #include "Utils/Utils.h"
 
 using namespace OCRCorrection;
-static const auto G = [](const GtChar& c) {return c.ocr;};
 
 ////////////////////////////////////////////////////////////////////////////////
 void
@@ -47,21 +45,12 @@ AutoCorrector::add_pattern(const std::string& pat)
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-AutoCorrector::correct(GtDoc& doc)
+AutoCorrector::correct(Document& doc)
 {
 	n_ = calculate_testset_size(doc);
 	nx_ = calculate_corrections_size(doc);
 
-	int c = 0;
-	for (auto& line: doc.lines()) {
-		line.each_token(G, [&](GtLine::range r) {
-			if (c < n_) {
-				line.set_eval(r, false);
-				if (r.touch())
-					c++;
-			}
-		});
-	}
+	mark_tokens(doc);
 	if (not each_ and not ranked_)
 		correct(doc, CorrectPercent());
 	if (each_)
@@ -72,78 +61,96 @@ AutoCorrector::correct(GtDoc& doc)
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-AutoCorrector::correct(GtDoc& doc, CorrectPercent) const
+AutoCorrector::mark_tokens(Document& doc) const
 {
 	int c = 0;
-	for (auto& line: doc.lines()) {
-		line.each_token(G, [&](GtLine::range r) {
-			if (c < nx_) {
-				if (r.touch()) {
-					c++;
-					line.correct(r);
-				}
+	for (auto& token: doc) {
+		if (token.isSpace()) {
+			token.metadata()["eval"] = L"false";
+		} else {
+			// do evaluate tokens in the evaluation set
+			if (c < n_) {
+				token.metadata()["eval"] = L"false";
+				c++;
+			} else {
+				token.metadata()["eval"] = L"true";
 			}
-		});
+			// short and/or not normal tokens are not touched by the profiler
+			if (token.isNormal() or token.getWOCR_lc().size() > 3) {
+				token.metadata()["touch"] = L"true";
+			} else {
+				token.metadata()["touch"] = L"false";
+			}
+		}
 	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-AutoCorrector::correct(GtDoc& doc, CorrectSuggestionsRanked) const
+AutoCorrector::correct(Document& doc, CorrectPercent) const
+{
+	int c = 0;
+	for (auto& token: doc) {
+		// skip space
+		if (token.isSpace())
+			continue;
+		// correct up to nx tokens
+		if (c >= nx_)
+			break;
+
+		// correct all tokens in the test set
+		c++;
+		correct(token);
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void
+AutoCorrector::correct(Document& doc, CorrectSuggestionsRanked) const
 {
 	int c = 0;
 	for (const auto& s: suggestions_) {
-		if (c >= nx_)
-			break;
-		for (auto& line: doc.lines()) {
+		for (auto& token: doc) {
+			if (token.isSpace())
+				continue;
 			if (c >= nx_)
 				break;
-			line.each_token(G, [&](GtLine::range r) {
-				if (c <= nx_ and r.touch()) {
-					correct(line, r, s.second);
-					c++;
-				}
-			});
+
+			c++;
+			if (s.second.count(token.getWOCR_lc())) {
+				correct(token);
+			}
 		}
 	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-AutoCorrector::correct(GtDoc& doc, CorrectSuggestionsEach) const
+AutoCorrector::correct(Document& doc, CorrectSuggestionsEach) const
 {
 	int c = 0;
-	for (auto& line: doc.lines()) {
+	for (auto& token: doc) {
+		if (token.isSpace())
+			continue;
 		if (c >= nx_)
 			break;
+
+		c++;
 		for (const auto& s: suggestions_) {
-			if (c >= nx_)
-				break;
-			line.each_token(G, [&](GtLine::range r) {
-				if (c <= nx_ and r.touch()) {
-					correct(line, r, s.second);
-					c++;
-				}
-			});
+			if (s.second.count(token.getWOCR_lc())) {
+				correct(token);
+				break; // just correct each token once
+			}
 		}
 	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool
-AutoCorrector::correct(GtLine& line, GtToken t, const Candidates& cands) const
+void
+AutoCorrector::correct(Token& token) const
 {
-	static std::wstring buf;
-	buf.clear();
-	std::transform(t.b, t.e, std::back_inserter(buf), [](const GtChar& c) {
-		return tolower(c.ocr);
-	});
-	if (cands.count(buf)) {
-		line.correct(t);
-		return true;
-	} else {
-		return false;
-	}
+	token.metadata()["correction"] = token.metadata()["groundtruth"];
+	token.metadata()["correction-lc"] = token.metadata()["groundtruth-lc"];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -190,28 +197,26 @@ AutoCorrector::read_suggestions(const std::string& path)
 
 ////////////////////////////////////////////////////////////////////////////////
 int
-AutoCorrector::calculate_testset_size(const GtDoc& doc) const
+AutoCorrector::calculate_testset_size(const Document& doc) const
 {
 	return (calculate_number_of_tokens(doc) * testset_) / 100;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 int
-AutoCorrector::calculate_corrections_size(const GtDoc& doc) const
+AutoCorrector::calculate_corrections_size(const Document& doc) const
 {
 	return (calculate_number_of_tokens(doc) * first_) / 100;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 int
-AutoCorrector::calculate_number_of_tokens(const GtDoc& doc) const
+AutoCorrector::calculate_number_of_tokens(const Document& doc)
 {
 	int n = 0;
-	for (const auto& line: doc.lines()) {
-		line.each_token_ocr([&](GtLine::range r) {
-			if (r.touch())
-				++n;
-		});
+	for (const auto& token: doc) {
+		if (not token.isSpace())
+			++n;
 	}
 	return n;
 }
