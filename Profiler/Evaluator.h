@@ -86,7 +86,7 @@ namespace OCRCorrection {
 		}
 		static bool has_ocr_errors(const Token& token);
 
-		std::array<std::vector<size_t>, 4> classes_;
+		std::array<std::vector<size_t>, 5> classes_;
 		Mode mode_;
 		int ntest_, neval_, nx_;
 	};
