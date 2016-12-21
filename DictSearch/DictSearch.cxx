@@ -252,6 +252,13 @@ DictSearch::getMinCascadeRank() const
 // 		std::wcerr << "csl::DictSearch::query: caught exception: " << exc.what() << std::endl;
 // 	    }
 	}
+	if (not foundAnswers) {
+		// This means, that the query could not be mapped to a dictionary entry.
+		// This is most likely an error, but we could not generate any candidates
+		// for this.
+		;
+
+	}
 	return foundAnswers;
 
     }
