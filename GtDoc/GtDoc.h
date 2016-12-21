@@ -213,13 +213,13 @@ OCRCorrection::bot(It b, It e, G g)
 	if (b == e)
 		return e;
 
-	if (Document::isSpace(g(*b)))
+	if (Document::isSpace(g(*e)))
 		return std::find_if(std::reverse_iterator<It>(e),
 				std::reverse_iterator<It>(b),
 				[g](const GtChar& c) {
 			return g(c) != L'~' and not Document::isSpace(g(c));
 		}).base();
-	else if (Document::isWord(g(*b)))
+	else if (Document::isWord(g(*e)))
 		return std::find_if(std::reverse_iterator<It>(e),
 				std::reverse_iterator<It>(b),
 				[g](const GtChar& c) {
