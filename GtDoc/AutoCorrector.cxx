@@ -187,11 +187,11 @@ AutoCorrector::read_suggestions(const std::string& path)
 			suggestions[current_freq].insert(Utils::utf8(m[1]));
 		}
 	}
-	for (const auto& p: suggestions) {
-		for (const auto& str: p.second) {
-			std::wcerr << p.first << ": "  << str << "\n";
-		}
-	}
+	// for (const auto& p: suggestions) {
+	// 	for (const auto& str: p.second) {
+	// 		std::wcerr << p.first << ": "  << str << "\n";
+	// 	}
+	// }
 	return suggestions;
 }
 
