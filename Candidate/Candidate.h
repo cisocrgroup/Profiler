@@ -70,6 +70,10 @@ namespace OCRCorrection {
 	    return ocrTrace_;
 	}
 
+	inline bool isUnknown() const {
+		return getOCRTrace().isUnknown() or
+			getHistInstruction().isUnknown();
+	}
 	//@}
 
 	/******************** SETTERS ************************/

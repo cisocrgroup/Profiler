@@ -39,6 +39,8 @@ Evaluator::has_ocr_errors(const Token& token)
 	if (not r.empty()) {
 		return not begin(r)->getOCRTrace().empty(); // empty ocr trace means no errors
 	}
+	if (std::any_of(r.begin(), r.end(), [](const Candidate& c) {return c.isUnknown();}))
+		return true; // if token is uniterpretable it is an ocr error;
 	return false; // no candidates means no errors
 }
 
@@ -105,6 +107,10 @@ Evaluator::classify(const Token& token)
 		throw std::runtime_error("cannot evaluate recall and "
 				"precision of tokens without any groundtruth");
 
+	const CandidateRange r(token);
+	if (std::any_of(r.begin(), r.end(), [](const Candidate& c) {return c.isUnknown();}))
+		unknowns_.push_back(token.getIndexInDocument());
+
 	// update counts
 	if (token.metadata()["eval"] == L"true")
 		++neval_;
@@ -144,6 +150,7 @@ Evaluator::write(const std::string& dir, const Document& doc) const
 	auto fp = dir + "/false_positives.txt";
 	auto fnf = dir + "/false_negatives_fair.txt";
 	auto fno = dir + "/false_negatives_objective.txt";
+	auto uk = dir + "/unknowns.txt";
 	auto corrs = dir + "/corrections.txt";
 
 	if (mkdir(dir.data(), 0752) != 0 and errno != EEXIST)
@@ -187,6 +194,23 @@ Evaluator::write(const std::string& dir, const Document& doc) const
 
 	size_t normal = 0;
 	size_t corrections = 0;
+
+	if (not unknowns_.empty()) {
+		os.open(uk);
+		if (not os.good())
+			throw std::system_error(errno, std::system_category(), uk);
+		os << "# " << Utils::utf8(uk) << "\n";
+		for (auto id: unknowns_) {
+			const auto& token = doc.at(id);
+			os << token.getWOCR();
+			if (token.candidatesBegin() != token.candidatesEnd()) {
+				os << "," << *token.candidatesBegin();
+			}
+			os << "\n";
+		}
+	}
+	os.close();
+
 	os.open(corrs);
 	if (not os.good())
 		throw std::system_error(errno, std::system_category(), corrs);
