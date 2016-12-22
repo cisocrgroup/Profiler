@@ -1,5 +1,5 @@
-#ifndef OCRC_AdaptiveLex_hpp__
-#define OCRC_AdaptiveLex_hpp__
+#ifndef CSL_AdaptiveLex_hpp__
+#define CSL_AdaptiveLex_hpp__
 
 #include <unordered_map>
 #include "DictSearch.h"
@@ -35,4 +35,4 @@ namespace csl {
 	};
 }
 
-#endif // OCRC_AdaptiveLex_hpp__
+#endif // CSL_AdaptiveLex_hpp__

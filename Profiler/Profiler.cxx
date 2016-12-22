@@ -258,6 +258,12 @@ namespace OCRCorrection {
 		for( csl::DictSearch::CandidateSet::const_iterator cand = tempCands.begin(); cand != tempCands.end(); ++cand ) {
 		    std::vector< csl::Instruction > ocrInstructions;
 
+		    if (cand->getHistInstruction().isUnknown()) {
+			    instructionComputer_.computeInstruction(
+					    cand->getWord(), token->getWOCR_lc(), &ocrInstructions, true);
+			    continue;
+		    }
+
 		    // throw away "short" candidates for "long" words
 		    if( cand->getWord().length() < 4 ) {
 			continue;

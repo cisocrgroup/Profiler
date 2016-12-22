@@ -1,6 +1,7 @@
 #ifndef CSL_DICTSEARCH_CXX
 #define CSL_DICTSEARCH_CXX CSL_DICTSEARCH_CXX
 
+#include "UnknownVirtualLex.h" // must be included before DictSearch.h
 #include "AdaptiveLex.h" // must be included before DictSearch.h
 #include "./DictSearch.h"
 #include "Utils/Utils.h"
@@ -253,15 +254,15 @@ DictSearch::getMinCascadeRank() const
 // 	    }
 	}
 	if (not foundAnswers) {
-		// This means, that the query could not be mapped to a dictionary entry.
-		// This is most likely an error, but we could not generate any candidates
-		// for this.
-		;
-
 	}
 	return foundAnswers;
 
     }
+void DictSearch::enableUnknownVirtualLex()
+{
+	std::unique_ptr<UnknownVirtualLex> tmp(new UnknownVirtualLex());
+	addDictModule(*tmp.release());
+}
 
 } // namespace csl
 
