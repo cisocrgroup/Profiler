@@ -211,9 +211,9 @@ Evaluator::write(const std::string& dir, const Document& doc) const
 	if (not os.good())
 		throw std::system_error(errno, std::system_category(), info);
 	os << "# " << Utils::utf8(info) << "\n"
-	   << "True positive:               " << true_positives() << "\n"
-	   << "True negative:               " << true_negatives() << "\n"
-	   << "False positive:              " << false_positives() << "\n"
+	   << "True positives:              " << true_positives() << "\n"
+	   << "True negatives:              " << true_negatives() << "\n"
+	   << "False positives              " << false_positives() << "\n"
 	   << "False negatives (fair):      " << false_negatives_fair() << "\n"
 	   << "False negatives (objective): " << false_negatives_objective() << "\n"
 	   << "Precision:                   " << std::setprecision(4) << precision() << "\n"
@@ -251,8 +251,8 @@ Evaluator::write(std::wostream& os, Class c, const Document& doc) const
 	};
 
 	for (const size_t id: classes_[static_cast<size_t>(c)]) {
-		if (doc.at(id).has_metadata("file"))
-			os << "file: " << doc.at(id).metadata()["file"] << "\n";
+		if (doc.at(id).has_metadata("source-file"))
+			os << "file: " << doc.at(id).metadata()["source-file"] << "\n";
 		os << "gt:   " << doc.at(id).metadata()["groundtruth"] << "\n";
 		os << "ocr:  " << doc.at(id).getWOCR() << "\n";
 		for (const auto& cand: CandRange(doc.at(id))) {
