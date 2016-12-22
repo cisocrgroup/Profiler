@@ -7,6 +7,7 @@
 namespace csl {
 
     wchar_t Pattern::leftRightDelimiter_ = L':';
+    const std::wstring Pattern::UNKNOWN = L"<<UNKNOWN>>";
 
 void Pattern::print(std::wostream& os) const
 {

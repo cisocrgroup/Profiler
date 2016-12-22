@@ -18,6 +18,7 @@ namespace csl {
      */
     class Pattern {
     public:
+	    static const std::wstring UNKNOWN;
 	/**
 	 * @brief Constructs an empty pattern with left == right == ""
 	 */
@@ -56,6 +57,10 @@ namespace csl {
 	inline void clear() {
 	    left_.clear();
 	    right_.clear();
+	}
+
+	inline bool isUnknown() const noexcept {
+		return getLeft() == UNKNOWN or getRight() == UNKNOWN;
 	}
 
 	/**
