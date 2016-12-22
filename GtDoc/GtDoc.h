@@ -108,12 +108,9 @@ namespace OCRCorrection {
 		Lines lines_;
 	};
 
-	template<class It, class G> It eot(It b, It e, G g);
-	template<class It> It eot_gt(It b, It e);
-	template<class It> It eot_ocr(It b, It e);
-	template<class It, class G> It bot(It b, It e, G g);
-	template<class It> It bot_gt(It b, It e);
-	template<class It> It bot_ocr(It b, It e);
+	template<class It, class G> It border(It b, It e, G g);
+	template<class It> It border_gt(It b, It e);
+	template<class It> It border_ocr(It b, It e);
 
 	std::wistream& operator>>(std::wistream& is, GtLine& line);
 	std::wistream& operator>>(std::wistream& is, GtDoc& doc);
@@ -127,7 +124,7 @@ OCRCorrection::GtLine::each_token(G g, F f) const
 	const auto b = begin();
 	const auto e = end();
 	for (auto i = b; i != e;) {
-		auto t = eot(i, e, g);
+		auto t = border(i, e, g);
 		f({i, t});
 		i = t;
 	}
@@ -152,23 +149,23 @@ OCRCorrection::GtLine::each_token_ocr(F f) const
 ////////////////////////////////////////////////////////////////////////////////
 template<class It>
 It
-OCRCorrection::eot_gt(It b, It e)
+OCRCorrection::border_gt(It b, It e)
 {
-	return eot(b, e, [](const GtChar& c) {return c.gt;});
+	return border(b, e, [](const GtChar& c) {return c.gt;});
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 template<class It>
 It
-OCRCorrection::eot_ocr(It b, It e)
+OCRCorrection::border_ocr(It b, It e)
 {
-	return eot(b, e, [](const GtChar& c) {return c.ocr;});
+	return border(b, e, [](const GtChar& c) {return c.ocr;});
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 template<class It, class G>
 It
-OCRCorrection::eot(It b, It e, G g)
+OCRCorrection::border(It b, It e, G g)
 {
 	if (b == e)
 		return e;
@@ -187,52 +184,6 @@ OCRCorrection::eot(It b, It e, G g)
 					Document::isWord(g(c)) or
 					Document::isSpace(g(c)));
 		});
-}
-
-////////////////////////////////////////////////////////////////////////////////
-template<class It>
-It
-OCRCorrection::bot_gt(It b, It e)
-{
-	return bot(b, e, [](const GtChar& c) {return c.gt;});
-}
-
-////////////////////////////////////////////////////////////////////////////////
-template<class It>
-It
-OCRCorrection::bot_ocr(It b, It e)
-{
-	return bot(b, e, [](const GtChar& c) {return c.ocr;});
-}
-
-////////////////////////////////////////////////////////////////////////////////
-template<class It, class G>
-It
-OCRCorrection::bot(It b, It e, G g)
-{
-	if (b == e)
-		return e;
-
-	if (Document::isSpace(g(*e)))
-		return std::find_if(std::reverse_iterator<It>(e),
-				std::reverse_iterator<It>(b),
-				[g](const GtChar& c) {
-			return g(c) != L'~' and not Document::isSpace(g(c));
-		}).base();
-	else if (Document::isWord(g(*e)))
-		return std::find_if(std::reverse_iterator<It>(e),
-				std::reverse_iterator<It>(b),
-				[g](const GtChar& c) {
-			return g(c) != L'~' and not Document::isWord(g(c));
-		}).base();
-	else
-		return std::find_if(std::reverse_iterator<It>(e),
-				std::reverse_iterator<It>(b),
-				[g](const GtChar& c) {
-			return g(c) != L'~' and (
-					Document::isWord(g(c)) or
-					Document::isSpace(g(c)));
-		}).base();
 }
 
 #endif // OCRCorrection_GtDoc_hpp__

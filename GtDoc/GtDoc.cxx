@@ -58,9 +58,12 @@ GtLine::parse(Document& doc) const
 		});
 
 		gt.clear();
-		auto bb = bot_gt(begin(), r.b);
-		auto ee = eot_gt(r.b, end());
-		std::for_each(bb, ee, [&](const GtChar& c) {
+
+		using It = GtLine::const_iterator;
+		auto bb = border_gt(std::reverse_iterator<It>(r.e),
+				std::reverse_iterator<It>(begin()));
+		auto ee = border_gt(r.b, end());
+		std::for_each(bb.base(), ee, [&](const GtChar& c) {
 			if (c.copy_gt())
 				gt.push_back(c.gt);
 		});
