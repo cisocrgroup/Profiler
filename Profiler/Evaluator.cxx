@@ -237,7 +237,7 @@ Evaluator::write(const std::string& dir, const Document& doc) const
 	os << "# " << Utils::utf8(info) << "\n"
 	   << "True positives:              " << true_positives() << "\n"
 	   << "True negatives:              " << true_negatives() << "\n"
-	   << "False positives              " << false_positives() << "\n"
+	   << "False positives:             " << false_positives() << "\n"
 	   << "False negatives (fair):      " << false_negatives_fair() << "\n"
 	   << "False negatives (objective): " << false_negatives_objective() << "\n"
 	   << "Precision:                   " << std::setprecision(4) << precision() << "\n"
