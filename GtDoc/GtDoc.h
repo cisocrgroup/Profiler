@@ -125,7 +125,8 @@ OCRCorrection::GtLine::each_token(G g, F f) const
 	const auto e = end();
 	for (auto i = b; i != e;) {
 		auto t = border(i, e, g);
-		f({i, t});
+		if (i != t)
+			f({i, t});
 		i = t;
 	}
 }

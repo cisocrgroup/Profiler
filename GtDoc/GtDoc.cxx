@@ -51,27 +51,39 @@ GtLine::parse(Document& doc) const
 	static const wchar_t* boolean[] = {L"false", L"true"};
 	static std::wstring gt, ocr;
 	each_token_ocr([&](range r) {
+		assert(r.b != r.e);
+		// std::wcerr << "fle: " << Utils::utf8(file_) << "\n";
 		ocr.clear();
 		std::for_each(r.b, r.e, [&](const GtChar& c) {
 			if (c.copy_ocr())
 				ocr.push_back(c.ocr);
 		});
-
-		gt.clear();
+		// std::wcerr << "ocr: " << ocr << "\n";
 
 		using It = GtLine::const_iterator;
-		auto bb = border_gt(std::reverse_iterator<It>(r.e),
+		gt.clear();
+		auto bb = border_gt(std::reverse_iterator<It>(std::next(r.b)),
 				std::reverse_iterator<It>(begin()));
-		auto ee = border_gt(r.b, end());
+		// std::wcerr << "HERE: " << std::distance(begin(), bb.base()) << "\n";
+		// for (auto i = begin(); i != bb.base(); ++i)
+		// 	std::wcerr << i->gt;
+		// std::wcerr << "<--\n";
+		auto ee = border_gt(std::prev(r.e), end());
+		// std::wcerr << "HERE: " << std::distance(begin(), ee) << "\n";
+		// for (auto i = begin(); i != ee; ++i)
+		// 	std::wcerr << i->gt;
+		// std::wcerr << "<--\n";
 		std::for_each(bb.base(), ee, [&](const GtChar& c) {
 			if (c.copy_gt())
 				gt.push_back(c.gt);
 		});
+		// std::wcerr << "gt:  " << gt  << "\n";
 
 		const auto idx = doc.getNrOfTokens();
 		doc.pushBackToken(ocr, r.normal());
 		doc.at(idx).metadata()["groundtruth"] = gt;
 		doc.at(idx).metadata()["groundtruth-lc"] = Utils::tolower(gt);
+		doc.at(idx).metadata()["source-file"] = Utils::utf8(file_);
 
 		// std::wcerr << "Adding token: " << doc.at(idx).getWOCR_lc() << "\n"
 		// 	   << "normal:       " << doc.at(idx).isNormal() << "\n"
