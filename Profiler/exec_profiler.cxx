@@ -48,7 +48,9 @@ void printHelp() {
 	       << "[--strict yes|no|very]      set the strictness of the evaluation"
                << std::endl
 	       << "[--autocorrect patterns]    Autocorrect a comma separated list of patterns. Tokens that match one of the given patterns are \"corrected\" with their groundtruth"
-	       << std::endl;
+	       << std::endl
+    	       << "[--enable-unknowns]         Enable handling of uninterpretable (unknown) tokens"
+	       << std::endl
 	;
 }
 
@@ -76,6 +78,7 @@ int main( int argc, char const** argv ) {
     options.specifyOption( "evaluate", csl::Getopt::STRING );
     options.specifyOption( "strict", csl::Getopt::STRING );
     options.specifyOption( "autocorrect", csl::Getopt::STRING );
+    options.specifyOption( "enable-unknowns", csl::Getopt::STRING );
 
     try {
 	options.getOptionsAsSpecified( argc, argv );
@@ -149,6 +152,9 @@ int main( int argc, char const** argv ) {
             //csl::CSLLocale::string2wstring( exc.what(), wideWhat );
 	std::wcerr << "Error while readConfiguration: " << wideWhat << std::endl;
 	return EXIT_FAILURE;
+    }
+    if (options.hasOption("enable-unknowns")) {
+	    profiler.enableUnknownVirtualLex();
     }
 
     /**
