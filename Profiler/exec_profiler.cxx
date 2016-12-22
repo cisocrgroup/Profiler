@@ -78,7 +78,7 @@ int main( int argc, char const** argv ) {
     options.specifyOption( "evaluate", csl::Getopt::STRING );
     options.specifyOption( "strict", csl::Getopt::STRING );
     options.specifyOption( "autocorrect", csl::Getopt::STRING );
-    options.specifyOption( "enable-unknowns", csl::Getopt::STRING );
+    options.specifyOption( "enable-unknowns", csl::Getopt::VOID );
 
     try {
 	options.getOptionsAsSpecified( argc, argv );
