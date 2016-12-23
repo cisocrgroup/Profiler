@@ -245,15 +245,14 @@ DictSearch::getMinCascadeRank() const
 
 //	    try {
 		answers->setCurrentDictModule( *( (*dm).second ) );
+		std::wcerr << "currentdictmod: " << dm->second->getName() << "\n";
 		// std::wcerr << "name: " << dm->second->getName() << "\n";
 		// std::wcerr << "query: " << query << "\n";
-		foundAnswers = dm->second->query(query, answers);
+		foundAnswers |= dm->second->query(query, answers);
 		// foundAnswers = ( (* (*dm).second ) ).query( query, answers );
 // 	    } catch( std::exception& exc ) {
 // 		std::wcerr << "csl::DictSearch::query: caught exception: " << exc.what() << std::endl;
 // 	    }
-	}
-	if (not foundAnswers) {
 	}
 	return foundAnswers;
 
