@@ -5,6 +5,8 @@
 #include "DictSearch.h"
 
 namespace csl {
+	// Virtual lexicon, that handles tokens, for which no other lexicon
+	// could generate valid candidates. It has maximum rank.
 	class UnknownVirtualLex: public csl::DictSearch::iDictModule {
 	public:
 		using DictModule = csl::DictSearch::iDictModule;

@@ -16,11 +16,11 @@ UnknownVirtualLex::UnknownVirtualLex()
 bool
 UnknownVirtualLex::doquery(const std::wstring& query, Receiver& res)
 {
-	// This lex is the last one with a maximal cascade rank.
+	// This lex is allways the last one with a maximal cascade rank.
 	// If no other dictionary could find the query, this one marks the
 	// token as an unkown entry.
-	// This is most likely an error, but we could not generate any candidates
-	// for this.
+	// The unknown token is most likely an error, but we do not know
+	// for sure.
 	csl::Interpretation i;
 	i.setWord(query);
 	i.setBaseWord(query);
@@ -30,5 +30,6 @@ UnknownVirtualLex::doquery(const std::wstring& query, Receiver& res)
 			csl::Pattern::UNKNOWN, csl::Pattern::UNKNOWN, 0);
 	assert(i.getHistInstruction().isUnknown());
 	static_cast<csl::iInterpretationReceiver&>(res).receive(i);
+	// std::wcerr << "UNKOWN: " << query << "\n";
 	return true;
 }
