@@ -86,6 +86,8 @@ namespace OCRCorrection {
 		GtToken(const_iterator begin, const_iterator end)
 			: b(begin), e(end) {}
 
+		const_iterator begin() const noexcept {return b;}
+		const_iterator end() const noexcept {return e;}
 		bool touch() const noexcept {return normal() and size() > 3;}
 		bool normal() const noexcept;
 		size_t size() const noexcept {return std::distance(b, e);}
