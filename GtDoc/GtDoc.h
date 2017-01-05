@@ -42,7 +42,9 @@ namespace OCRCorrection {
 		bool is_error() const noexcept {return not op.is_none();}
 		bool copy_gt() const noexcept {return gt != L'~' or op.is_none();}
 		bool copy_ocr() const noexcept {return ocr != L'~' or op.is_none();}
-		bool is_normal() const noexcept {return copy_ocr() and Document::isWord(ocr);}
+		bool is_normal() const noexcept {
+			return copy_ocr() ? Document::isWord(ocr) : true;
+		}
 
 		wchar_t gt, ocr;
 		EditOperation op;
