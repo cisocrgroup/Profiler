@@ -76,11 +76,11 @@ AutoCorrector::mark_tokens(Document& doc) const
 				token.metadata()["eval"] = L"true";
 			}
 			// short and/or not normal tokens are not touched by the profiler
-			if (token.isNormal() or token.getWOCR_lc().size() > 3) {
-				token.metadata()["touch"] = L"true";
-			} else {
-				token.metadata()["touch"] = L"false";
-			}
+			// if (token.isNormal() or token.getWOCR_lc().size() > 3) {
+			// 	token.metadata()["touch"] = L"true";
+			// } else {
+			// 	token.metadata()["touch"] = L"false";
+			// }
 		}
 	}
 }

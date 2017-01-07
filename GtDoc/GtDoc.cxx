@@ -84,6 +84,17 @@ GtLine::parse(Document& doc) const
 		doc.at(idx).metadata()["groundtruth"] = gt;
 		doc.at(idx).metadata()["groundtruth-lc"] = Utils::tolower(gt);
 		doc.at(idx).metadata()["source-file"] = Utils::utf8(file_);
+		doc.at(idx).metadata()["touch"] = boolean[not not r.touch()];
+		// if (doc.at(idx).metadata()["groundtruth-lc"] == L"ſaffrã") {
+		// 	std::wcout << "touch: " << r.normal() << "\n";
+		// 	for (const auto c: r) {
+		// 		std::wcout << c.gt << static_cast<wchar_t>(c.op) << c.ocr << "\n";
+		// 		std::wcout << "copy ocr: " << c.copy_ocr() << "\n";
+		// 		std::wcout << "normal:   " << c.is_normal() << "\n";
+		// 	}
+		// 	std::wcout << "touch: " << doc.at(idx).metadata()["touch"] << "\n";
+		// 	throw std::runtime_error("DONE");
+		// }
 
 		// std::wcerr << "Adding token: " << doc.at(idx).getWOCR_lc() << "\n"
 		// 	   << "normal:       " << doc.at(idx).isNormal() << "\n"
