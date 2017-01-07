@@ -245,7 +245,6 @@ DictSearch::getMinCascadeRank() const
 
 //	    try {
 		answers->setCurrentDictModule( *( (*dm).second ) );
-		std::wcerr << "currentdictmod: " << dm->second->getName() << "\n";
 		// std::wcerr << "name: " << dm->second->getName() << "\n";
 		// std::wcerr << "query: " << query << "\n";
 		foundAnswers |= dm->second->query(query, answers);
