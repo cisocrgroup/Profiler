@@ -3,37 +3,39 @@
 
 #include <vector>
 #include <string>
+#include <unordered_set>
 
 namespace OCRCorrection {
-	class GtDoc;
-	class GtLine;
+	class Document;
+	class Token;
 
 	class AutoCorrector {
 	public:
 		void add_patterns(const std::string& pat);
 		void add_pattern(const std::string& pat);
-		void operator()(GtDoc& doc) const {correct(doc);}
-		void correct(GtDoc& doc) const;
+		void operator()(Document& doc) {correct(doc);}
+		void correct(Document& doc);
 
 	private:
+		using Candidates = std::unordered_set<std::wstring>;
+		using Suggestions = std::map<int, Candidates>;
 		struct CorrectPercent {};
 		struct CorrectPatterns {};
-		void correct(GtDoc& doc, CorrectPercent) const;
-		void correct(GtDoc& doc, CorrectPatterns) const;
-		struct Pattern {
-			using It = std::wstring::const_iterator;
-			Pattern(std::wstring g, std::wstring o, int p)
-				: gt(std::move(g))
-				, ocr(std::move(o))
-				, n(p)
-			{}
-			void correct(GtLine& line) const;
+		struct CorrectSuggestionsRanked {};
+		struct CorrectSuggestionsEach {};
+		void mark_tokens(Document& doc) const;
+		void correct(Document& doc, CorrectPercent) const;
+		void correct(Document& doc, CorrectSuggestionsEach) const;
+		void correct(Document& doc, CorrectSuggestionsRanked) const;
+		void correct(Token& token) const;
+		static Suggestions read_suggestions(const std::string& str);
+		int calculate_testset_size(const Document& doc) const;
+		int calculate_corrections_size(const Document& doc) const;
+		static int calculate_number_of_tokens(const Document& doc);
 
-			std::wstring gt, ocr;
-			double n;
-		};
-		std::vector<Pattern> patterns_;
-		int testset_, first_;
+		Suggestions suggestions_;
+		int testset_, first_, nx_, n_;
+		bool ranked_, each_;
 	};
 }
 

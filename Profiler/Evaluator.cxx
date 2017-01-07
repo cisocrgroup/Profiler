@@ -1,13 +1,13 @@
 #include <iomanip>
 #include <cmath>
 #include "GlobalProfile/GlobalProfile.h"
-#include "RecPrec.h"
+#include "Evaluator.h"
 
 using namespace OCRCorrection;
 
 ////////////////////////////////////////////////////////////////////////////////
 double
-RecPrec::precision() const noexcept
+Evaluator::precision() const noexcept
 {
 	return (double)true_positives() /
 		((double)true_positives() + (double)false_positives());
@@ -15,37 +15,29 @@ RecPrec::precision() const noexcept
 
 ////////////////////////////////////////////////////////////////////////////////
 double
-RecPrec::recall() const noexcept
+Evaluator::recall_objective() const noexcept
 {
 	return (double)true_positives() /
-		((double)true_positives() + (double)false_negatives());
+		((double)true_positives() + (double)false_negatives_objective());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 double
-RecPrec::accuracy() const noexcept
+Evaluator::recall_fair() const noexcept
 {
-	return ((double)true_positives() + (double) true_negatives()) /
-		(double)sum();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-double
-RecPrec::f_measure(double beta) const noexcept
-{
-	const auto beta_square = std::pow(beta, 2);
-	const auto p = precision();
-	const auto r = recall();
-	return (p * r) / ((beta_square * p) + r);
+	return (double)true_positives() /
+		((double)true_positives() + (double)false_negatives_fair());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool
-RecPrec::has_ocr_errors(const Token& token)
+Evaluator::has_ocr_errors(const Token& token)
 {
 	using std::begin;
 	using std::end;
 	CandidateRange r(token);
+	if (std::any_of(r.begin(), r.end(), [](const Candidate& c) {return c.isUnknown();}))
+		return true; // if token is uniterpretable it is an ocr error;
 	if (not r.empty()) {
 		return not begin(r)->getOCRTrace().empty(); // empty ocr trace means no errors
 	}
@@ -53,15 +45,28 @@ RecPrec::has_ocr_errors(const Token& token)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+Evaluator::Class
+Evaluator::get_false_negative(const Token& token)
+{
+	if (token.metadata()["touch"] == L"true")
+		return Class::FalseNegativeFair;
+	else if (token.metadata()["touch"] == L"false")
+		return Class::FalseNegativeObjective;
+	else
+		throw std::runtime_error("Invalid metadata for `value`: " +
+				Utils::utf8(token.metadata()["touch"]));
+}
+
+////////////////////////////////////////////////////////////////////////////////
 bool
-RecPrec::is_true_positive(const Token&, ModeNormal)
+Evaluator::is_true_positive(const Token&, ModeNormal)
 {
 	return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool
-RecPrec::is_true_positive(const Token& token, ModeStrict)
+Evaluator::is_true_positive(const Token& token, ModeStrict)
 {
 
 	using std::begin;
@@ -75,7 +80,7 @@ RecPrec::is_true_positive(const Token& token, ModeStrict)
 
 ////////////////////////////////////////////////////////////////////////////////
 bool
-RecPrec::is_true_positive(const Token& token, ModeVeryStrict)
+Evaluator::is_true_positive(const Token& token, ModeVeryStrict)
 {
 	CandidateRange r(token);
 	return token.metadata()["groundtruth-lc"] == r.begin()->getWord();
@@ -84,32 +89,56 @@ RecPrec::is_true_positive(const Token& token, ModeVeryStrict)
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-OCRCorrection::RecPrec::classify(const Document& doc)
+Evaluator::classify(const Document& doc)
 {
 	for (const auto& token: doc) {
-		// each normal token must have a groundtruth attached to it
-		if (token.isNormal() and not token.has_metadata("groundtruth"))
-			throw std::runtime_error("cannot evaluate recall and "
-					"precision of tokens without groundtruth");
-
-		if (token.has_metadata("eval") and token.metadata()["eval"] == L"true") {
-			const auto idx = token.getIndexInDocument();
-			(*this)[classify(token)].push_back(idx);
-		}
+		classify(token);
 	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OCRCorrection::RecPrec::Class
-OCRCorrection::RecPrec::classify(const Token& token) const
+void
+Evaluator::classify(const Token& token)
+{
+	// skip spaces
+	if (token.isSpace())
+		return;
+	if (not token.has_metadata("groundtruth"))
+		throw std::runtime_error("cannot evaluate recall and "
+				"precision of tokens without any groundtruth");
+
+	const CandidateRange r(token);
+	if (std::any_of(r.begin(), r.end(),
+				[](const Candidate& c) {return c.isUnknown();})) {
+		unknowns_.push_back(token.getIndexInDocument());
+	}
+
+	// update counts
+	if (token.metadata()["eval"] == L"true")
+		++neval_;
+	else if (token.metadata()["eval"] == L"false")
+		++ntest_;
+	if (token.has_metadata("correction"))
+		++nx_;
+	// do not evaluate tokens in the test set
+	if (token.metadata()["eval"] == L"false")
+		return;
+
+	const auto idx = token.getIndexInDocument();
+	(*this)[get_class(token)].push_back(idx);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+Evaluator::Class
+Evaluator::get_class(const Token& token) const
 {
 	switch (mode_) {
 	case Mode::Normal:
-		return classify(token, ModeNormal());
+		return get_class(token, ModeNormal());
 	case Mode::Strict:
-		return classify(token, ModeStrict());
+		return get_class(token, ModeStrict());
 	case Mode::VeryStrict:
-		return classify(token, ModeVeryStrict());
+		return get_class(token, ModeVeryStrict());
 	default:
 		throw std::logic_error("default label in `switch(mode_)` "
 				"encountered");
@@ -118,13 +147,15 @@ OCRCorrection::RecPrec::classify(const Token& token) const
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-OCRCorrection::RecPrec::write(const std::string& dir, const Document& doc) const
+Evaluator::write(const std::string& dir, const Document& doc) const
 {
 	auto info = dir + "/info.txt";
-	auto tp = dir + "/true_positive.txt";
-	auto tn = dir + "/true_negative.txt";
-	auto fp = dir + "/false_positive.txt";
-	auto fn = dir + "/false_negative.txt";
+	auto tp = dir + "/true_positives.txt";
+	auto tn = dir + "/true_negatives.txt";
+	auto fp = dir + "/false_positives.txt";
+	auto fnf = dir + "/false_negatives_fair.txt";
+	auto fno = dir + "/false_negatives_objective.txt";
+	auto uk = dir + "/unknowns.txt";
 	auto corrs = dir + "/corrections.txt";
 
 	if (mkdir(dir.data(), 0752) != 0 and errno != EEXIST)
@@ -152,25 +183,50 @@ OCRCorrection::RecPrec::write(const std::string& dir, const Document& doc) const
 	write(os, Class::FalsePositive, doc);
 	os.close();
 
-	os.open(fn);
+	os.open(fnf);
 	if (not os.good())
-		throw std::system_error(errno, std::system_category(), fn);
-	os << "# " << Utils::utf8(fn) << "\n";
-	write(os, Class::FalseNegative, doc);
+		throw std::system_error(errno, std::system_category(), fnf);
+	os << "# " << Utils::utf8(fnf) << "\n";
+	write(os, Class::FalseNegativeFair, doc);
+	os.close();
+
+	os.open(fno);
+	if (not os.good())
+		throw std::system_error(errno, std::system_category(), fno);
+	os << "# " << Utils::utf8(fno) << "\n";
+	write(os, Class::FalseNegativeObjective, doc);
 	os.close();
 
 	size_t normal = 0;
 	size_t corrections = 0;
+
+	if (not unknowns_.empty()) {
+		os.open(uk);
+		if (not os.good())
+			throw std::system_error(errno, std::system_category(), uk);
+		os << "# " << Utils::utf8(uk) << "\n";
+		for (auto id: unknowns_) {
+			const auto& token = doc.at(id);
+			os << token.getWOCR();
+			CandidateRange r(token);
+			for (const auto& cand: r) {
+				os << "," << cand;
+			}
+			os << "\n";
+		}
+	}
+	os.close();
+
 	os.open(corrs);
 	if (not os.good())
-		throw std::system_error(errno, std::system_category(), fn);
+		throw std::system_error(errno, std::system_category(), corrs);
 	os << "# " << Utils::utf8(corrs) << "\n";
 	for (const auto& token: doc) {
 		++normal;
 		if (token.has_metadata("correction")) {
 			++corrections;
-			os << token.getWOCR() << ":"
-			   << token.metadata()["correction"];
+			os << token.metadata()["correction"] << ":"
+			   << token.getWOCR();
 			if (token.candidatesBegin() != token.candidatesEnd()) {
 				os << "," << *token.candidatesBegin();
 			}
@@ -185,14 +241,17 @@ OCRCorrection::RecPrec::write(const std::string& dir, const Document& doc) const
 	if (not os.good())
 		throw std::system_error(errno, std::system_category(), info);
 	os << "# " << Utils::utf8(info) << "\n"
-	   << "True positive:    " << true_positives() << "\n"
-	   << "True negative:    " << true_negatives() << "\n"
-	   << "False positive:   " << false_positives() << "\n"
-	   << "False negative:   " << false_negatives() << "\n"
-	   << "Precision:        " << std::setprecision(4) << precision() << "\n"
-	   << "Recall:           " << std::setprecision(4) << recall() << "\n"
-	   << "Evaluated tokens: " << sum() << "\n"
-	   << "Corrected tokens: " << corrections << "\n";
+	   << "True positives:              " << true_positives() << "\n"
+	   << "True negatives:              " << true_negatives() << "\n"
+	   << "False positives:             " << false_positives() << "\n"
+	   << "False negatives (fair):      " << false_negatives_fair() << "\n"
+	   << "False negatives (objective): " << false_negatives_objective() << "\n"
+	   << "Precision:                   " << std::setprecision(4) << precision() << "\n"
+	   << "Recall (fair):               " << std::setprecision(4) << recall_fair() << "\n"
+	   << "Recall (objective):          " << std::setprecision(4) << recall_objective() << "\n"
+	   << "Evaluated tokens:            " << neval_ << "\n"
+	   << "Not evaluated tokens:        " << ntest_ << "\n"
+	   << "Corrected tokens:            " << nx_ << "\n";
 	os.close();
 
 	if (doc.has_global_profile()) {
@@ -208,7 +267,7 @@ OCRCorrection::RecPrec::write(const std::string& dir, const Document& doc) const
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-RecPrec::write(std::wostream& os, Class c, const Document& doc) const
+Evaluator::write(std::wostream& os, Class c, const Document& doc) const
 {
 	struct CandRange {
 		CandRange(const Token& token): token_(token) {}
@@ -222,8 +281,8 @@ RecPrec::write(std::wostream& os, Class c, const Document& doc) const
 	};
 
 	for (const size_t id: classes_[static_cast<size_t>(c)]) {
-		if (doc.at(id).has_metadata("file"))
-			os << "file: " << doc.at(id).metadata()["file"] << "\n";
+		if (doc.at(id).has_metadata("source-file"))
+			os << "file: " << doc.at(id).metadata()["source-file"] << "\n";
 		os << "gt:   " << doc.at(id).metadata()["groundtruth"] << "\n";
 		os << "ocr:  " << doc.at(id).getWOCR() << "\n";
 		for (const auto& cand: CandRange(doc.at(id))) {
@@ -234,7 +293,7 @@ RecPrec::write(std::wostream& os, Class c, const Document& doc) const
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-RecPrec::write(std::wostream& os, const GlobalProfile& gp) const
+Evaluator::write(std::wostream& os, const GlobalProfile& gp) const
 {
 	using Pair = std::pair<csl::Pattern, double>;
 	std::vector<Pair> hist, ocr;

@@ -742,6 +742,8 @@ namespace csl {
 
 	bool hasHypothetic() const;
 
+	void enableUnknownVirtualLex();
+
 	//@} // END Configuration methods
 
 	/**

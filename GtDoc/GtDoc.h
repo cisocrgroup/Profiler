@@ -37,27 +37,27 @@ namespace OCRCorrection {
 
 	struct GtChar {
 		GtChar() = default;
-		GtChar(wchar_t g, wchar_t o, wchar_t c, EditOperation e)
-			: gt(g), ocr(o), cor(o), op(e), eval(true), corrected(false) {}
+		GtChar(wchar_t g, wchar_t o, EditOperation e)
+			: gt(g), ocr(o), op(e) {}
 		bool is_error() const noexcept {return not op.is_none();}
-		void correct() noexcept {cor = gt; corrected = true;}
-		void uncorrect() noexcept {cor = ocr; corrected = false;}
 		bool copy_gt() const noexcept {return gt != L'~' or op.is_none();}
 		bool copy_ocr() const noexcept {return ocr != L'~' or op.is_none();}
-		bool copy_cor() const noexcept {return cor != L'~' or op.is_none();}
-		bool is_normal() const noexcept {return copy_cor() and Document::isWord(cor);}
+		bool is_normal() const noexcept {
+			return copy_ocr() ? Document::isWord(ocr) : true;
+		}
 
-		wchar_t gt, ocr, cor;
+		wchar_t gt, ocr;
 		EditOperation op;
-		bool eval, corrected;
 	};
+
+	struct GtToken;
 
 	class GtLine {
 	public:
 		using Chars = std::vector<GtChar>;
 		using const_iterator = Chars::const_iterator;
 		using iterator = Chars::iterator;
-		using range = std::pair<const_iterator, const_iterator>;
+		using range = GtToken;
 
 		GtLine(): file_(), chars_() {}
 		GtLine(const std::string& file,const std::wstring& gt,
@@ -72,11 +72,29 @@ namespace OCRCorrection {
 		const std::string& file() const noexcept {return file_;}
 		void parse(Document& doc) const;
 		template<class F>
-		void each_token(F f) const;
+		void each_token_gt(F f) const;
+		template<class F>
+		void each_token_ocr(F f) const;
+		template<class F, class G>
+		void each_token(G g, F f) const;
 
 	private:
 		std::string file_;
 		Chars chars_;
+	};
+
+	struct GtToken {
+		using const_iterator = GtLine::const_iterator;
+		GtToken(const_iterator begin, const_iterator end)
+			: b(begin), e(end) {}
+
+		const_iterator begin() const noexcept {return b;}
+		const_iterator end() const noexcept {return e;}
+		bool touch() const noexcept {return normal() and size() > 3;}
+		bool normal() const noexcept;
+		size_t size() const noexcept {return std::distance(b, e);}
+		bool empty() const noexcept {return b == e;}
+		const_iterator b, e;
 	};
 
 	class GtDoc {
@@ -94,39 +112,74 @@ namespace OCRCorrection {
 		Lines lines_;
 	};
 
-	template<class It, class G> It eot(It b, It e, G g);
+	template<class It, class G> It border(It b, It e, G g);
+	template<class It> It border_gt(It b, It e);
+	template<class It> It border_ocr(It b, It e);
 
 	std::wistream& operator>>(std::wistream& is, GtLine& line);
 	std::wistream& operator>>(std::wistream& is, GtDoc& doc);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-template<class F>
+template<class F, class G>
 void
-OCRCorrection::GtLine::each_token(F f) const
+OCRCorrection::GtLine::each_token(G g, F f) const
 {
 	const auto b = begin();
 	const auto e = end();
 	for (auto i = b; i != e;) {
-		auto t = eot(i, e, [](const GtChar& c) {return c.cor;});
-		f({i, t});
+		auto t = border(i, e, g);
+		if (i != t)
+			f({i, t});
 		i = t;
 	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+template<class F>
+void
+OCRCorrection::GtLine::each_token_gt(F f) const
+{
+	each_token([](const GtChar& c){return c.gt;}, f);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+template<class F>
+void
+OCRCorrection::GtLine::each_token_ocr(F f) const
+{
+	each_token([](const GtChar& c){return c.ocr;}, f);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+template<class It>
+It
+OCRCorrection::border_gt(It b, It e)
+{
+	return border(b, e, [](const GtChar& c) {return c.gt;});
+}
+
+////////////////////////////////////////////////////////////////////////////////
+template<class It>
+It
+OCRCorrection::border_ocr(It b, It e)
+{
+	return border(b, e, [](const GtChar& c) {return c.ocr;});
+}
+
+////////////////////////////////////////////////////////////////////////////////
 template<class It, class G>
 It
-OCRCorrection::eot(It b, It e, G g)
+OCRCorrection::border(It b, It e, G g)
 {
 	if (b == e)
 		return e;
 
-	if (Document::isSpace(b->cor))
+	if (Document::isSpace(g(*b)))
 		return std::find_if(std::next(b), e, [g](const GtChar& c) {
 			return g(c) != L'~' and not Document::isSpace(g(c));
 		});
-	else if (Document::isWord(b->cor))
+	else if (Document::isWord(g(*b)))
 		return std::find_if(std::next(b), e, [g](const GtChar& c) {
 			return g(c) != L'~' and not Document::isWord(g(c));
 		});

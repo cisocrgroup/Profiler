@@ -160,6 +160,10 @@ namespace OCRCorrection {
 	 */
 	inline bool isNormal() const;
 
+	bool isSpace() const {
+		return std::all_of(begin(getWOCR()), end(getWOCR()), iswspace);
+	}
+
 	/**
 	 * @brief returns true iff token was found suspicious.
 	 * @return true iff token was found suspicious

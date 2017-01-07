@@ -40,7 +40,7 @@ GtLine::GtLine(const std::string& file, const std::wstring& gt,
 	}
 	chars_.reserve(gt.size());
 	for (size_t i = 0; i < gt.size(); ++i) {
-		chars_[i] = GtChar(gt[i], ocr[i], ocr[i], ops[i]);
+		chars_[i] = GtChar(gt[i], ocr[i], ops[i]);
 	}
 }
 
@@ -49,39 +49,52 @@ void
 GtLine::parse(Document& doc) const
 {
 	static const wchar_t* boolean[] = {L"false", L"true"};
-	std::wstring gt, cor, ocr;
-	each_token([&](range r) {
-		gt.clear();
-		cor.clear();
+	static std::wstring gt, ocr;
+	each_token_ocr([&](range r) {
+		assert(r.b != r.e);
+		// std::wcerr << "fle: " << Utils::utf8(file_) << "\n";
 		ocr.clear();
-		bool normal = true;
-		bool eval = true;
-		bool corrected = false;
-		std::for_each(r.first, r.second, [&](const GtChar& c) {
+		std::for_each(r.b, r.e, [&](const GtChar& c) {
 			if (c.copy_ocr())
 				ocr.push_back(c.ocr);
+		});
+		// std::wcerr << "ocr: " << ocr << "\n";
+
+		using It = GtLine::const_iterator;
+		gt.clear();
+		auto bb = border_gt(std::reverse_iterator<It>(std::next(r.b)),
+				std::reverse_iterator<It>(begin()));
+		// std::wcerr << "HERE: " << std::distance(begin(), bb.base()) << "\n";
+		// for (auto i = begin(); i != bb.base(); ++i)
+		// 	std::wcerr << i->gt;
+		// std::wcerr << "<--\n";
+		auto ee = border_gt(std::prev(r.e), end());
+		// std::wcerr << "HERE: " << std::distance(begin(), ee) << "\n";
+		// for (auto i = begin(); i != ee; ++i)
+		// 	std::wcerr << i->gt;
+		// std::wcerr << "<--\n";
+		std::for_each(bb.base(), ee, [&](const GtChar& c) {
 			if (c.copy_gt())
 				gt.push_back(c.gt);
-			if (c.copy_cor())
-				cor.push_back(c.cor);
-			normal &= c.is_normal();
-			eval &= c.eval;
-			corrected |= c.corrected;
 		});
+		// std::wcerr << "gt:  " << gt  << "\n";
 
 		const auto idx = doc.getNrOfTokens();
-		doc.pushBackToken(ocr, normal);
+		doc.pushBackToken(ocr, r.normal());
 		doc.at(idx).metadata()["groundtruth"] = gt;
 		doc.at(idx).metadata()["groundtruth-lc"] = Utils::tolower(gt);
-		doc.at(idx).metadata()["eval"] = boolean[not not eval];
-
-		if (not normal or ocr.size() < 4) {
-			doc.at(idx).metadata()["eval"] = boolean[0];
-		}
-		if (normal and ocr.size() > 3 and corrected) {
-			doc.at(idx).metadata()["correction"] = cor;
-			doc.at(idx).metadata()["correction-lc"] = Utils::tolower(cor);
-		}
+		doc.at(idx).metadata()["source-file"] = Utils::utf8(file_);
+		doc.at(idx).metadata()["touch"] = boolean[not not r.touch()];
+		// if (doc.at(idx).metadata()["groundtruth-lc"] == L"ſaffrã") {
+		// 	std::wcout << "touch: " << r.normal() << "\n";
+		// 	for (const auto c: r) {
+		// 		std::wcout << c.gt << static_cast<wchar_t>(c.op) << c.ocr << "\n";
+		// 		std::wcout << "copy ocr: " << c.copy_ocr() << "\n";
+		// 		std::wcout << "normal:   " << c.is_normal() << "\n";
+		// 	}
+		// 	std::wcout << "touch: " << doc.at(idx).metadata()["touch"] << "\n";
+		// 	throw std::runtime_error("DONE");
+		// }
 
 		// std::wcerr << "Adding token: " << doc.at(idx).getWOCR_lc() << "\n"
 		// 	   << "normal:       " << doc.at(idx).isNormal() << "\n"
@@ -92,6 +105,13 @@ GtLine::parse(Document& doc) const
 		// 		   << doc.at(idx).metadata()["correction-lc"] << "\n";
 		// }
 	});
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool
+GtToken::normal() const noexcept
+{
+	return std::all_of(b, e, [](const GtChar& c) {return c.is_normal();});
 }
 
 ////////////////////////////////////////////////////////////////////////////////

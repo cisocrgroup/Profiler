@@ -1,6 +1,7 @@
 #ifndef CSL_DICTSEARCH_CXX
 #define CSL_DICTSEARCH_CXX CSL_DICTSEARCH_CXX
 
+#include "UnknownVirtualLex.h" // must be included before DictSearch.h
 #include "AdaptiveLex.h" // must be included before DictSearch.h
 #include "./DictSearch.h"
 #include "Utils/Utils.h"
@@ -246,7 +247,7 @@ DictSearch::getMinCascadeRank() const
 		answers->setCurrentDictModule( *( (*dm).second ) );
 		// std::wcerr << "name: " << dm->second->getName() << "\n";
 		// std::wcerr << "query: " << query << "\n";
-		foundAnswers = dm->second->query(query, answers);
+		foundAnswers |= dm->second->query(query, answers);
 		// foundAnswers = ( (* (*dm).second ) ).query( query, answers );
 // 	    } catch( std::exception& exc ) {
 // 		std::wcerr << "csl::DictSearch::query: caught exception: " << exc.what() << std::endl;
@@ -255,6 +256,11 @@ DictSearch::getMinCascadeRank() const
 	return foundAnswers;
 
     }
+void DictSearch::enableUnknownVirtualLex()
+{
+	std::unique_ptr<UnknownVirtualLex> tmp(new UnknownVirtualLex());
+	addDictModule(*tmp.release());
+}
 
 } // namespace csl
 

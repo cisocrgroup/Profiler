@@ -138,6 +138,13 @@ namespace OCRCorrection {
 	}
 
 	/**
+	 * @brief enable virtual unknown dictionary
+	 */
+	void enableUnknownVirtualLex() {
+		dictSearch_.enableUnknownVirtualLex();
+	}
+
+	/**
 	 * @brief Set the number of initial pages to be processed
 	 *
 	 *
