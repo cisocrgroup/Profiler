@@ -31,8 +31,7 @@ namespace csl {
 	    // the ocr trace is also unknown.
 	    if (unknown and instructions) {
 		    Instruction i;
-		    i.emplace_back(
-			csl::Pattern::UNKNOWN, csl::Pattern::UNKNOWN, 0);
+		    i.emplace_back(PosPattern::Unknown());
 		    instructions->push_back(i);
 		    return true;
 	    }

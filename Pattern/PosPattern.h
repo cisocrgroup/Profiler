@@ -19,6 +19,9 @@ namespace csl {
 	inline PosPattern();
 
 	inline PosPattern( const std::wstring& left, const std::wstring& right, size_t position );
+	static inline PosPattern Unknown() {
+		return {Pattern::UNKNOWN, Pattern::UNKNOWN, 0};
+	}
 
 	inline bool operator==( PosPattern const& other ) const;
 

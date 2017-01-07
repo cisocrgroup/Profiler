@@ -26,8 +26,7 @@ UnknownVirtualLex::doquery(const std::wstring& query, Receiver& res)
 	i.setBaseWord(query);
 	i.setBaseWordScore(0);
 	i.setLevDistance(1); // is handled separately for ocr trace, but lev is at least 1
-	i.getHistInstruction().emplace_back(
-			csl::Pattern::UNKNOWN, csl::Pattern::UNKNOWN, 0);
+	i.getHistInstruction().push_back(PosPattern::Unknown());
 	assert(i.getHistInstruction().isUnknown());
 	static_cast<csl::iInterpretationReceiver&>(res).receive(i);
 	// std::wcerr << "UNKOWN: " << query << "\n";
