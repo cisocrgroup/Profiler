@@ -100,18 +100,42 @@ OCRCorrection::Evaluator::get_class(const Token& token, M m)
 {
 	if (token.metadata()["groundtruth-lc"] != token.getWOCR_lc()) {
 		if (has_ocr_errors(token)) {
-			if (is_true_positive(token, m))
+			if (is_true_positive(token, m)) {
+				// std::wcout << token.metadata()["groundtruth-lc"] << ":"
+				// 	   << token.getWOCR_lc() << ":"
+				// 	   << token.metadata()["touch"]
+				// 	   << "\n";
+				// using std::begin;
+				// using std::end;
+				// CandidateRange r(token);
+				// for (const auto& c: r) {
+				// 	std::wcout << "cand:" << c << "\n";
+				// }
+				assert(token.metadata()["touch"] == L"true");
 				return Class::TruePositive;
-			else
+			} else {
 				return get_false_negative(token);
+			}
 		} else {
 			return get_false_negative(token);
 		}
 	} else {
-		if (has_ocr_errors(token))
+		if (has_ocr_errors(token)) {
+			// std::wcout << token.metadata()["groundtruth-lc"] << ":"
+			// 	   << token.getWOCR_lc() << ":"
+			// 	   << token.metadata()["touch"]
+			// 	   << "\n";
+			// using std::begin;
+			// using std::end;
+			// CandidateRange r(token);
+			// for (const auto& c: r) {
+			// 	std::wcout << "cand:" << c << "\n";
+			// }
+			assert(token.metadata()["touch"] == L"true");
 			return Class::FalsePositive;
-		else
+		} else {
 			return Class::TrueNegative;
+		}
 	}
 }
 

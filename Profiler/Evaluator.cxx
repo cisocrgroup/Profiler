@@ -36,11 +36,11 @@ Evaluator::has_ocr_errors(const Token& token)
 	using std::begin;
 	using std::end;
 	CandidateRange r(token);
+	if (std::any_of(r.begin(), r.end(), [](const Candidate& c) {return c.isUnknown();}))
+		return true; // if token is uniterpretable it is an ocr error;
 	if (not r.empty()) {
 		return not begin(r)->getOCRTrace().empty(); // empty ocr trace means no errors
 	}
-	if (std::any_of(r.begin(), r.end(), [](const Candidate& c) {return c.isUnknown();}))
-		return true; // if token is uniterpretable it is an ocr error;
 	return false; // no candidates means no errors
 }
 
@@ -108,8 +108,10 @@ Evaluator::classify(const Token& token)
 				"precision of tokens without any groundtruth");
 
 	const CandidateRange r(token);
-	if (std::any_of(r.begin(), r.end(), [](const Candidate& c) {return c.isUnknown();}))
+	if (std::any_of(r.begin(), r.end(),
+				[](const Candidate& c) {return c.isUnknown();})) {
 		unknowns_.push_back(token.getIndexInDocument());
+	}
 
 	// update counts
 	if (token.metadata()["eval"] == L"true")
@@ -118,6 +120,9 @@ Evaluator::classify(const Token& token)
 		++ntest_;
 	if (token.has_metadata("correction"))
 		++nx_;
+	// do not evaluate tokens in the test set
+	if (token.metadata()["eval"] == L"false")
+		return;
 
 	const auto idx = token.getIndexInDocument();
 	(*this)[get_class(token)].push_back(idx);
@@ -203,8 +208,9 @@ Evaluator::write(const std::string& dir, const Document& doc) const
 		for (auto id: unknowns_) {
 			const auto& token = doc.at(id);
 			os << token.getWOCR();
-			if (token.candidatesBegin() != token.candidatesEnd()) {
-				os << "," << *token.candidatesBegin();
+			CandidateRange r(token);
+			for (const auto& cand: r) {
+				os << "," << cand;
 			}
 			os << "\n";
 		}

@@ -258,13 +258,6 @@ namespace OCRCorrection {
 		for( csl::DictSearch::CandidateSet::const_iterator cand = tempCands.begin(); cand != tempCands.end(); ++cand ) {
 		    std::vector< csl::Instruction > ocrInstructions;
 
-		    if (cand->getHistInstruction().isUnknown()) {
-			    instructionComputer_.computeInstruction(
-					    cand->getWord(), token->getWOCR_lc(), &ocrInstructions, true);
-			    continue;
-		    }
-
-		    // throw away "short" candidates for "long" words
 		    if( cand->getWord().length() < 4 ) {
 			continue;
 		    }
@@ -276,7 +269,14 @@ namespace OCRCorrection {
 
 
 		    //std::wcerr << "instructionComputer_.computeInstruction( " << cand->getWord() << ", " <<token->getWOCR_lc() <<", "<<&ocrInstructions<<" )"<<std::endl; // DEBUG
-		    instructionComputer_.computeInstruction( cand->getWord(), token->getWOCR_lc(), &ocrInstructions );
+
+		    auto is_unknown = cand->getHistInstruction().isUnknown();
+		    // make shure that, if a token contains an unkown candidate,
+		    // the unkown candiate is the only candidate for this token.
+		    // a -> b = not a or b
+		    assert(not is_unknown or (tempCands.size() == 1));
+		    instructionComputer_.computeInstruction(cand->getWord(),
+				    token->getWOCR_lc(), &ocrInstructions, is_unknown);
 		    //std::wcout << "BLA: Finished" << std::endl;
 
 
@@ -300,6 +300,20 @@ namespace OCRCorrection {
 		    } myEquals;
 
 		    // If the OCR instruction is ambiguous, the interp. is cloned for each possible instruction
+		    // if (is_unknown) {
+		    //         std::wcerr << "\nUNKOWN: ";
+		    //         token->origin().print(std::wcerr);
+		    //         for (const csl::Instruction& i: ocrInstructions) {
+		    //     	    std::wcerr << "inst: " << i << "\n";
+		    //         }
+		    //         std::wcerr << "curr: " << *cand << "\n";
+		    //         for (auto i = tempCands.begin();
+		    //     		    i != tempCands.end();
+		    //     		    ++i) {
+		    //     	    std::wcerr << "cand: " << *i << "\n";
+		    //         }
+
+		    // }
 		    // It's not exactly clear if this is the right thing to do!!
 		    for( std::vector< csl::Instruction >::const_iterator instruction = ocrInstructions.begin();
 			 instruction != ocrInstructions.end();
@@ -322,10 +336,12 @@ namespace OCRCorrection {
 				continue;
 			}
 
-			Profiler_Interpretation current = Profiler_Interpretation( *cand );
+			Profiler_Interpretation current =
+				Profiler_Interpretation( *cand );
 			current.setOCRTrace( *instruction );
 
-			current.setCombinedProbability( getCombinedProb( current ) );
+			current.setCombinedProbability(
+					getCombinedProb(current));
 
 			//     std::wcerr << "(Profiler) token: "
 			// 	       << token->getWOCR() << "\n";
@@ -371,9 +387,17 @@ namespace OCRCorrection {
 		    cand->setVoteWeight( cand->getCombinedProbability() / sumOfProbabilities );
 
 		    // check if voteWeight is NaN (not a number)
-		    if( cand->getVoteWeight() != cand->getVoteWeight() ) {
-			std::wcerr << "NAN=" << cand->getVoteWeight()  << "," << token->getWOCR_lc() << "," << cand->toString() <<  std::endl;
-			continue;
+		    if(cand->getVoteWeight() != cand->getVoteWeight()) {
+			// std::wcerr << "NAN=" << cand->getVoteWeight()  << "," << token->getWOCR_lc() << "," << cand->toString() <<  std::endl;
+			if (cand->isUnknown())
+				cand->setVoteWeight(1.0);
+			 else if (iterationNumber == 1)
+				cand->setVoteWeight(config_.ocrPatternStartProb_);
+			else
+				cand->setVoteWeight(config_.ocrPatternSmoothingProb_);
+
+			 // throw std::runtime_error("NAN");
+			// continue;
 		    }
 
 
@@ -507,7 +531,10 @@ namespace OCRCorrection {
 
 
 	// compute probabilities for hist. variant patterns
-	if( config_.resetHistPatternProbabilities_ ) globalProfile_.histPatternProbabilities_.clear();
+	if( config_.resetHistPatternProbabilities_ ) {
+		std::wcerr << "clearing hist pattern probabilities\n";
+		globalProfile_.histPatternProbabilities_.clear();
+	}
 	for( PatternCounter::PatternIterator it = histCounter_.patternsBegin(); it != histCounter_.patternsEnd(); ++it ) {
 
 	    // note that config_.patternCutoff_hist_ is a threshold "per 1.000 profiled tokens"
@@ -530,7 +557,10 @@ namespace OCRCorrection {
 	}
 
 	// compute probabilities for ocr patterns
-	if( config_.resetOCRPatternProbabilities_ ) globalProfile_.ocrPatternProbabilities_.clearExplicitWeights();
+	if( config_.resetOCRPatternProbabilities_ ) {
+		std::wcerr << "clearing OCR pattern probabilities\n";
+		globalProfile_.ocrPatternProbabilities_.clearExplicitWeights();
+	}
 
 	for( PatternCounter::PatternIterator it = ocrCounter_.patternsBegin(); it != ocrCounter_.patternsEnd(); ++it ) {
 
@@ -650,17 +680,28 @@ namespace OCRCorrection {
 	cand.setLangProbability( langProb );
 
 	// ocr Probability
-	double ocrProb = 1;
-	double w = 0;
+	double ocrProb = 1.0;
+	double w = 0.0;
 
 	for( csl::Instruction::const_iterator posPat = cand.getOCRTrace().begin();
 	     posPat != cand.getOCRTrace().end();
 	     ++posPat ) {
 
 	    w = globalProfile_.ocrPatternProbabilities_.getWeight( *posPat );
-//		std::wcerr << "weight for " << ((csl::Pattern)*posPat).toString() << " is " << w << std::endl;
-	    ocrProb *= ( w != csl::PatternWeights::UNDEF )? w : 0;
+		// std::wcerr << "weight for " << ((csl::Pattern)*posPat).toString() << " is " << w << std::endl;
+		if (std::isinf(w)) {
+			w = 1;
+		} else if (w == csl::PatternWeights::UNDEF) {
+			w = config_.ocrPatternStartProb_;
+		}
+		    ocrProb *= ( w != csl::PatternWeights::UNDEF )? w : 0;
+		    if (ocrProb <= 0) {
+			    ocrProb = config_.ocrPatternStartProb_;
+		    }
 	    }
+	// give each pattern at least a small probability
+	// if (ocrProb == 0)
+		// ocrProb = config_.ocrPatternStartProb_;
 	cand.setChannelProbability( ocrProb );
 
 	double combinedProb = ocrProb * langProb;
