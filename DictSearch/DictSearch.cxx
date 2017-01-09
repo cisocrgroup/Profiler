@@ -1,6 +1,7 @@
 #ifndef CSL_DICTSEARCH_CXX
 #define CSL_DICTSEARCH_CXX CSL_DICTSEARCH_CXX
 
+#include <memory>
 #include "UnknownVirtualLex.h" // must be included before DictSearch.h
 #include "AdaptiveLex.h" // must be included before DictSearch.h
 #include "./DictSearch.h"

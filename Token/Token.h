@@ -4,6 +4,7 @@
 #include<vector>
 #include<string>
 #include<algorithm>
+#include <memory>
 
 #include <LevFilter/LevFilter.h>
 #include <Vaam/Vaam.h>

@@ -1,4 +1,6 @@
 #include <unordered_set>
+#include <memory>
+#include <system_error>
 #include "Utils/IStr.h"
 #include "AdaptiveLex.h"
 
