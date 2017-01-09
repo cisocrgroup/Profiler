@@ -68,7 +68,7 @@ GtLine::parse(Document& doc) const
 		// for (auto i = begin(); i != bb.base(); ++i)
 		// 	std::wcerr << i->gt;
 		// std::wcerr << "<--\n";
-		auto ee = border_gt(std::prev(r.e), end());
+		auto ee = border_gt(std::prev(r.e), this->end());
 		// std::wcerr << "HERE: " << std::distance(begin(), ee) << "\n";
 		// for (auto i = begin(); i != ee; ++i)
 		// 	std::wcerr << i->gt;
