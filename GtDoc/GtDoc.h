@@ -64,6 +64,8 @@ namespace OCRCorrection {
 		GtLine(): file_(), chars_() {}
 		GtLine(const std::string& file,const std::wstring& gt,
 				const std::wstring& ops, const std::wstring& ocr);
+		const_iterator cbegin() const noexcept {return chars_.begin();}
+		const_iterator cend() const noexcept {return chars_.end();}
 		const_iterator begin() const noexcept {return chars_.begin();}
 		const_iterator end() const noexcept {return chars_.end();}
 		iterator begin() noexcept {return chars_.begin();}
