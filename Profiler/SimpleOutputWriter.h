@@ -7,12 +7,14 @@ namespace OCRCorrection {
 
         class SimpleOutputWriter {
         public:
-                SimpleOutputWriter(const Document& document);
+                SimpleOutputWriter(std::wostream& os,
+				const Document& document);
                 void write() const;
 
         private:
                 void writeNormalToken(const Token& token) const;
                 const Document& document_;
+		std::wostream& os_;
         };
 }
 

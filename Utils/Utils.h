@@ -2,6 +2,7 @@
 #define OCRC_UTILS_H OCRC_UTILS_H
 
 #include"../Global.h"
+#include <algorithm>
 #include<string>
 #include<map>
 #include <sstream>
@@ -37,6 +38,21 @@ namespace OCRCorrection {
                  * convert a wide string to utf8
                  */
                 static std::string utf8(std::wstring const& wstr);
+
+		/**
+		 * convert wstring to lower case
+		 */
+		static std::wstring tolower(const std::wstring& str) {
+			return tolower(str.data(), str.size());
+		}
+		static std::wstring tolower(const wchar_t* str) {
+			return tolower(str, wcslen(str));
+		}
+		static std::wstring tolower(const wchar_t* str, size_t n) {
+			std::wstring res(n, 0);
+			std::transform(str, str + n, begin(res), towlower);
+			return res;
+		}
 
                 /**
                  * convert a utf8 encoded multibyte string to a wide string

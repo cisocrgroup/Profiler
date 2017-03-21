@@ -138,11 +138,7 @@ namespace csl {
 	     *
 	     */
 	    iDictModule const* dictModule_;
-	}; // class Interpretation
-
-
-
-
+	}; // class Inter
 
 	/**
 	 * @brief Whoever wants to receive results from DictSearch, has to implement
@@ -269,6 +265,16 @@ namespace csl {
 	     */
 	    Interpretation_t const& at( size_t i ) const {
 		return myVector_.at( i );
+	    }
+
+	    /**
+	     * Remove all interpretations from the candidate set that match the
+	     * given predicate p.
+	     */
+	    template<class P>
+	    void discard_if(P p) {
+		    auto e = std::remove_if(myVector_.begin(), myVector_.end(), p);
+		    myVector_.erase(e, myVector_.end());
 	    }
 
 
@@ -606,6 +612,7 @@ namespace csl {
 
 	    bool query( std::wstring const& query, iResultReceiver* answers ) {
 		bool foundAnswers = false;
+		// std::wcerr << "query: " << query << "\n";
 		if( getDict() ) {
 		    getMyDictSearch().msMatch_.setFBDic( *( getDict() ) );
 		    getMyDictSearch().msMatch_.setDistance( getDLevByWordlength( query.length() ) );
@@ -613,10 +620,12 @@ namespace csl {
 
 		    foundAnswers = getMyDictSearch().msMatch_.query( query.c_str(), *answers );
 
+			// std::wcerr << "maxnrofpatterns: " << getMaxNrOfPatterns() << "\n";
 		    if( getMaxNrOfPatterns() > 0 ) {
 			if( ! getMyDictSearch().hasHypothetic() ) {
 			    throw exceptions::cslException( "csl::DictSearch::DictModule::query: DictSearch has no Vaam ready" );
 			}
+			// std::wcerr << "getDLevHypothetic: " << getDLevHypothetic() << "\n";
 			if( getDLevHypothetic() == 0 ) { // use val
 			    getMyDictSearch().val_->setBaseDic( dict_->getFWDic() );
 			    getMyDictSearch().val_->setMinNrOfPatterns( 1 ); // get only strictly hypothetic matches
@@ -688,6 +697,26 @@ namespace csl {
 	void initHypothetic( char const* patternFile );
 
 
+	/**
+	 * Add a new managed DictionaryModule
+	 */
+	iDictModule& addDictModule(iDictModule& module);
+
+	/**
+	 * Search for a dictionary module by name
+	 */
+	iDictModule* findDictModule(const std::wstring& name) const;
+
+	/**
+	 * Get the maximum cascade rank of dictionary modules
+	 */
+	size_t getMaxCascadeRank() const;
+
+	/**
+	 * Get the maximum cascade rank of dictionary modules
+	 */
+	size_t getMinCascadeRank() const;
+
 	DictModule& addDictModule( std::wstring const& name, std::string const& dicFile, size_t cascadeRank = 0 );
 
         DictModule& addDictModule( std::wstring const& name, Dict_t const& dicRef, size_t cascadeRank = 0 );
@@ -712,6 +741,8 @@ namespace csl {
 	bool hasDictModules() const;
 
 	bool hasHypothetic() const;
+
+	void enableUnknownVirtualLex();
 
 	//@} // END Configuration methods
 

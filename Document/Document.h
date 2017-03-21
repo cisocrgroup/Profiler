@@ -20,6 +20,7 @@ namespace OCRCorrection {
 
 namespace OCRCorrection {
 
+	class GlobalProfile;
 
     /**
      * @brief
@@ -672,7 +673,22 @@ namespace OCRCorrection {
         static inline bool isWord(wchar_t c);
         static inline bool isSpace(wchar_t c);
 
+	const GlobalProfile& global_profile() const noexcept {
+		return *global_profile_;
+	}
+	GlobalProfile& global_profile() noexcept {
+		return *global_profile_;
+	}
+	void set_global_profile(GlobalProfile& profile) noexcept {
+		global_profile_ = &profile;
+	}
+	bool has_global_profile() const noexcept {
+		return global_profile_;
+	}
+
+
     private: 	/////  PRIVATE  of class Document ///////////////////////////
+	GlobalProfile* global_profile_;
 
 
 	friend class IBMGTReader;

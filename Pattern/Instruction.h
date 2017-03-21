@@ -47,6 +47,11 @@ namespace csl {
 	 */
 	bool isDestroyed() const;
 
+	/**
+	 * @brief Check if any of the patterns is unknown.
+	 */
+	bool isUnknown() const;
+
 	//@}
 
 	/**

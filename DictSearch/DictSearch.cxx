@@ -1,8 +1,12 @@
 #ifndef CSL_DICTSEARCH_CXX
 #define CSL_DICTSEARCH_CXX CSL_DICTSEARCH_CXX
 
+#include <memory>
+#include "UnknownVirtualLex.h" // must be included before DictSearch.h
+#include "AdaptiveLex.h" // must be included before DictSearch.h
 #include "./DictSearch.h"
 #include "Utils/Utils.h"
+
 namespace csl {
 
     DictSearch::DictSearch() :
@@ -120,6 +124,14 @@ namespace csl {
 
 
 	    }
+	    // adaptive dictionaries
+	    else if (iniConf.getstring(*it + ":dict_type") == std::string("adaptive")) {
+		    auto ocr_errors = iniConf.getint(*it + ":ocrErrors");
+		    std::unique_ptr<AdaptiveLex> adm(new AdaptiveLex(
+					    OCRCorrection::Utils::utf8(*it),
+					    cascadeRank, ocr_errors));
+		    addDictModule(*adm.release());
+	    }
 	    else {
 		throw exceptions::cslException( "csl::DictSearch::readConfiguration: unknown dict_type for dictionary " + *it );
 	    }
@@ -141,6 +153,43 @@ namespace csl {
 	val_->setMinNrOfPatterns( 1 );
     }
 
+DictSearch::iDictModule&
+DictSearch::addDictModule(iDictModule& module)
+{
+	internalDictModules_.push_back(&module);
+	allDictModules_.emplace(module.getCascadeRank(), &module);
+	return module;
+}
+
+DictSearch::iDictModule*
+DictSearch::findDictModule(const std::wstring& name) const
+{
+	using Map = std::multimap<size_t, iDictModule*>;
+	using Val = Map::value_type;
+	auto find = [&name](const Val& val) {
+		return val.second->getName() == name;
+	};
+	auto i = std::find_if(begin(allDictModules_), end(allDictModules_), find);
+	return i == end(allDictModules_) ? nullptr : i->second;
+}
+
+size_t
+DictSearch::getMaxCascadeRank() const
+{
+	if (allDictModules_.empty())
+		return 0;
+	else
+		return std::prev(allDictModules_.end())->first;
+}
+
+size_t
+DictSearch::getMinCascadeRank() const
+{
+	if (allDictModules_.empty())
+		return 0;
+	else
+		return allDictModules_.begin()->first;
+}
 
     DictSearch::DictModule& DictSearch::addDictModule( std::wstring const& name, std::string const& dicFile, size_t cascadeRank ) {
 	DictModule* newDM = new DictModule( *this, name, dicFile, cascadeRank );
@@ -184,6 +233,8 @@ namespace csl {
 	for( std::multimap< size_t, iDictModule* >::const_iterator dm = allDictModules_.begin();
 	     dm != allDictModules_.end();
 	     ++dm ) {
+		// std::wcerr << "cascade Rank: " << cascadeRank << "\n";
+		// std::wcerr << "current: " << dm->first << "\n";
 	    if( ((*dm).first) > cascadeRank ) {
 		if( foundAnswers ) {
 		    return true;
@@ -195,7 +246,10 @@ namespace csl {
 
 //	    try {
 		answers->setCurrentDictModule( *( (*dm).second ) );
-		foundAnswers = ( (* (*dm).second ) ).query( query, answers );
+		// std::wcerr << "name: " << dm->second->getName() << "\n";
+		// std::wcerr << "query: " << query << "\n";
+		foundAnswers |= dm->second->query(query, answers);
+		// foundAnswers = ( (* (*dm).second ) ).query( query, answers );
 // 	    } catch( std::exception& exc ) {
 // 		std::wcerr << "csl::DictSearch::query: caught exception: " << exc.what() << std::endl;
 // 	    }
@@ -203,6 +257,11 @@ namespace csl {
 	return foundAnswers;
 
     }
+void DictSearch::enableUnknownVirtualLex()
+{
+	std::unique_ptr<UnknownVirtualLex> tmp(new UnknownVirtualLex());
+	addDictModule(*tmp.release());
+}
 
 } // namespace csl
 
