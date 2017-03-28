@@ -39,15 +39,13 @@ SimpleOutputWriter::writeNormalToken(const Token& token) const
 	};
 	bool somethingWasPrinted = false;
 	Candidates candidates(token);
+	os_ << "@" << token.getWOCR_lc() << "\n";
 	for (const auto& cand: candidates) {
-		somethingWasPrinted = true;
-		os_ << token.getIndexInDocument() << ","
-		    << token.getWOCR() << ","
-		    << cand << ","
-		    << "dict=" << cand.getDictModule().getName() << "\n";
+		os_ << cand.getWord() << ":" << cand.getBaseWord()
+		    << cand.getInstruction()
+		    << ",dist=" << cand.getLevDistance()
+		    << "(" << cand.getDictModule().getName() << ")"
+		    << ",ocr=[" << cand.getOCRTrace() << "]"
+		    << ",weight=" << cand.getVoteWeight() << "\n";
 	}
-        if (not somethingWasPrinted) {
-                os_ << token.getIndexInDocument() << ","
-		    << token.getWOCR() << std::endl;
-        }
 }

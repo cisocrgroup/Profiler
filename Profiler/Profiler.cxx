@@ -689,7 +689,8 @@ namespace OCRCorrection {
 
 	    w = globalProfile_.ocrPatternProbabilities_.getWeight( *posPat );
 		// std::wcerr << "weight for " << ((csl::Pattern)*posPat).toString() << " is " << w << std::endl;
-		if (std::isinf(w)) {
+		// if (std::isinf(w)) {
+		if (w != w) {
 			w = 1;
 		} else if (w == csl::PatternWeights::UNDEF) {
 			w = config_.ocrPatternStartProb_;
