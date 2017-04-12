@@ -16,6 +16,7 @@ void printHelp() {
  *
  */
 int main(int argc, char const** argv) {
+	try {
     std::locale::global( std::locale( "" ) );
 
     csl::Getopt options;
@@ -53,7 +54,7 @@ int main(int argc, char const** argv) {
 		t.addToken( line.c_str(), annotation );
 	    }
 	    if( errno == EILSEQ ) { // catch encoding error
-		throw csl::exceptions::badInput( "MinDic::compileDic: Encoding error in input sequence." );
+		throw std::runtime_error( "MinDic::compileDic: Encoding error in input sequence." );
 	    }
 	    t.finishConstruction();
 
@@ -63,10 +64,10 @@ int main(int argc, char const** argv) {
 	    //   t.printCells();
 	    return EXIT_SUCCESS;
 
-	} catch ( csl::exceptions::cslException ex ) {
+	} catch (const csl::exceptions::cslException& ex ) {
 	    std::wcout<<"compileMD failed: "<<ex.what()<<std::endl;
 	    return EXIT_FAILURE;
-	} catch ( std::exception ex ) {
+	} catch (const std::exception& ex ) {
 	    std::wcout<<"compileMD failed: "<<ex.what()<<std::endl;
 	    return EXIT_FAILURE;
 	}
@@ -86,7 +87,7 @@ int main(int argc, char const** argv) {
 		    outFile.replace( outFile.size() - 4, 4, ".mdic" );
 		}
 		else {
-		    std::wcerr << "Your input filename does not end with '.lex'. In this case please provide an output filename as second argument." << std::endl;
+		    std::wcout << "Your input filename does not end with '.lex'. In this case please provide an output filename as second argument." << std::endl;
 		    return EXIT_FAILURE;
 		}
 	    }
@@ -99,11 +100,17 @@ int main(int argc, char const** argv) {
 	    //   t.toDot();
 	    //   t.printCells();
 
-	} catch ( std::exception ex ) {
+	} catch (const std::exception& ex ) {
 	    std::wcout<<"compileMD failed: "<<ex.what()<<std::endl;
 	    return EXIT_FAILURE;
 	}
 
     }
-
+	} catch (const csl::exceptions::cslException& e) {
+		std::wcout << "compileMD failed: " << e.what() << std::endl;
+		return EXIT_FAILURE;
+	} catch (const std::exception& e) {
+		std::wcout << "compileMD failed: " << e.what() << std::endl;
+		return EXIT_FAILURE;
+	}
 }
