@@ -68,7 +68,7 @@ GtLine::parse(Document& doc) const
 		// for (auto i = begin(); i != bb.base(); ++i)
 		// 	std::wcerr << i->gt;
 		// std::wcerr << "<--\n";
-		auto ee = border_gt(std::prev(r.e), cend());
+		auto ee = border_gt(r.b, cend());
 		// std::wcerr << "HERE: " << std::distance(begin(), ee) << "\n";
 		// for (auto i = begin(); i != ee; ++i)
 		// 	std::wcerr << i->gt;
@@ -112,6 +112,15 @@ bool
 GtToken::normal() const noexcept
 {
 	return std::all_of(b, e, [](const GtChar& c) {return c.is_normal();});
+}
+
+////////////////////////////////////////////////////////////////////////////////
+size_t
+GtToken::size() const noexcept
+{
+	return std::count_if(b, e, [](const GtChar& c) {
+		return c.copy_ocr();
+	});
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -602,30 +602,22 @@ namespace csl {
 		caseMode_ = cm;
 	    }
 
-
 	    Global::CaseMode getCaseMode() const {
 		return caseMode_;
 	    }
 
-
-
-
 	    bool query( std::wstring const& query, iResultReceiver* answers ) {
 		bool foundAnswers = false;
-		// std::wcerr << "query: " << query << "\n";
 		if( getDict() ) {
 		    getMyDictSearch().msMatch_.setFBDic( *( getDict() ) );
 		    getMyDictSearch().msMatch_.setDistance( getDLevByWordlength( query.length() ) );
 		    getMyDictSearch().msMatch_.setCaseMode( getCaseMode() );
 
 		    foundAnswers = getMyDictSearch().msMatch_.query( query.c_str(), *answers );
-
-			// std::wcerr << "maxnrofpatterns: " << getMaxNrOfPatterns() << "\n";
 		    if( getMaxNrOfPatterns() > 0 ) {
 			if( ! getMyDictSearch().hasHypothetic() ) {
 			    throw exceptions::cslException( "csl::DictSearch::DictModule::query: DictSearch has no Vaam ready" );
 			}
-			// std::wcerr << "getDLevHypothetic: " << getDLevHypothetic() << "\n";
 			if( getDLevHypothetic() == 0 ) { // use val
 			    getMyDictSearch().val_->setBaseDic( dict_->getFWDic() );
 			    getMyDictSearch().val_->setMinNrOfPatterns( 1 ); // get only strictly hypothetic matches
@@ -788,7 +780,6 @@ namespace csl {
 
 	VaamDict_t dummyDic;
 	MSMatch< FW_BW > msMatch_;
-
     }; // class DictSearch
 
 
