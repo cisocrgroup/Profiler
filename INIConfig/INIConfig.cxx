@@ -141,7 +141,8 @@ namespace csl {
 
 	if( std::string( getstring( key ) ) == "true" ) return true;
 	else if( std::string( getstring( key ) ) == "false" ) return false;
-	else throw exceptions::cslException( "csl::INIConfig: can not interpret bool from value." );
+	else return getint(key);
+	return false;
     }
 
 } // eon
