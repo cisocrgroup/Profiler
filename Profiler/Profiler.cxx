@@ -151,7 +151,7 @@ namespace OCRCorrection {
 	    // this has to be done again because the MinDic's position in memory changes
 	    freqList_.connectBaseWordFrequency( baseWordFrequencyDic_ );
 	    //                     do print in the last iteration
-	    cc.clearInstructions();
+	    cc.recalculateInstructions();
 	    doIteration(cc, iterationNr, (iterationNr == config_.nrOfIterations_));
 	}
 
@@ -258,15 +258,10 @@ namespace OCRCorrection {
 				);
 			}
 		} myEquals;
-		for (auto c = value->candidates.begin(); c != value->candidates.end(); ++c) {
-			auto instrs = value->instructions.find(c);
-			if (instrs == value->instructions.end())
-				continue;
-			assert(instrs != value->instructions.end());
-
-			for (auto i = instrs->second.begin(); i != instrs->second.end(); ++i) {
-				Profiler_Interpretation current = Profiler_Interpretation(*c);
-				current.setOCRTrace(*i);
+		for (auto& c: value->candidates) {
+			for (auto& i: c.second) {
+				Profiler_Interpretation current = Profiler_Interpretation(c.first);
+				current.setOCRTrace(i);
 				current.setCombinedProbability(getCombinedProb(current));
 
 				if (candidates_.empty() || (!myEquals(current, candidates_.back()))) {

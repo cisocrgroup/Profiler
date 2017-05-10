@@ -12,28 +12,26 @@ CandidateConstructor::getValue(Profiler& profiler, Token& token)
 	auto f = values_.find(token.getWOCR_lc());
 	if (f == values_.end()) {
 		++n;
-		std::wcerr << "NEW VALUE: " << token.getWOCR_lc()
-			   << " (new: " << n << ", old: " << o << ")\n";
 		f = values_.emplace_hint(f, token.getWOCR_lc(),
 				calculateValue(profiler, token));
+		std::wcerr << "NEW VALUE: " << token.getWOCR_lc()
+			   << " CANDIATES: " << f->second->candidates.size()
+			   << " (new: " << n << ", old: " << o << ")\n";
 	} else {
 		++o;
 	}
 	assert(f != values_.end());
-	if (f->second->mustRecalculateInstructions) {
-		f->second->instructions = calculateInstructionsMap(
-				token, f->second->candidates);
-	}
+	assert(f->second.get());
 	return f->second.get();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-CandidateConstructor::clearInstructions() const
+CandidateConstructor::recalculateInstructions()
 {
 	for (const auto& v: values_) {
 		assert(v.second);
-		v.second->mustRecalculateInstructions = true;
+		v.second->recalculateInstructions(computer_);
 	}
 }
 
@@ -41,51 +39,49 @@ CandidateConstructor::clearInstructions() const
 std::unique_ptr<CandidateConstructor::Value>
 CandidateConstructor::calculateValue(Profiler& profiler, Token& token)
 {
-	CandidateSet tmp;
-	profiler.calculateCandidateSet(token, tmp);
-	std::wcerr << "SIZE OF CANDIDATES: " << tmp.size() << "\n";
-	return std::unique_ptr<Value>(
-			new Value{tmp, calculateInstructionsMap(token, tmp), false}
-	);
+	return std::unique_ptr<Value>(new Value(computer_, profiler, token));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CandidateConstructor::InstructionsMap
-CandidateConstructor::calculateInstructionsMap(const Token& token,
-		const CandidateSet& candidates)
+CandidateConstructor::Value::Value(Computer& computer, Profiler& profiler, const Token& token)
+	: ocrlc(token.getWOCR_lc())
+	, candidates()
 {
-	InstructionsMap instructions;
-	int total = 0;
-	for (auto c = candidates.begin(); c != candidates.end(); ++c) {
-		// ignore short words
-		if (c->getWord().length() < 4) {
-			continue;
+	CandidateSet tmp;
+	profiler.calculateCandidateSet(token, tmp);
+	for (const auto& candidate: tmp) {
+		auto instructions = calculateInstructions(computer, candidate);
+		if (not instructions.empty()) {
+			candidates.emplace_back(candidate, std::move(instructions));
 		}
-		// throw away candidates containing a hyphen
-		// Yes, there are such words in staticlex :-/
-		if (c->getWord().find( '-') != std::wstring::npos) {
-			continue;
-		}
-
-		// calculate instructions
-		std::vector<csl::Instruction> ocrInstructions;
-		auto is_unknown = c->getHistInstruction().isUnknown();
-		assert(not is_unknown or (candidates.size() == 1));
-		instructionComputer_.computeInstruction(c->getWord(),
-				token.getWOCR_lc(), &ocrInstructions, is_unknown);
-
-		// ocrInstructions is empty, if the ocr errors can be explained
-		// by std. lev. distance but not
-		// by the distance defined with the patternWeights object.
-		// In that case, drop the candidates.
-		total += int(ocrInstructions.size());
-		if(ocrInstructions.empty()) {
-			std::wcerr << "NO OCR INSTRUCTIONS\n";
-			continue;
-		}
-		instructions.emplace(c, ocrInstructions);
 	}
-	std::wcerr << "INSTRUCTIONS: " << total << " / " << instructions.size() << "\n";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+CandidateConstructor::Value::Instructions
+CandidateConstructor::Value::calculateInstructions(
+		Computer& computer, const Interpretation& cand) const
+{
+	// ignore short words
+	if (cand.getWord().length() < 4)
+		return {};
+	// throw away candidates containing a hyphen
+	// Yes, there are such words in staticlex :-/
+	if (cand.getWord().find('-') != std::wstring::npos)
+		return {};
+
+	Instructions instructions;
+	auto is_unknown = cand.getHistInstruction().isUnknown();
+	computer.computeInstruction(cand.getWord(), ocrlc, &instructions, is_unknown);
 	return instructions;
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+void
+CandidateConstructor::Value::recalculateInstructions(Computer& computer)
+{
+	for (auto& c: candidates) {
+		c.second = calculateInstructions(computer, c.first);
+	}
+}

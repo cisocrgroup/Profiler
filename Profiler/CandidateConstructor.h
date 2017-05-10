@@ -14,27 +14,33 @@ namespace OCRCorrection {
 	public:
 		using Token = Profiler::Profiler_Token;
 		using CandidateSet = csl::DictSearch::CandidateSet;
-		using InstructionsMap = std::map<
-			CandidateSet::const_iterator,
-			std::vector<csl::Instruction>
-				>;
-		struct Value {
-			const CandidateSet candidates;
-			InstructionsMap instructions;
-			bool mustRecalculateInstructions;
+		using Computer = csl::ComputeInstruction;
+		class Value {
+		private:
+			using Interpretation = csl::DictSearch::Interpretation;
+			using Instructions = std::vector<csl::Instruction>;
+
+			Value(Computer& computer, Profiler& profiler, const Token& token);
+			Instructions calculateInstructions(
+					Computer& computer, const Interpretation& i) const;
+			void recalculateInstructions(Computer& computer);
+			friend class CandidateConstructor;
+
+		public:
+			const std::wstring ocrlc;
+			std::vector<std::pair<Interpretation, Instructions>> candidates;
 		};
+
 		Value* getValue(Profiler& profiler, Token& token);
 		void connectPatternProbabilities(const csl::PatternProbabilities& pp) {
-			instructionComputer_.connectPatternProbabilities(pp);
+			computer_.connectPatternProbabilities(pp);
 		}
-		void clearInstructions() const;
+		void recalculateInstructions();
 
 	private:
 		std::unique_ptr<Value> calculateValue(Profiler& profiler, Token& token);
-		InstructionsMap calculateInstructionsMap(const Token& token,
-				const CandidateSet& candidates);
 
-		csl::ComputeInstruction instructionComputer_;
+		Computer computer_;
 		std::map<std::wstring, std::unique_ptr<Value>> values_;
 	};
 }
