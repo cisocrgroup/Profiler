@@ -42,7 +42,8 @@ namespace OCRCorrection {
 
 	    if( freqFile ) {
 		if( ! weightFile ) {
-		    throw std::runtime_error( "OCRC::FrequencyList: For initialisation, give a freqFile and a weightFile" );
+		    throw std::runtime_error( "OCRC::FrequencyList: For initialisation, "
+				    "give a freqFile and a weightFile" );
 		}
 		loadFromFile( freqFile, weightFile );
 	    }

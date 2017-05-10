@@ -96,7 +96,7 @@ namespace OCRCorrection {
 		const_iterator end() const noexcept {return e;}
 		bool touch() const noexcept {return normal() and size() > 3;}
 		bool normal() const noexcept;
-		size_t size() const noexcept {return std::distance(b, e);}
+		size_t size() const noexcept;
 		bool empty() const noexcept {return b == e;}
 		const_iterator b, e;
 	};

@@ -170,6 +170,8 @@ namespace OCRCorrection {
             csl::Stopwatch iterationTime;
 
 	std::wcout << "*** Iteration " << iterationNumber << " ***" << std::endl;
+	std::wcerr << L" STARTING OCR PROB (s:ſ): " << globalProfile_.ocrPatternProbabilities_.getWeight(csl::Pattern(L"s", L"ſ")) << "\n";
+	std::wcerr << L"STARTING HIST PROB (s:ſ): " << globalProfile_.histPatternProbabilities_.getWeight(csl::Pattern(L"s", L"ſ")) << "\n";
 
 	// static_cast< csl::PatternProbabilities >( globalProfile_.ocrPatternProbabilities_ ).print( std::wcout );
 
@@ -297,7 +299,7 @@ namespace OCRCorrection {
 		//     }
 
 
-		//     //std::wcerr << "instructionComputer_.computeInstruction( " << cand->getWord() << ", " <<token->getWOCR_lc() <<", "<<&ocrInstructions<<" )"<<std::endl; // DEBUG
+		// //std::wcerr << "instructionComputer_.computeInstruction( " << cand->getWord() << ", " <<token->getWOCR_lc() <<", "<<&ocrInstructions<<" )"<<std::endl; // DEBUG
 
 		//     auto is_unknown = cand->getHistInstruction().isUnknown();
 		//     // make shure that, if a token contains an unkown candidate,
@@ -323,7 +325,6 @@ namespace OCRCorrection {
 		// 			  Profiler_Interpretation const&  b ) const {
 		// 	    return ( (a.getHistTrace() == b.getHistTrace() ) &&
 		// 		     (a.getOCRTrace() == b.getOCRTrace() )
-
 		// 		);
 		// 	}
 		//     } myEquals;
@@ -405,7 +406,6 @@ namespace OCRCorrection {
 		// this is an ugly thing: Evaluation_Token holds a COPY of the Profiler_Token
 		//evalToken.tok_.setProbNormalizationFactor( (double)1 / (double)sumOfProbabilities );
 
-		token->setWOCRFreq( wOCRFreqlist_[token->getWOCR()] );
 
 
 		// This is the actual run through the interpretations where the profiling is done
@@ -475,6 +475,7 @@ namespace OCRCorrection {
 		    counter[L"wasProfiled"] += cand->getVoteWeight();
 
 		} // for all interpretations
+
 
 
 
@@ -695,6 +696,8 @@ namespace OCRCorrection {
 
 	std::wcerr << "Finished iteration in " << iterationTime.readSeconds() << " seconds." <<  std::endl;
 
+	std::wcerr << L" FINISH OCR PROB (s:ſ): " << globalProfile_.ocrPatternProbabilities_.getWeight(csl::Pattern(L"s", L"ſ")) << "\n";
+	std::wcerr << L"FINISH HIST PROB (s:ſ): " << globalProfile_.histPatternProbabilities_.getWeight(csl::Pattern(L"s", L"ſ")) << "\n";
     } // void doIteration
 
 

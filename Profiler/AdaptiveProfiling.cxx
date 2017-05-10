@@ -21,7 +21,7 @@ Profiler::calculateNonAdaptiveCandidateSet(const Profiler_Token& t,
 		csl::DictSearch::CandidateSet& candidates)
 {
 	// std::wcerr << "(Profiler) Calculating non adaptive profile for token "
-	// 	   << t.getWOCR() << "\n";
+	//            << t.getWOCR() << "\n";
 	dictSearch_.query(t.getWOCR_lc(), &candidates);
 	std::sort(candidates.begin(), candidates.end());
 	// for (const auto& cand: candidates) {

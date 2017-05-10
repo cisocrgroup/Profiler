@@ -77,8 +77,6 @@ namespace csl {
     template< typename MinDicType >
     void Vaam< MinDicType >::query_rec( size_t depth ) const {
 
-// 	std::wcout<<"query_rec( "<<depth<<" ):word="<<baseWord_<<std::endl; // DEBUG
-
 
 	stack_.push_back( StackItem( *this ) );
 
@@ -179,8 +177,8 @@ namespace csl {
 
 		    // check if maxNrOfPatterns_ is reached already
 			// std::wcerr << "max: " << maxNrOfPatterns_ << "\n";
-			// std::wcerr << "app: " << position->getNrOfPatternsApplied() << "\n";
-		    if( ( maxNrOfPatterns_ != Vaam::INFINITE ) && ( position->getNrOfPatternsApplied() == maxNrOfPatterns_ ) )
+			// // // std::wcerr << "app: " << position->getNrOfPatternsApplied() << "\n";
+		    if(( maxNrOfPatterns_ != Vaam::INFINITE ) && ( position->getNrOfPatternsApplied() == maxNrOfPatterns_ ) )
 			continue;
 
 
