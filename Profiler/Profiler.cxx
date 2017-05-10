@@ -4,6 +4,7 @@
 #include "./Profiler.h"
 #include "Utils/NoThousandGrouping.h"
 #include "./Profiler_Token.tcc"
+#include "./CandidateConstructor.h"
 
 namespace OCRCorrection {
 
@@ -125,7 +126,9 @@ namespace OCRCorrection {
 
 	freqList_.setHistPatternSmoothingProb( config_.histPatternSmoothingProb_ );
 
-	instructionComputer_.connectPatternProbabilities( globalProfile_.ocrPatternProbabilities_ );
+	CandidateConstructor cc;
+	cc.connectPatternProbabilities(globalProfile_.ocrPatternProbabilities_);
+	// instructionComputer_.connectPatternProbabilities(globalProfile_.ocrPatternProbabilities_);
 
 
 	//////// 1ST ITERATION ///////////////////
@@ -134,8 +137,7 @@ namespace OCRCorrection {
 
 	//                --> true/false specifies if HTML output for 1st iteration is to be written to stdout
 	bool doWriteHTML = ( config_.nrOfIterations_ == 1 );
-
-	doIteration( 1, doWriteHTML );
+	doIteration(cc, 1, doWriteHTML);
 
 	//////// 2ND AND FURTHER ITERATIONS ///////////////////
 	initGlobalOcrPatternProbs(2);
@@ -149,7 +151,8 @@ namespace OCRCorrection {
 	    // this has to be done again because the MinDic's position in memory changes
 	    freqList_.connectBaseWordFrequency( baseWordFrequencyDic_ );
 	    //                     do print in the last iteration
-	    doIteration(  iterationNr, ( iterationNr == config_.nrOfIterations_ ) );
+	    cc.clearInstructions();
+	    doIteration(cc, iterationNr, (iterationNr == config_.nrOfIterations_));
 	}
 
 
@@ -163,7 +166,7 @@ namespace OCRCorrection {
 
     }
 
-    void Profiler::doIteration( size_t iterationNumber, bool lastIteration ) {
+    void Profiler::doIteration(CandidateConstructor& cc, size_t iterationNumber, bool lastIteration) {
             csl::Stopwatch iterationTime;
 
 	std::wcout << "*** Iteration " << iterationNumber << " ***" << std::endl;
@@ -172,7 +175,6 @@ namespace OCRCorrection {
 
 	globalProfile_.dictDistribution_.clear();
 
-	csl::DictSearch::CandidateSet tempCands;
 
 	// note that the baseWordFrequency_ are of course carried to the next iteration,
 	// but in the form of a DFA. That's why this variable is local to doIteration().
@@ -244,7 +246,39 @@ namespace OCRCorrection {
                                    << stopwatch.readMilliseconds() << "ms" << std::endl;
                         stopwatch.start();
                 }
-		calculateCandidateSet(*token, tempCands);
+
+		auto value = cc.getValue(*this, *token);
+		assert(value);
+		double sumOfProbabilities = 0;
+		struct {
+			bool operator()(Profiler_Interpretation const& a,
+				Profiler_Interpretation const& b) const {
+				return ((a.getHistTrace() == b.getHistTrace()) &&
+					(a.getOCRTrace() == b.getOCRTrace())
+				);
+			}
+		} myEquals;
+		for (auto c = value->candidates.begin(); c != value->candidates.end(); ++c) {
+			auto instrs = value->instructions.find(c);
+			if (instrs == value->instructions.end())
+				continue;
+			assert(instrs != value->instructions.end());
+
+			for (auto i = instrs->second.begin(); i != instrs->second.end(); ++i) {
+				Profiler_Interpretation current = Profiler_Interpretation(*c);
+				current.setOCRTrace(*i);
+				current.setCombinedProbability(getCombinedProb(current));
+
+				if (candidates_.empty() || (!myEquals(current, candidates_.back()))) {
+					sumOfProbabilities += current.getCombinedProbability();
+					candidates_.push_back(current);
+				}
+			}
+		}
+
+		// csl::DictSearch::CandidateSet tempCands;
+		// this->calculateCandidateSet(*token, tempCands);
+
 		// tempCands.reset();
 		// //std::wcout << "Profiler:: process Token " << token->getWOCR_lc() << std::endl;
 		// dictSearch_.query( token->getWOCR_lc(), &tempCands );
@@ -254,122 +288,122 @@ namespace OCRCorrection {
 
 
 		// compute ocrTraces, values like the candProbabilities and the sum of cand-scores
-		double sumOfProbabilities = 0;
-		for( csl::DictSearch::CandidateSet::const_iterator cand = tempCands.begin(); cand != tempCands.end(); ++cand ) {
-		    std::vector< csl::Instruction > ocrInstructions;
+		// double sumOfProbabilities = 0;
+		// for( csl::DictSearch::CandidateSet::const_iterator cand = tempCands.begin(); cand != tempCands.end(); ++cand ) {
+		//     std::vector< csl::Instruction > ocrInstructions;
 
-		    if( cand->getWord().length() < 4 ) {
-			continue;
-		    }
-		    // throw away candidates containing a hyphen
-		    // Yes, there are such words in staticlex :-/
-		    if( cand->getWord().find( '-') != std::wstring::npos ) {
-			continue;
-		    }
-
-
-		    //std::wcerr << "instructionComputer_.computeInstruction( " << cand->getWord() << ", " <<token->getWOCR_lc() <<", "<<&ocrInstructions<<" )"<<std::endl; // DEBUG
-
-		    auto is_unknown = cand->getHistInstruction().isUnknown();
-		    // make shure that, if a token contains an unkown candidate,
-		    // the unkown candiate is the only candidate for this token.
-		    // a -> b = not a or b
-		    assert(not is_unknown or (tempCands.size() == 1));
-		    instructionComputer_.computeInstruction(cand->getWord(),
-				    token->getWOCR_lc(), &ocrInstructions, is_unknown);
-		    //std::wcout << "BLA: Finished" << std::endl;
+		//     if( cand->getWord().length() < 4 ) {
+		// 	continue;
+		//     }
+		//     // throw away candidates containing a hyphen
+		//     // Yes, there are such words in staticlex :-/
+		//     if( cand->getWord().find( '-') != std::wstring::npos ) {
+		// 	continue;
+		//     }
 
 
-		    // std::wcerr << cand->toString() << std::endl;
-		    //std::wcerr<<"instructionComputer_.computeInstruction( " << cand->getWord() << ", " <<token->getWOCR_lc() <<", "<<&ocrInstructions<<" )"<<std::endl; // DEBUG
-		    // ocrInstructions is empty, if the ocr errors can be explained by std. lev. distance but not
-		    // by the distance defined with the patternWeights object. In that case, drop the candidate.
-		    if( ocrInstructions.empty() ) {
-			    std::wcerr << "NO OCR INSTRUCTIONS\n";
-			continue;
-		    }
+		//     //std::wcerr << "instructionComputer_.computeInstruction( " << cand->getWord() << ", " <<token->getWOCR_lc() <<", "<<&ocrInstructions<<" )"<<std::endl; // DEBUG
 
-		    struct {
-			bool operator() ( Profiler_Interpretation const& a,
-					  Profiler_Interpretation const&  b ) const {
-			    return ( (a.getHistTrace() == b.getHistTrace() ) &&
-				     (a.getOCRTrace() == b.getOCRTrace() )
+		//     auto is_unknown = cand->getHistInstruction().isUnknown();
+		//     // make shure that, if a token contains an unkown candidate,
+		//     // the unkown candiate is the only candidate for this token.
+		//     // a -> b = not a or b
+		//     assert(not is_unknown or (tempCands.size() == 1));
+		//     instructionComputer_.computeInstruction(cand->getWord(),
+		// 		    token->getWOCR_lc(), &ocrInstructions, is_unknown);
+		//     //std::wcout << "BLA: Finished" << std::endl;
 
-				);
-			}
-		    } myEquals;
 
-		    // If the OCR instruction is ambiguous, the interp. is cloned for each possible instruction
-		    // if (is_unknown) {
-		    //         std::wcerr << "\nUNKOWN: ";
-		    //         token->origin().print(std::wcerr);
-		    //         for (const csl::Instruction& i: ocrInstructions) {
-		    //     	    std::wcerr << "inst: " << i << "\n";
-		    //         }
-		    //         std::wcerr << "curr: " << *cand << "\n";
-		    //         for (auto i = tempCands.begin();
-		    //     		    i != tempCands.end();
-		    //     		    ++i) {
-		    //     	    std::wcerr << "cand: " << *i << "\n";
-		    //         }
+		//     // std::wcerr << cand->toString() << std::endl;
+		//     //std::wcerr<<"instructionComputer_.computeInstruction( " << cand->getWord() << ", " <<token->getWOCR_lc() <<", "<<&ocrInstructions<<" )"<<std::endl; // DEBUG
+		//     // ocrInstructions is empty, if the ocr errors can be explained by std. lev. distance but not
+		//     // by the distance defined with the patternWeights object. In that case, drop the candidate.
+		//     if( ocrInstructions.empty() ) {
+		// 	    std::wcerr << "NO OCR INSTRUCTIONS\n";
+		// 	continue;
+		//     }
 
-		    // }
-		    // It's not exactly clear if this is the right thing to do!!
-		    for( std::vector< csl::Instruction >::const_iterator instruction = ocrInstructions.begin();
-			 instruction != ocrInstructions.end();
-			 ++instruction ) {
-			// std::wcerr<<"Instr: "<<*instruction << std::endl; // DEBUG
-			//     std::wcerr << "(POFILER) " << token->getWOCR_lc() << ","
-			// 	       << cand->getWord() << "," << cand->getLevDistance()
-			// 	       << "+ocr" << *instruction << "\n";
+		//     struct {
+		// 	bool operator() ( Profiler_Interpretation const& a,
+		// 			  Profiler_Interpretation const&  b ) const {
+		// 	    return ( (a.getHistTrace() == b.getHistTrace() ) &&
+		// 		     (a.getOCRTrace() == b.getOCRTrace() )
 
-			if( instruction->size() > cand->getLevDistance() ) {
-				// std::wcerr << "instruction->size(): "
-				// 	   << instruction->size() << "\n"
-				// 	   << "cand->getLevDistance(): "
-				// 	   << cand->getLevDistance() << "\n"
-				// 	   << "instructions:";
-				// for (const auto& i: *instruction) {
-				// 	std::wcerr << " " << i;
-				// }
-				// std::wcerr << "\nFOO\n";
-				continue;
-			}
+		// 		);
+		// 	}
+		//     } myEquals;
 
-			Profiler_Interpretation current =
-				Profiler_Interpretation( *cand );
-			current.setOCRTrace( *instruction );
+		//     // If the OCR instruction is ambiguous, the interp. is cloned for each possible instruction
+		//     // if (is_unknown) {
+		//     //         std::wcerr << "\nUNKOWN: ";
+		//     //         token->origin().print(std::wcerr);
+		//     //         for (const csl::Instruction& i: ocrInstructions) {
+		//     //     	    std::wcerr << "inst: " << i << "\n";
+		//     //         }
+		//     //         std::wcerr << "curr: " << *cand << "\n";
+		//     //         for (auto i = tempCands.begin();
+		//     //     		    i != tempCands.end();
+		//     //     		    ++i) {
+		//     //     	    std::wcerr << "cand: " << *i << "\n";
+		//     //         }
 
-			current.setCombinedProbability(
-					getCombinedProb(current));
+		//     // }
+		//     // It's not exactly clear if this is the right thing to do!!
+		//     for( std::vector< csl::Instruction >::const_iterator instruction = ocrInstructions.begin();
+		// 	 instruction != ocrInstructions.end();
+		// 	 ++instruction ) {
+		// 	// std::wcerr<<"Instr: "<<*instruction << std::endl; // DEBUG
+		// 	//     std::wcerr << "(POFILER) " << token->getWOCR_lc() << ","
+		// 	// 	       << cand->getWord() << "," << cand->getLevDistance()
+		// 	// 	       << "+ocr" << *instruction << "\n";
 
-			//     std::wcerr << "(Profiler) token: "
-			// 	       << token->getWOCR() << "\n";
-			//     std::wcerr << "(Profiler) current: " << current << "\n";
-			//     std::wcerr << "(Profiler) current.getOCRTrace(): "
-			// 	       << current.getOCRTrace() << "\n";
+		// 	if( instruction->size() > cand->getLevDistance() ) {
+		// 		// std::wcerr << "instruction->size(): "
+		// 		// 	   << instruction->size() << "\n"
+		// 		// 	   << "cand->getLevDistance(): "
+		// 		// 	   << cand->getLevDistance() << "\n"
+		// 		// 	   << "instructions:";
+		// 		// for (const auto& i: *instruction) {
+		// 		// 	std::wcerr << " " << i;
+		// 		// }
+		// 		// std::wcerr << "\nFOO\n";
+		// 		continue;
+		// 	}
 
-			// Here, candidates with equal hist- and OCR-Trace are avoided!
-			// See the compare-operator above
-			if( candidates_.empty() || ( ! myEquals( current, candidates_.back() ) ) ) {
-			    //if( ( iterationNumber < 2 ) || current.getCombinedProbability() > 1e-8 ) { // EXPERIMENTAL
-				sumOfProbabilities += current.getCombinedProbability();
-				candidates_.push_back( current );
-				//}
-			}
-			else {
-// 			    std::wcout << "Remove duplicate:" << std::endl
-// 				       << candidates_.back() << std::endl
-// 				       << current << std::endl;
-			}
-		    }
+		// 	Profiler_Interpretation current =
+		// 		Profiler_Interpretation( *cand );
+		// 	current.setOCRTrace( *instruction );
 
-		    // modern wins!
-		    // if(
-		    // 	cand->getInstruction().empty() && ( cand->getLevDistance() == 0 ) ) {
-		    // 	break;
-		    // }
-		}
+		// 	current.setCombinedProbability(
+		// 			getCombinedProb(current));
+
+		// 	//     std::wcerr << "(Profiler) token: "
+		// 	// 	       << token->getWOCR() << "\n";
+		// 	//     std::wcerr << "(Profiler) current: " << current << "\n";
+		// 	//     std::wcerr << "(Profiler) current.getOCRTrace(): "
+		// 	// 	       << current.getOCRTrace() << "\n";
+
+		// 	// Here, candidates with equal hist- and OCR-Trace are avoided!
+		// 	// See the compare-operator above
+		// 	if( candidates_.empty() || ( ! myEquals( current, candidates_.back() ) ) ) {
+		// 	    //if( ( iterationNumber < 2 ) || current.getCombinedProbability() > 1e-8 ) { // EXPERIMENTAL
+		// 		sumOfProbabilities += current.getCombinedProbability();
+		// 		candidates_.push_back( current );
+		// 		//}
+		// 	}
+		// 	else {
+// 		// 	    std::wcout << "Remove duplicate:" << std::endl
+// 		// 		       << candidates_.back() << std::endl
+// 		// 		       << current << std::endl;
+		// 	}
+		//     }
+
+		//     // modern wins!
+		//     // if(
+		//     // 	cand->getInstruction().empty() && ( cand->getLevDistance() == 0 ) ) {
+		//     // 	break;
+		//     // }
+		// }
 
 		token->setProbNormalizationFactor( (double)1 / (double)sumOfProbabilities );
 

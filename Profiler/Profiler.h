@@ -32,6 +32,7 @@
 #include "./FrequencyList.h"
 
 namespace OCRCorrection {
+	class CandidateConstructor;
 
     /**
      * @brief Read the {@link profiler_manual Profiler manual} to find out more about the purpose and use of the Profiler.
@@ -54,7 +55,6 @@ namespace OCRCorrection {
 
 	class Profiler_Token;
 
-    private:
 	class Profiler_Interpretation;
 
     public:
@@ -67,9 +67,9 @@ namespace OCRCorrection {
 	 */
 	typedef std::vector< OCRCorrection::Profiler::Profiler_Token > Document_t;
 
-    private:
 
 #include "./Profiler_Interpretation.h"
+    private:
 	class Evaluation;
 	class Evaluation_Token;
 	class HTMLWriter;
@@ -213,10 +213,11 @@ namespace OCRCorrection {
 	}
 
 
-    private:
+    public:
 	// Adaptive Profiling
 	void calculateCandidateSet(const Profiler_Token& t,
 			csl::DictSearch::CandidateSet& candidates);
+    private:
 	void calculateAdaptiveCandidateSet(const Profiler_Token& t,
 			csl::DictSearch::CandidateSet& candidates);
 	void calculateNonAdaptiveCandidateSet(const Profiler_Token& t,
@@ -234,7 +235,8 @@ namespace OCRCorrection {
 	/**
 	 * @brief Execute one iteration of the profiling process.
 	 */
-	void doIteration( size_t iterationNumber, bool lastIteration = false );
+	void doIteration(CandidateConstructor& cc, size_t iterationNumber,
+			bool lastIteration = false );
 
 	/**
 	 * @brief Computes the combined probability for a candidate interpretation.
@@ -282,7 +284,7 @@ namespace OCRCorrection {
 	/**
 	 * @brief This module handles the computation of the ocrInstructions via dynamic programming.
 	 */
-	csl::ComputeInstruction instructionComputer_;
+	// csl::ComputeInstruction instructionComputer_;
 
 	/**
 	 * @brief During a run through the text, histCounter_ accumulates the necessary statistics related to
@@ -345,7 +347,6 @@ namespace OCRCorrection {
 	static bool sortBySecond( std::pair< csl::Pattern, double > const& a, std::pair< csl::Pattern, double > const& b ) {
 	    return ( a.second > b.second ); // reverse ordering
 	}
-
 
 	class Configuration {
 	public:

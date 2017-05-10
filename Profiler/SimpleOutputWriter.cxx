@@ -41,11 +41,11 @@ SimpleOutputWriter::writeNormalToken(const Token& token) const
 	Candidates candidates(token);
 	os_ << "@" << token.getWOCR_lc() << "\n";
 	for (const auto& cand: candidates) {
-		os_ << cand.getWord() << ":" << cand.getBaseWord()
+		os_ << cand.getWord() << ":" << cand.getBaseWord() << "+"
 		    << cand.getInstruction()
 		    << ",dist=" << cand.getLevDistance()
 		    << "(" << cand.getDictModule().getName() << ")"
-		    << ",ocr=[" << cand.getOCRTrace() << "]"
+		    << ",ocr=" << cand.getOCRTrace()
 		    << ",weight=" << cand.getVoteWeight() << "\n";
 	}
 }
