@@ -43,21 +43,22 @@ int main( int argc, char const** argv ) {
 	int k = 0;
 	csl::MinDic<> const* minDic = 0;
 	csl::FBDic<>* fbdic = 0; // this one is loaded in case a fbdic is passed to the program
-
-	// In case a .fbdic file is passed, open it and use the FWDic
-	if( ( options.getArgument( 0 ).size() >= 5 ) && options.getArgument( 0 ).substr( options.getArgument( 0 ).size() - 5 ) == "fbdic" ) {
-	    fbdic= new csl::FBDic<>( options.getArgument( 0 ).c_str() );
-	    minDic = &( fbdic->getFWDic() );
-	}
-	else {
-	    minDic = new csl::MinDic<>( options.getArgument( 0 ).c_str() );
-	}
+	csl::MSMatch<>* msmatch = 0;
 
 	if (options.hasOption("k")) {
 		k = std::stoi(options.getOption("k"));
 	}
+	if (k > 0) {
+		msmatch = new csl::MSMatch<>(k, options.getArgument(0).c_str());
+	// In case a .fbdic file is passed, open it and use the FWDic
+	} else if ((options.getArgument(0).size() >= 5) &&
+			options.getArgument(0).substr(options.getArgument(0).size() - 5) == "fbdic") {
+	    fbdic= new csl::FBDic<>( options.getArgument( 0 ).c_str() );
+	    minDic = &( fbdic->getFWDic() );
+	} else {
+	    minDic = new csl::MinDic<>( options.getArgument( 0 ).c_str() );
+	}
 
-	csl::MSMatch<> msmatch(k, options.getArgument(0).c_str());
 	MyCandidateReceiver r;
 
 	std::wstring query;
@@ -68,17 +69,17 @@ int main( int argc, char const** argv ) {
 	    }
 
 	    int ann = 0;
-	    if (k == 0) {
+	    if (k <= 0) {
 		    if( minDic->lookup( query.c_str(), &ann ) ) {
 			std::wcout << ann << std::endl;
 		    }
-		    else std::wcout <<"-1" << std::endl;
+		    else std::wcout <<std::endl;
 	    } else {
-		    msmatch.query(query.c_str(), r);
+		    msmatch->query(query.c_str(), r);
 		    if (r.found())
-			    std::wcout << "1\n";
+			    std::wcout << ann << std::endl;
 		    else
-			    std::wcout << "-1\n";
+			    std::wcout << std::endl;
 		    r.reset();
 	    }
 	}
