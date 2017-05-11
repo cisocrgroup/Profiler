@@ -14,9 +14,17 @@ CandidateConstructor::getValue(Profiler& profiler, Token& token)
 		++n;
 		f = values_.emplace_hint(f, token.getWOCR_lc(),
 				calculateValue(profiler, token));
-		std::wcerr << "NEW VALUE: " << token.getWOCR_lc()
-			   << " CANDIATES: " << f->second->candidates.size()
-			   << " (new: " << n << ", old: " << o << ")\n";
+		// std::wcerr << "NEW VALUE: " << token.getWOCR_lc()
+		// 	   << " CANDIATES: " << f->second->candidates.size()
+		// 	   << " (new: " << n << ", old: " << o << ")\n";
+		// for (const auto& c: f->second->candidates) {
+		// 	std::wcerr << f->second->ocrlc << ":"
+		// 		   << c.first;
+		// 	for (const auto& i: c.second) {
+		// 		std::wcerr << ":" << i;
+		// 	}
+		// 	std::wcerr << "\n";
+		// }
 	} else {
 		++o;
 	}
@@ -50,30 +58,37 @@ CandidateConstructor::Value::Value(Computer& computer, Profiler& profiler, const
 	CandidateSet tmp;
 	profiler.calculateCandidateSet(token, tmp);
 	for (const auto& candidate: tmp) {
-		auto instructions = calculateInstructions(computer, candidate);
-		if (not instructions.empty()) {
+		Instructions instructions;
+		calculateInstructions(computer, candidate, instructions);
+		if (not instructions.empty())
 			candidates.emplace_back(candidate, std::move(instructions));
-		}
 	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CandidateConstructor::Value::Instructions
+void
 CandidateConstructor::Value::calculateInstructions(
-		Computer& computer, const Interpretation& cand) const
+		Computer& computer, const Interpretation& cand,
+		Instructions& instructions) const
 {
+	instructions.clear();
+	assert(instructions.empty());
 	// ignore short words
 	if (cand.getWord().length() < 4)
-		return {};
+		return;
 	// throw away candidates containing a hyphen
 	// Yes, there are such words in staticlex :-/
 	if (cand.getWord().find('-') != std::wstring::npos)
-		return {};
+		return;
 
-	Instructions instructions;
 	auto is_unknown = cand.getHistInstruction().isUnknown();
 	computer.computeInstruction(cand.getWord(), ocrlc, &instructions, is_unknown);
-	return instructions;
+	auto e = std::remove_if(begin(instructions), end(instructions),
+		[&](const csl::Instruction& i) {
+			return i.size() > cand.getLevDistance();
+		}
+	);
+	instructions.erase(e);
 }
 
 
@@ -82,6 +97,6 @@ void
 CandidateConstructor::Value::recalculateInstructions(Computer& computer)
 {
 	for (auto& c: candidates) {
-		c.second = calculateInstructions(computer, c.first);
+		calculateInstructions(computer, c.first, c.second);
 	}
 }

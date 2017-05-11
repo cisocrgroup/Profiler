@@ -151,7 +151,10 @@ namespace OCRCorrection {
 	    // this has to be done again because the MinDic's position in memory changes
 	    freqList_.connectBaseWordFrequency( baseWordFrequencyDic_ );
 	    //                     do print in the last iteration
+	    csl::Stopwatch stopwatch;
 	    cc.recalculateInstructions();
+	    std::wcerr << "Recalculation of Instructions took: "
+		       << stopwatch.readMilliseconds() << "ms\n";
 	    doIteration(cc, iterationNr, (iterationNr == config_.nrOfIterations_));
 	}
 
@@ -170,8 +173,6 @@ namespace OCRCorrection {
             csl::Stopwatch iterationTime;
 
 	std::wcout << "*** Iteration " << iterationNumber << " ***" << std::endl;
-	std::wcerr << L" STARTING OCR PROB (s:ſ): " << globalProfile_.ocrPatternProbabilities_.getWeight(csl::Pattern(L"s", L"ſ")) << "\n";
-	std::wcerr << L"STARTING HIST PROB (s:ſ): " << globalProfile_.histPatternProbabilities_.getWeight(csl::Pattern(L"s", L"ſ")) << "\n";
 
 	// static_cast< csl::PatternProbabilities >( globalProfile_.ocrPatternProbabilities_ ).print( std::wcout );
 
@@ -696,8 +697,6 @@ namespace OCRCorrection {
 
 	std::wcerr << "Finished iteration in " << iterationTime.readSeconds() << " seconds." <<  std::endl;
 
-	std::wcerr << L" FINISH OCR PROB (s:ſ): " << globalProfile_.ocrPatternProbabilities_.getWeight(csl::Pattern(L"s", L"ſ")) << "\n";
-	std::wcerr << L"FINISH HIST PROB (s:ſ): " << globalProfile_.histPatternProbabilities_.getWeight(csl::Pattern(L"s", L"ſ")) << "\n";
     } // void doIteration
 
 

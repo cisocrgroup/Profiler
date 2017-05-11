@@ -21,8 +21,9 @@ namespace OCRCorrection {
 			using Instructions = std::vector<csl::Instruction>;
 
 			Value(Computer& computer, Profiler& profiler, const Token& token);
-			Instructions calculateInstructions(
-					Computer& computer, const Interpretation& i) const;
+			void calculateInstructions(
+					Computer& computer, const Interpretation& i,
+					Instructions& instructions) const;
 			void recalculateInstructions(Computer& computer);
 			friend class CandidateConstructor;
 
