@@ -181,7 +181,7 @@ namespace csl {
 
 	    inline bool operator==( State const& other ) {
 		return( ( myGraph_ == other.myGraph_  ) && // compare pointers
-			( stateIndex_ == stateIndex_ ) );
+			( stateIndex_ == other.stateIndex_ ) );
 	    }
 
 	    inline State& operator=( State const& other ) {
