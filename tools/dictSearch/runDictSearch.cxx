@@ -6,16 +6,14 @@
 
 // uncomment this if you want so suppress output for the words
 //#define CSL_DICTSEARCH_PRINTNONE 1;
-#define CSL_QUERY 1
+static void output(const std::wstring& query, csl::DictSearch& dictSearch, csl::DictSearch::CandidateSet& candSet, bool printend, bool machineReadable);
 
 void printHelp() {
     std::wcerr<< std::endl
 	      << "Use like: runDictSearch"<<std::endl
 	      << "--config=<configFile>         configuration file (obligatory)" << std::endl
 	      << "--machineReadable             Print (even more) machine-readable output, that is, all answers in one line, separated by '|'" << std::endl
-#ifdef CSL_QUERY
 	      << "--query=query                 specify query token" << std::endl
-#endif // CSL_QUERY
 	      << std::endl<<std::endl;
 }
 
@@ -27,9 +25,7 @@ int main( int argc, char const** argv ) {
     options.specifyOption( "help", csl::Getopt::VOID );
     options.specifyOption( "config", csl::Getopt::STRING );
     options.specifyOption( "machineReadable", csl::Getopt::VOID );
-#ifdef CSL_QUERY
     options.specifyOption( "query", csl::Getopt::STRING );
-#endif // CSL_QUERY
 
     options.getOptionsAsSpecified( argc, argv );
 
@@ -59,12 +55,18 @@ int main( int argc, char const** argv ) {
 	machineReadable = true;
     }
 
-#ifdef CSL_QUERY
     if (options.hasOption("query")) {
 	    query = OCRCorrection::Utils::utf8(options.getOption("query"));
-#else // CSL_QUERY
-    while( std::getline( std::wcin, query ).good() ) {
-#endif // CLS_QUERY
+	    output(query, dictSearch, candSet, false, machineReadable);
+    } else {
+	    while (std::getline(std::wcin, query)) {
+		    output(query, dictSearch, candSet, true, machineReadable);
+	    }
+    }
+}
+
+void output(const std::wstring& query, csl::DictSearch& dictSearch, csl::DictSearch::CandidateSet& candSet, bool printend, bool machineReadable)
+{
 	candSet.clear(); // empty the CandidateSet
 	dictSearch.query( query, &candSet ); // execute lookup
 
@@ -111,8 +113,9 @@ int main( int argc, char const** argv ) {
 			}
 		    }
 	    }
+	    if (printend)
+		    std::wcout << "--END--" << std::endl;
 	}
 #endif
     }
 
-}
