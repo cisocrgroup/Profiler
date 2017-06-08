@@ -70,7 +70,6 @@ void output(const std::wstring& query, csl::DictSearch& dictSearch, csl::DictSea
 	candSet.clear(); // empty the CandidateSet
 	dictSearch.query( query, &candSet ); // execute lookup
 
-#ifndef CSL_DICTSEARCH_PRINTNONE
 	std::sort( candSet.begin(), candSet.end() ); // sort candidates following a very coarse order relation
 	// std::wcout << query << "\n";
 	if( candSet.empty() ) {
@@ -116,6 +115,5 @@ void output(const std::wstring& query, csl::DictSearch& dictSearch, csl::DictSea
 	    if (printend)
 		    std::wcout << "--END--" << std::endl;
 	}
-#endif
     }
 
