@@ -18,7 +18,7 @@ namespace OCRCorrection {
 
 	/**
 	 * @brief writes a DocXML representation of the given document t othe given output stream
-	 * 
+	 *
 	 * @param[in]  doc     a const reference to a document
 	 * @param[out] xml_out a reference to an output stream
 	 *
@@ -32,29 +32,31 @@ namespace OCRCorrection {
 
 
     private:
-
-    };
+	using PageIterator = Document::const_PageIterator;
+	using TokenIterator = Document::const_iterator;
+	void writePages(PageIterator b, PageIterator e, size_t& count, std::wostream& xml_out) const;
+	void writeTokens(TokenIterator b, TokenIterator e, size_t& count, std::wostream& xml_out) const;
 
     inline std::wstring xml_escape( std::wstring const& input ) {
 	std::wstring str = input;
 	size_t pos = 0;
 	while( ( pos = str.find( '&', pos ) ) != std::wstring::npos ) {
-	    str.replace( pos, 1, L"&amp;" ); 
+	    str.replace( pos, 1, L"&amp;" );
 	    ++pos;
 	}
 	pos = 0;
 	while( ( pos = str.find( '>', pos ) ) != std::wstring::npos ) {
-	    str.replace( pos, 1, L"&gt;" ); 
+	    str.replace( pos, 1, L"&gt;" );
 	    ++pos;
 	}
 	pos = 0;
 	while( ( pos = str.find( '<', pos ) ) != std::wstring::npos ) {
-	    str.replace( pos, 1, L"&lt;" ); 
+	    str.replace( pos, 1, L"&lt;" );
 	    ++pos;
 	}
 	return str;
     }
-    
+
 } // eon
 
 #endif
