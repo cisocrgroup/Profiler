@@ -21,14 +21,14 @@ namespace OCRCorrection {
 
 	size_t tokenCount = 0;
 	if( ! doc.hasPages() ) {
-		writeTokens(doc.tokensBegin(), doc.tokensEnd(), tokenCount, xml_out)
+		writeTokens(doc.begin(), doc.end(), tokenCount, xml_out);
 	} else {
-		writePages(doc.pagesBegin(), doc.pagesEnd(), tokenCount, xml_out)
+		writePages(doc.pagesBegin(), doc.pagesEnd(), tokenCount, xml_out);
 	}
 	xml_out << "</document>" << std::endl;
     }
-    void DocXMLWriter::writePages(PageIterator b, PageIterator e, size_t& tokenCount std::wostream& xml_out) const {
-	    for (auto pageIt = b; pageit != e; ++pageIt) {
+    void DocXMLWriter::writePages(PageIterator b, PageIterator e, size_t& tokenCount, std::wostream& xml_out) const {
+	    for (auto pageIt = b; pageIt != e; ++pageIt) {
 		    xml_out << "<page imageFile=\"" << Utils::utf8(pageIt->getImageFile()) /*csl::CSLLocale::string2wstring( pageIt->getImageFile() )*/ << "\" sourceFile=\"" << Utils::utf8(pageIt->getSourceFile()) /*csl::CSLLocale::string2wstring( pageIt->getSourceFile() )*/<< "\">" <<std::endl;
 			writeTokens(pageIt->begin(), pageIt->end(), tokenCount, xml_out);
 		    xml_out << "</page>" << std::endl;
@@ -36,7 +36,7 @@ namespace OCRCorrection {
     }
 
     void DocXMLWriter::writeTokens(TokenIterator b, TokenIterator e, size_t& tokenCount, std::wostream& xml_out) const {
-	    for( Document::const_iterator token = pageIt->begin(); token != pageIt->end(); ++token ) {
+	    for( Document::const_iterator token = b; token != e; ++token ) {
 		if( token->getWOCR() == L" " ) {
 		    xml_out
 			<< "<token token_id=\"" << tokenCount << "\" special_seq=\"space\" isNormal=\"false\">" << std::endl

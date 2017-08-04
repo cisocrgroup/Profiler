@@ -36,6 +36,7 @@ namespace OCRCorrection {
 	using TokenIterator = Document::const_iterator;
 	void writePages(PageIterator b, PageIterator e, size_t& count, std::wostream& xml_out) const;
 	void writeTokens(TokenIterator b, TokenIterator e, size_t& count, std::wostream& xml_out) const;
+    };
 
     inline std::wstring xml_escape( std::wstring const& input ) {
 	std::wstring str = input;
