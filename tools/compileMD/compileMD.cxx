@@ -63,10 +63,10 @@ int main(int argc, char const** argv) {
 	    //   t.printCells();
 	    return EXIT_SUCCESS;
 
-	} catch ( csl::exceptions::cslException ex ) {
+	} catch ( const csl::exceptions::cslException& ex ) {
 	    std::wcout<<"compileMD failed: "<<ex.what()<<std::endl;
 	    return EXIT_FAILURE;
-	} catch ( std::exception ex ) {
+	} catch ( const std::exception& ex ) {
 	    std::wcout<<"compileMD failed: "<<ex.what()<<std::endl;
 	    return EXIT_FAILURE;
 	}
