@@ -61,6 +61,8 @@ namespace OCRCorrection {
                         return utf8(str.data(), str.size());
                 }
                 static std::wstring utf8(const char *str) {
+			if (not str)
+				return std::wstring();
                         return utf8(str, strlen(str));
                 }
                 static std::wstring utf8(const char *str, size_t n);
