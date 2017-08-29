@@ -150,7 +150,7 @@ namespace OCRCorrection {
     void DocXMLWriter::writeAdaptiveTokens(const Document& doc, std::wostream& xml_out) const {
 	xml_out << "<adaptiveTokens>\n";
 	for (const auto& token: doc.getAdaptiveTokens()) {
-		xml_out << "<token>" << xml_escape(token) << "</token>\n";
+		xml_out << "<adaptiveToken>" << xml_escape(token) << "</adaptiveToken>\n";
 	}
 	xml_out << "</adaptiveTokens>\n";
     }
