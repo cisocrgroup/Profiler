@@ -25,7 +25,8 @@ namespace csl {
 	    return it->second;
 
 	// Smart merge filter
-	if( smartMerge_ ) {
+	//
+	if( smartMerge_ and not pattern.isUnknown()) {
 	    if( pattern.getLeft().size() > 0 && ( pattern.getRight().find( pattern.getLeft() ) != std::wstring::npos )  ) return UNDEF;
 	    if( pattern.getRight().size() > 0 && ( pattern.getLeft().find( pattern.getRight() ) != std::wstring::npos )  ) return UNDEF;
 	}

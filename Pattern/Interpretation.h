@@ -29,7 +29,7 @@ namespace csl {
 	 * @brief set up a comparison based on the sum of levenshtein or pattern edits.
 	 *
 	 * Give the levenshtein operations a marginally higher punishment, so that
-	 * if the sums are equal, the one with less lev. operations and more pattern 
+	 * if the sums are equal, the one with less lev. operations and more pattern
 	 * operations will win.
 	 */
 	bool operator<( Interpretation const& other ) const;
@@ -50,7 +50,8 @@ namespace csl {
 	std::wstring const& getWord() const;
 
 	/**
-	 * @brief returns the so-called @c baseWord from the dictionary, that was changed into a variant with the given @c Instruction
+	 * @brief returns the so-called @c baseWord from the dictionary,
+	 * that was changed into a variant with the given @c Instruction
 	 *
 	 * If the instruction is empty, then @c getWord() == @c getBaseWord()
 	 */
@@ -67,7 +68,7 @@ namespace csl {
 	size_t getBaseWordScore() const;
 
 	/**
-	 * @brief returns the instruction that was used to turn @c baseWord into @c word 
+	 * @brief returns the instruction that was used to turn @c baseWord into @c word
 	 * @deprecated Use getHistInstruction instead!
 	 */
 	Instruction& getInstruction();
@@ -87,9 +88,9 @@ namespace csl {
 	 * @brief const version of getHistInstruction()
 	 */
 	Instruction const& getHistInstruction() const;
-	
+
 	// @} // END Getters
-	
+
 	/**
 	 * @name Setters
 	 */
@@ -117,11 +118,11 @@ namespace csl {
 	 */
 	// @{
 	/**
-	 * @brief prints a string-representation of the interpretation to stdout or to another std::wstream 
+	 * @brief prints a string-representation of the interpretation to stdout or to another std::wstream
 	 * specified as argument.
 	 */
 	void print( std::wostream& os = std::wcout ) const;
-	
+
 	std::wstring toString() const;
 
 	/**
@@ -145,7 +146,7 @@ namespace csl {
 	Instruction instructionOCR_;
 
 	/**
-	 * @brief 
+	 * @brief
 	 *
 	 */
 	size_t levDistance_;
@@ -158,7 +159,7 @@ namespace csl {
 	int baseWordScore_;
 
 
-	    
+
     }; // class Interpretation
 
 

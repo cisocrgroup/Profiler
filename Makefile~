@@ -1,6 +1,6 @@
-DESTDIR ?= 
+DESTDIR ?= /usr/local
+BNDIR = /bin
 PREFIX ?= /usr/local/
-BINDIR ?= $(PREFIX)/bin
 
 PROFILER=build/bin/profiler
 COMPILE=build/bin/compileFBDic
@@ -20,5 +20,5 @@ clean:
 
 .PHONY: install
 install: $(PROFILER) $(COMPILE) $(TRAIN)
-	install -d $(DESTDIR)$(PREFIX)/bin
-	install $^ $(DESTDIR)$(PREFIX)/bin
+	install -d $(DESTDIR)$(BINDIR)
+	install $^ $(DESTDIR)$(BINDIR)

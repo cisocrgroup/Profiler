@@ -4,6 +4,7 @@
 #include<vector>
 #include<string>
 #include<algorithm>
+#include <memory>
 
 #include <LevFilter/LevFilter.h>
 #include <Vaam/Vaam.h>
@@ -11,6 +12,7 @@
 #include <Candidate/Candidate.h>
 #include "./Character.h"
 #include "./TokenImageInfoBox.h"
+#include "./Metadata.h"
 
 /******************************************************/
 /***********  IMPORTANT *******************************/
@@ -158,6 +160,10 @@ namespace OCRCorrection {
 	 * @return true iff token is marked as normal
 	 */
 	inline bool isNormal() const;
+
+	bool isSpace() const {
+		return std::all_of(begin(getWOCR()), end(getWOCR()), iswspace);
+	}
 
 	/**
 	 * @brief returns true iff token was found suspicious.
@@ -336,6 +342,23 @@ namespace OCRCorrection {
 
 	CharIterator charEnd() {
 	    return characters_.end();
+	}
+
+	Metadata& init_metadata() {
+		metadata_.reset(new Metadata());
+		return *metadata_;
+	}
+	const Metadata& metadata() const noexcept {
+		return *metadata_;
+	}
+	Metadata& metadata() noexcept {
+		return metadata_ ? *metadata_ : init_metadata();
+	}
+	bool has_metadata(const std::string& s) const noexcept {
+		return metadata_ ? metadata_->has(s) : false;
+	}
+	void erase_metadata(const std::string& s) const noexcept {
+		if (metadata_) metadata_->erase(s);
 	}
 
 	//@}
@@ -517,11 +540,18 @@ namespace OCRCorrection {
 
 	};
 
-	class CandidateIterator {
+	class CandidateIterator:
+		public std::iterator <std::forward_iterator_tag, Candidate> {
 	public:
 	    CandidateIterator( CandidateChain* pos ) :
 		pos_( pos ) {
 
+	    }
+
+	    CandidateIterator operator++(int) {
+		auto tmp = *this;
+		operator++();
+		return tmp;
 	    }
 
 	    CandidateIterator& operator++() {
@@ -529,7 +559,11 @@ namespace OCRCorrection {
 		return *this;
 	    }
 
-	    bool operator !=( CandidateIterator const& other ) {
+	    bool operator==(CandidateIterator const& other) const {
+		    return pos_ == other.pos_;
+	    }
+
+	    bool operator !=( CandidateIterator const& other ) const {
 		return pos_ != other.pos_;
 	    }
 
@@ -647,8 +681,6 @@ namespace OCRCorrection {
 	 */
 	std::wstring externalId_;
 
-
-
 	/**
 	 * @brief Holds the index of the Token in its document.
 	 */
@@ -683,8 +715,6 @@ namespace OCRCorrection {
 	 */
 	csl::DictSearch::iDictModule const* currentDictModule_;
 
-
-
 	/**
 	 * @brief The list of candidates is provided by the Profiler
 	 *
@@ -695,6 +725,12 @@ namespace OCRCorrection {
 	 * @brief specifies the nr of cands stored in candidates_
 	 */
 	size_t nrOfCandidates_;
+    private:
+	/**
+	 * Pointer to a Metadata instance
+	 */
+	std::unique_ptr<Metadata> metadata_;
+
 
     }; // class Token
 

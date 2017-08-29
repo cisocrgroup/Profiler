@@ -25,7 +25,7 @@ namespace csl {
      * @see csl::LevDEA, csl::LevFilter, csl::LevFilter::CandidateReceiver
      *
      * @todo At the moment the levenshtein threshold can only be set once at construction. It should be easy to provide
-     *       some method like setDistance() to change this anytime. 
+     *       some method like setDistance() to change this anytime.
      * @todo remove fixed-length string components. Change interface to std::wstring
      *
      * @author Ulrich Reffle, <uli@cis.uni-muenchen.de>
@@ -42,7 +42,7 @@ namespace csl {
 
 	/**
 	 * @brief Create an MSMatch object with a levenshtein threshold \c k and a path specifying a file with a compiled FBDic.
-	 * 
+	 *
 	 * @param k the levenshtein threshold: MSMatch will extract candidates with distance lower or equal to \c k
 	 * @param FBDicFile a path specifying a file with a compiled FBDic
 	 */
@@ -51,14 +51,17 @@ namespace csl {
 	inline ~MSMatch();
 
 	/**
-	 * @brief returns the highest threshold to be set. The setting of a higher distance (in the constructor or with setDidtance() ) will 
+	 * @brief returns the highest threshold to be set. The setting of a higher distance (in the constructor or with setDidtance() ) will
 	 * trigger an exception
 	 */
 	inline static size_t getMaximumDistance() {
 	    return 3;
 	}
 
-	inline void setFBDic( FBDic<> const& fbDic );
+	inline void setFBDic( FBDic<> const& fbDic ) {
+		fbDic_ = &fbDic;
+		dictFW_ =  &( fbDic_->getFWDic() );
+    	}
 
 	inline void setDistance( size_t dist ) {
 	    k_ = dist;

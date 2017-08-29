@@ -16,7 +16,7 @@ namespace csl {
 	}
 
 	dictBW_ = 0;
- 
+
 	levDEASecond_ = new LevDEA( k_ );
     }
 
@@ -37,7 +37,7 @@ namespace csl {
 	levDEAFirst_ = new LevDEA( 0 );
 	levDEASecond_ = new LevDEA( 0 );
     }
-    
+
     template< MSMatchMode Mode >
     inline MSMatch< Mode >::~MSMatch() {
     }
@@ -96,12 +96,12 @@ namespace csl {
 	    CandidateMap::iterator pos = results_.find( wordCorrectDir );
 	    if( pos == results_.end() ) {
 		// printf( "MATCH FIRST TIME :%ls, dist is %d\n", wordCorrectDir, levDistance ); // DEBUG
-		results_.insert( std::pair< std::wstring, std::pair< size_t, int > >( 
-				     std::wstring( wordCorrectDir ), 
-				     std::pair< size_t, int >( 
-					 levDistance, 
-					 dictFW_->getAnnotation( perfHashValue ) 
-					 ) 
+		results_.insert( std::pair< std::wstring, std::pair< size_t, int > >(
+				     std::wstring( wordCorrectDir ),
+				     std::pair< size_t, int >(
+					 levDistance,
+					 dictFW_->getAnnotation( perfHashValue )
+					 )
 				     )
 		    );
 	    }
@@ -120,7 +120,7 @@ namespace csl {
 //	    printf( "word is %s, dicpos is %d, Try with %c(%d)\n", word_, dicPos, alph_.decode( *c ), *c );
 	    if( ( newLevPos = levDEASecond_->walk( levPos, *c ) ).isValid() ) {
 		newDicPos = curDict_->walk( dicPos, *c );
-		
+
 
 		assert( newDicPos != 0 ); // the transition always exists
 		word_[depth] = *c;
@@ -136,6 +136,7 @@ namespace csl {
 
     template<>
     inline void MSMatch< FW_BW >::intersectFirst( int dicPos, LevDEA::Pos levPos, int depth ) {
+	    // std::wcerr << "intersectFirst; depth = " << depth << "\n";
 	static int newDicPos;
 	static LevDEA::Pos newLevPos;
 
@@ -143,12 +144,13 @@ namespace csl {
 	// with the same state of the dict and the start state of the LevDEA
 	levDistanceFirst_ = levDEAFirst_->getDistance( levPos );
 	if( levDistanceFirst_ >= minDistFirst_ ) {
-	    // printf( "FOUND FIRST:%ls, dist of 1st part is %d\n", word_, levDistanceFirst_ );// DEBUG
+		// std::wcerr << "FOUND FIRST: " << word_ << ", dist of 1st part is " << levDistanceFirst_ << "\n";
 	    intersectSecond( dicPos, LevDEA::Pos( 0, 0 ), depth );
 	}
 
 
 	const wchar_t* c = curDict_->getSusoString( dicPos );
+	// std::wcerr << "SUSO: " << c << "\n";
 	for( ; *c; ++c ) {
 	    if( ( newLevPos = levDEAFirst_->walk( levPos, *c ) ).isValid() ) {
 		newDicPos = curDict_->walk( dicPos, *c );
@@ -171,7 +173,7 @@ namespace csl {
 	    results_.insert( std::pair< std::wstring, std::pair< size_t, int > >( std::wstring( pattern_ ), std::pair< size_t, int >( 0, ann ) ) );
 	}
     }
-    
+
     template<>
     inline void MSMatch< FW_BW >::queryCases_1() {
 	uint_t pos = 0;
@@ -200,11 +202,11 @@ namespace csl {
 	    intersectSecond( pos, LevDEA::Pos( 0, 0 ), wcslen( patRightRev_ ) );
  	}
     }
-    
+
     template<>
     inline void MSMatch< FW_BW >::queryCases_2() {
 	uint_t pos = 0;
-	
+
 //	printf( "0 | 0,1,2 errors\n" );
 	// 0 | 0,1,2 errors
  	reverse_ = false;
@@ -254,10 +256,12 @@ namespace csl {
  	curDict_ = dictFW_;
 	// load pattern outside the if-statement: we need it anyways in the next case
 	levDEASecond_->loadPattern( patRight_ );
+	// std::wcerr << "patRight: " << patRight_ << "\n";
+	// std::wcerr << "patLeft: " << patLeft_ << "\n";
  	if( ( pos = curDict_->walkStr( curDict_->getRoot(), patLeft_ ) ) ) {
 	    levDistanceFirst_ = 0;
  	    wcscpy( word_, patLeft_ );
-	    // printf( "FOUND FIRST:%ls, dist of 1st part is 0\n", word_ );
+	    // std::wcerr << "FOUND FIRST: " << word_ << ", dist of 1st part is 0\n";
 	    minDistSecond_ = 0;
 	    levDEASecond_->setDistance( 3 );
  	    intersectSecond( pos, LevDEA::Pos( 0, 0 ), wcslen( patLeft_ ) );
@@ -282,10 +286,10 @@ namespace csl {
 	if ( ( pos = curDict_->walkStr( curDict_->getRoot(), patRightRev_ ) ) ) {
 	    levDistanceFirst_ = 0;
 	    wcscpy( word_, patRightRev_ );
-	    //printf( "FOUND FIRST:%ls, dist of 1st part is 0\n", word_ );
+	    // std::wcerr << "FOUND FIRST: " << word_ << ", dist of 1st part is 0\n";
 	    levDEASecond_->setDistance( 3 );
 	    minDistSecond_ = 2;
-	    
+
 	    intersectSecond( pos, LevDEA::Pos( 0, 0 ), wcslen( patRightRev_ ) );
 	}
 
@@ -303,7 +307,7 @@ namespace csl {
 
 
 
-    
+
 
     template<>
     inline void MSMatch< STANDARD >::intersect( int dicPos, LevDEA::Pos levPos, int depth ) {
@@ -319,7 +323,7 @@ namespace csl {
 		// print w if node is final in dic and lev;
 		if( dictFW_->isFinal( newDicPos ) && curLevDEA_->isFinal( newLevPos ) ) {
 		    word_[depth+1] = 0;
-		    
+
 		    // push word and annotated value into the output list
 		    // follow the word through the automaton once more to get the perfect hashing value
 		    static size_t perfHashValue; static uint_t dicPos2;
@@ -339,10 +343,9 @@ namespace csl {
     template<>
     inline bool MSMatch< STANDARD >::query( const wchar_t* pattern, CandidateReceiver& candReceiver ) {
 	if( ! dictFW_ ) throw exceptions::LogicalError( "csl::MSMatch< STANDARD >::query: Method called without a dictionary being available" );
-
 	candReceiver_ = &candReceiver;
 	wcscpy( pattern_, pattern );
-	
+
 	curLevDEA_ = levDEASecond_;
 	curLevDEA_->setDistance( k_ );
 	curLevDEA_->loadPattern( pattern );
@@ -361,7 +364,7 @@ namespace csl {
 	}
 
 	candReceiver_ = &candReceiver; // is not necessary at the moment
-	
+
 	// std::wcout << "query=" << pattern << std::flush;
 	// std::wcout << ",results=" << &results_ << std::flush;
 	// std::wcout << ",size=" << results_.size() << std::endl;
@@ -385,13 +388,13 @@ namespace csl {
 	// split pattern into 2 halves
 	size_t patLength = wcslen( pattern_ );
 	size_t patCenter = (size_t) ( patLength / 2 );
-	size_t cLeft = 0, cRight = 0;	
+	size_t cLeft = 0, cRight = 0;
 	for ( size_t i = 0; i < patLength; ++i ) {
 	    if( i < patCenter ) patLeft_[cLeft++] = pattern_[i];
 	    else patRight_[cRight++] = pattern_[i];
 	}
 	patLeft_[cLeft] = patRight_[cRight] = 0;
-	
+
 	// reverse patterns
 	for( int i = cLeft - 1, iRev = 0; i >=0; --i, ++iRev ) patLeftRev_[iRev] = patLeft_[i];
 	for( int i = cRight - 1, iRev = 0; i >=0; --i, ++iRev ) patRightRev_[iRev] = patRight_[i];
@@ -412,11 +415,12 @@ namespace csl {
 		candReceiver_->receive( tmp.c_str(), (it->second).first , (it->second).second  );
 	    }
 	    else candReceiver_->receive( (it->first).c_str(), (it->second).first , (it->second).second );
+	    // std::wcerr << ">> " << it->first << "\n>> " << it->second.first << "," << it->second.second << "\n";
 	}
 	return ( ! results_.empty() );
     }
-    
-	
+
+
 
 } // eon
 

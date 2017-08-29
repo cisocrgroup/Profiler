@@ -1,3 +1,6 @@
+#ifndef csl_ComputeInstruction_hpp__
+#define csl_ComputeInstruction_hpp__
+
 #include "math.h"
 #include<iostream>
 #include <vector>
@@ -36,7 +39,7 @@ namespace csl {
 	 * @param wErr The incorrect word
 	 * @param[out] instructions is a pointer to a vector of instructions, which is filled with all (equally) best ways to transform the strings.
 	 */
-	bool computeInstruction( std::wstring const& wCorr, std::wstring const& wErr, std::vector< Instruction >* instruction = 0 );
+	bool computeInstruction( std::wstring const& wCorr, std::wstring const& wErr, std::vector< Instruction >* instruction = 0, bool unknown = false );
 
 
 	/**
@@ -120,3 +123,4 @@ namespace csl {
     }; // class ComputeInstruction
 
 } // ns csl
+#endif // csl_ComputeInstruction_hpp__
