@@ -3,6 +3,7 @@
 #include <system_error>
 #include "Utils/IStr.h"
 #include "AdaptiveLex.h"
+#include "Document/Document.h"
 
 using namespace csl;
 
@@ -124,3 +125,13 @@ AdaptiveLex::write(const std::string& file)
 		os << entry << "\n";
 	os.close();
 }
+
+////////////////////////////////////////////////////////////////////////////////
+void
+AdaptiveLex::addAdaptiveTokensToDocument(OCRCorrection::Document& doc)
+{
+	for (const auto& entry: LEX) {
+		doc.addAdaptiveToken(entry.first);
+	}
+}
+

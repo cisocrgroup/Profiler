@@ -4,6 +4,10 @@
 #include <unordered_map>
 #include "DictSearch.h"
 
+namespace OCRCorrection {
+	class Document;
+}
+
 namespace csl {
 	class AdaptiveLex: public csl::DictSearch::iDictModule {
 	public:
@@ -19,6 +23,7 @@ namespace csl {
 		static void add(const std::wstring& gt, const std::wstring& ocr,
 				Receiver& receiver);
 		static void write(const std::string& out);
+		static void addAdaptiveTokensToDocument(OCRCorrection::Document& doc);
 
 	private:
 		bool doquery(const std::wstring& q, Receiver& res);

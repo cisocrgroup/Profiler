@@ -222,8 +222,11 @@ int main( int argc, char const** argv ) {
     // do profiling
     //
     profiler.createProfile(document);
-    if (profiler.adaptive() and profiler.writeAdaptiveDictionary()) {
-	    csl::AdaptiveLex::write(profiler.getAdaptiveDictionaryPath());
+    if (profiler.adaptive()) {
+	    csl::AdaptiveLex::addAdaptiveTokensToDocument(document);
+	    if (profiler.writeAdaptiveDictionary()) {
+		    csl::AdaptiveLex::write(profiler.getAdaptiveDictionaryPath());
+	    }
     }
 
     if (options.hasOption("simpleOutput")) {
