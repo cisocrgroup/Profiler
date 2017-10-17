@@ -33,9 +33,6 @@
 
 namespace OCRCorrection {
 
-
-
-
     /**
      * @brief Read the {@link profiler_manual Profiler manual} to find out more about the purpose and use of the Profiler.
      *        Class Profiler analyzes an ocr-ed historical text
@@ -125,6 +122,29 @@ namespace OCRCorrection {
 	}
 
 	/**
+	 * @brief Enable/disable adaptive profiling
+	 */
+	void setAdaptive(bool adaptive) noexcept {
+		config_.adaptive_ = adaptive;
+	}
+	bool adaptive() const noexcept {
+		return config_.adaptive_;
+	}
+	bool writeAdaptiveDictionary() const noexcept {
+		return config_.writeAdaptiveDictionary_;
+	}
+	const std::string& getAdaptiveDictionaryPath() const noexcept {
+		return config_.adaptiveDictionaryPath_;
+	}
+
+	/**
+	 * @brief enable virtual unknown dictionary
+	 */
+	void enableUnknownVirtualLex() {
+		dictSearch_.enableUnknownVirtualLex();
+	}
+
+	/**
 	 * @brief Set the number of initial pages to be processed
 	 *
 	 *
@@ -183,7 +203,8 @@ namespace OCRCorrection {
 
     protected:
 	/**
-	 * @brief Returns a reference to the csl::DictSearch - object used by the Profiler.
+	 * @brief Returns a reference to the csl::DictSearch -
+	 * object used by the Profiler.
 	 *
 	 * This is not a const reference so it can be used to change the settings.
 	 */
@@ -193,6 +214,22 @@ namespace OCRCorrection {
 
 
     private:
+	// Adaptive Profiling
+	void calculateCandidateSet(const Profiler_Token& t,
+			csl::DictSearch::CandidateSet& candidates);
+	void calculateAdaptiveCandidateSet(const Profiler_Token& t,
+			csl::DictSearch::CandidateSet& candidates);
+	void calculateNonAdaptiveCandidateSet(const Profiler_Token& t,
+			csl::DictSearch::CandidateSet& candidates);
+	void createCandidatesWithCorrection(const Profiler_Token& t,
+		csl::DictSearch::CandidateSet& candidates);
+
+	void initGlobalOcrPatternProbs(int itn);
+
+	/**
+	 * Do calculate the profile
+	 */
+	void doCreateProfile(Document& sourceDoc);
 
 	/**
 	 * @brief Execute one iteration of the profiling process.
@@ -328,7 +365,10 @@ namespace OCRCorrection {
 		resetHistPatternProbabilities_( true ),
 		resetOCRPatternProbabilities_( true ),
 		donttouch_hyphenation_( true ),
-		donttouch_lineborders_( false)
+		donttouch_lineborders_( false),
+		adaptiveDictionaryPath_(),
+		writeAdaptiveDictionary_(false),
+		adaptive_(false)
 		{
 		}
 
@@ -388,6 +428,10 @@ namespace OCRCorrection {
 
 	    bool donttouch_lineborders_;
 
+	    std::string adaptiveDictionaryPath_;
+	    bool writeAdaptiveDictionary_;
+	    bool adaptive_;
+
 	    void print( std::wostream& os = std::wcout ) {
 		os << "number of iterations:           " << nrOfIterations_ << std::endl
 		   << std::endl
@@ -406,6 +450,11 @@ namespace OCRCorrection {
 		   << std::endl
 		   << "donttouch_hyphenation_:         " << donttouch_hyphenation_ << std::endl
 		   << "donttouch_lineborders_:         " << donttouch_lineborders_ << std::endl
+		   << std::endl
+		   << "writeAdaptiveDictionary:        " << writeAdaptiveDictionary_ << std::endl
+		   << "adaptiveDictionaryPath:         " << Utils::utf8(adaptiveDictionaryPath_) << std::endl
+		   << "adaptive_:                      " << adaptive_ << std::endl
+		   << std::endl
 		    ;
 	    }
 

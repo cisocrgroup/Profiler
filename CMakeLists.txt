@@ -2,13 +2,7 @@ project(OCRCorrection_cxx)
 
 cmake_minimum_required(VERSION 2.4)
 
-
-
-
-
 ADD_CUSTOM_TARGET(postcorrection DEPENDS JNICorrectionSystem )
-
-
 
 #SET(CMAKE_VERBOSE_MAKEFILE true)
 
@@ -22,7 +16,7 @@ SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 
 
-SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -Wall -Werror -Wno-unused -DXML_LIBRARY " )
+SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -Wall -Werror -Wno-unused -std=c++11 -DXML_LIBRARY " )
 SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -O3 " )
 SET(CMKAE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -Wdisabled-optimization")
 #SET(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -O1 " )
@@ -50,7 +44,7 @@ SET( USER_SOFTWARE_DIR /mounts/Users/student/uli/soft )
 #  Finds:
 #   CPPUNIT_INCLUDE_DIR
 #   CPPUNIT_LIBRARIES
-FIND_PACKAGE( CPPUNIT )
+FIND_PACKAGE( CPPUNIT REQUIRED)
 IF( CPPUNIT_FOUND )
  INCLUDE_DIRECTORIES( ${CPPUNIT_INCLUDE_DIR} )
 ENDIF( CPPUNIT_FOUND )
@@ -93,7 +87,12 @@ SET( OCRCORRECTION_SOURCES
 	     Document/Document.cxx
 	     CorrectionSystem/CorrectionSystem.cxx
 	     LevenshteinWeights/LevenshteinWeights.cxx
-	     Profiler/Profiler.cxx Profiler/HTMLWriter.cxx Profiler/Evaluation.cxx Profiler/SimpleOutputWriter.cxx
+	     Profiler/Profiler.cxx
+	     Profiler/AdaptiveProfiling.cxx
+	     Profiler/Evaluator.cxx
+	     Profiler/HTMLWriter.cxx
+	     Profiler/Evaluation.cxx
+	     Profiler/SimpleOutputWriter.cxx
 	     AbbyyXmlParser/AbbyyXmlParser.cxx
 	     DocXML/DocXMLReader.cxx
 	     DocXML/LegacyDocXMLReader.cxx
@@ -106,7 +105,9 @@ SET( OCRCORRECTION_SOURCES
 	     Token/TokenImageInfoBox.cxx
 	     GlobalProfile/GlobalProfileXMLReader.cxx
 	     GlobalProfile/PatternContainerXMLReader.cxx
-
+	     Pattern/Pattern.cxx
+	     GtDoc/GtDoc.cxx
+	     GtDoc/AutoCorrector.cxx
 	     )
 
 add_library( OCRCorrection STATIC ${OCRCORRECTION_SOURCES})

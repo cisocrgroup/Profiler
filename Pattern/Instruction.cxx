@@ -10,6 +10,12 @@ namespace csl {
 	status_(REGULAR) {
     }
 
+    bool Instruction::isUnknown() const {
+	    return std::any_of(begin(), end(), [](const PosPattern& p) {
+			return p.isUnknown();
+	    });
+    }
+
     bool Instruction::operator==( Instruction const& other ) const {
 	if( size() != other.size() ) return false;
 

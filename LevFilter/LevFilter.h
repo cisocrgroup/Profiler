@@ -32,7 +32,7 @@ namespace csl {
 
 
     /**
-     * This is an interface to be implemented by each class that wants to receive candidates from 
+     * This is an interface to be implemented by each class that wants to receive candidates from
      * some LevFilter implementation.
      *
      */
@@ -40,19 +40,19 @@ namespace csl {
     public:
 	virtual ~CandidateReceiver() {
 	}
-	
+
 	/**
 	 * LevFilter calls this method for each candidate.
 	 * @todo there should be a template parameter to specify annotation types other than integer.
 	 */
 	virtual void receive( const wchar_t* str, int levDistance, int annotation ) = 0;
-	
+
 	/**
 	 * @todo this method might not be needed anymore. Should be deprecated.
 	 */
 	virtual void reset() = 0;
     };
-    
+
 } // eon
 
 #endif

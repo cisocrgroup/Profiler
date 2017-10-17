@@ -1,4 +1,3 @@
-
 #include<iostream>
 
 #include <cstdlib>
@@ -12,6 +11,10 @@
 #include <DocXML/DocXMLReader.h>
 #include <AltoXML/AltoXMLReader.h>
 #include "SimpleOutputWriter.h"
+#include "GtDoc/GtDoc.h"
+#include "Profiler/Evaluator.h"
+#include "GtDoc/AutoCorrector.h"
+#include "DictSearch/AdaptiveLex.h"
 #include<IBMGroundtruth/IBMGTReader.h>
 #include<Getopt/Getopt.h>
 
@@ -19,7 +22,7 @@
 void printHelp() {
     std::wcerr << "Use like: profiler --config=<iniFile> --sourceFile=<xmlFile>"
 	       << std::endl
-	       << "--sourceFormat DocXML | AltoXML | ABBYY_XML_DIR | TXT   (Default: DocXML)" << std::endl
+	       << "--sourceFormat DocXML | AltoXML | DocGt | ABBYY_XML_DIR | TXT   (Default: DocXML)" << std::endl
 	       << "[--out_xml  <outputFile> ]  Prints xml containing the lists of hist. variants and ocr errors." << std::endl
 	       << "[--out_html <outputFile> ]  Prints all kinds of things to control the Profiler's performance to html." <<  std::endl
 	       << "[--out_doc  <outputFile> ]  Prints the document in DocXML format, including correction suggestions." <<  std::endl
@@ -35,12 +38,21 @@ void printHelp() {
 	       << std::endl
 	       << "[--out_gtxml <outputFile>]  Prints xml containing the GROUNDTRUTH lists of hist. variants and ocr errors. (if available)" << std::endl
 	       << "                            (Only for evaluation with groundtruth documents.)"
-           << std::endl
-           << "[--simpleOutput]            Print simple text output to stdout"
-           << std::endl
+               << std::endl
+               << "[--simpleOutput]            Print simple text output to stdout"
+	       << std::endl
+	       << "[--adaptive]                Use adaptive profiler, that uses correction information"
+               << std::endl
+	       << "[--evaluate <out-dir>]       Calculate recall and precision of the profiler and write results to <out-dir>"
+               << std::endl
+	       << "[--strict yes|no|very]      set the strictness of the evaluation"
+               << std::endl
+	       << "[--autocorrect patterns]    Autocorrect a comma separated list of patterns. Tokens that match one of the given patterns are \"corrected\" with their groundtruth"
+	       << std::endl
+    	       << "[--enable-unknowns]         Enable handling of uninterpretable (unknown) tokens"
+	       << std::endl
 	;
 }
-
 
 int main( int argc, char const** argv ) {
 
@@ -62,6 +74,11 @@ int main( int argc, char const** argv ) {
     options.specifyOption( "imageDir", csl::Getopt::STRING, "_NO_IMAGE_DIR_" );
     options.specifyOption( "createConfigFile", csl::Getopt::VOID );
     options.specifyOption( "simpleOutput", csl::Getopt::VOID );
+    options.specifyOption( "adaptive", csl::Getopt::VOID );
+    options.specifyOption( "evaluate", csl::Getopt::STRING );
+    options.specifyOption( "strict", csl::Getopt::STRING );
+    options.specifyOption( "autocorrect", csl::Getopt::STRING );
+    options.specifyOption( "enable-unknowns", csl::Getopt::VOID );
 
     try {
 	options.getOptionsAsSpecified( argc, argv );
@@ -113,7 +130,8 @@ int main( int argc, char const** argv ) {
             options.hasOption( "out_none" ) ||
             options.hasOption("simpleOutput")) ) {
 	std::wcerr << "Specify some output." << std::endl
-		   << "If you really want to run without any output, say this explicitly using --out_none" << std::endl
+		   << "If you really want to run without any output, say this explicitly using --out_none"
+		   << std::endl
 		   << "Use --help to learn about output options." << std::endl;
 	exit( EXIT_FAILURE );
     }
@@ -135,6 +153,9 @@ int main( int argc, char const** argv ) {
 	std::wcerr << "Error while readConfiguration: " << wideWhat << std::endl;
 	return EXIT_FAILURE;
     }
+    if (options.hasOption("enable-unknowns")) {
+	    profiler.enableUnknownVirtualLex();
+    }
 
     /**
      * @todo catch conversion errors string-->integer
@@ -148,10 +169,10 @@ int main( int argc, char const** argv ) {
     }
 
 
-
     if( options.hasOption( "out_html" ) ) {
 	profiler.setHTMLOutFile( options.getOption( "out_html" ) );
     }
+    profiler.setAdaptive(options.hasOption("adaptive"));
 
     OCRCorrection::Document document;
 
@@ -159,27 +180,27 @@ int main( int argc, char const** argv ) {
 	if( options.getOption( "sourceFormat" ) == "TXT" ) {
             OCRCorrection::TXTReader reader;
             reader.parse( options.getOption( "sourceFile" ).c_str(), &document );
-            profiler.createProfile( document );
 	}
 	else if( options.getOption( "sourceFormat" ) == "DocXML" ) {
             OCRCorrection::DocXMLReader reader;
             reader.parse( options.getOption( "sourceFile" ), &document );
-	    profiler.createProfile( document );
 	}
 	else if( options.getOption( "sourceFormat" ) == "AltoXML" ) {
             OCRCorrection::AltoXMLReader reader;
             reader.parse( options.getOption( "sourceFile" ), &document );
-	    profiler.createProfile( document );
 	}
 	else if( options.getOption( "sourceFormat" ) == "ABBYY_XML_DIR" ) {
             OCRCorrection::AbbyyXmlParser reader;
 	    reader.parseDirToDocument( options.getOption( "sourceFile" ), options.getOption( "imageDir" ), &document );
-	    profiler.createProfile( document );
 	}
 	else if( options.getOption( "sourceFormat" ) == "IBM_GROUNDTRUTH" ) {
 	    OCRCorrection::IBMGTReader r;
 	    r.parse( options.getOption( "sourceFile" ).c_str(), &document );
-	    profiler.createProfile( document );
+	}
+	else if (options.getOption("sourceFormat") == "DocGt") {
+		OCRCorrection::GtDoc gtdoc;
+		gtdoc.load(options.getOption("sourceFile"));
+		gtdoc.parse(document);
 	}
 	else {
 	    std::wcerr << "Unknown sourceFormat! Use: profiler --help" << std::endl;
@@ -191,10 +212,41 @@ int main( int argc, char const** argv ) {
         return EXIT_FAILURE;
     }
 
+    if (options.hasOption("autocorrect")) {
+	    OCRCorrection::AutoCorrector corrector;
+	    corrector.add_patterns(options.getOption("autocorrect"));
+	    corrector(document);
+    }
+
+    //
+    // do profiling
+    //
+    profiler.createProfile(document);
+    if (profiler.adaptive()) {
+	    csl::AdaptiveLex::addAdaptiveTokensToDocument(document);
+	    if (profiler.writeAdaptiveDictionary()) {
+		    csl::AdaptiveLex::write(profiler.getAdaptiveDictionaryPath());
+	    }
+    }
 
     if (options.hasOption("simpleOutput")) {
-            OCRCorrection::SimpleOutputWriter(document).write();
+            OCRCorrection::SimpleOutputWriter(std::wcout, document).write();
     }
+    if (options.hasOption("evaluate")) {
+  	OCRCorrection::Evaluator eval;
+  	if (options.hasOption("strict")) {
+  		if (options.getOption("strict") == "no")
+  			eval.set_mode(OCRCorrection::Evaluator::Mode::Normal);
+  		else if (options.getOption("strict") == "yes")
+  			eval.set_mode(OCRCorrection::Evaluator::Mode::Strict);
+  		else if (options.getOption("strict") == "very")
+  			eval.set_mode(OCRCorrection::Evaluator::Mode::VeryStrict);
+  		else
+  			throw std::runtime_error("Invalid strict mode given");
+  	}
+  	eval.classify(document);
+  	eval.write(options.getOption("evaluate"), document);
+  }
 
 
     if( options.hasOption( "out_xml" ) ) {
@@ -219,10 +271,14 @@ int main( int argc, char const** argv ) {
 
 
     } catch ( OCRCorrection::OCRCException& exc ) {
-            std::wcerr << "OCRC::Profiler: Caught OCRCException:" << OCRCorrection::Utils::utf8(exc.what()) << std::endl;
+            std::wcerr << "OCRC::Profiler: Caught OCRCException:"
+		       << OCRCorrection::Utils::utf8(exc.what())
+		       << std::endl;
         return EXIT_FAILURE;
     } catch ( csl::exceptions::cslException& exc ) {
-            std::wcerr << "OCRC::Profiler: Caught cslException: " << OCRCorrection::Utils::utf8(exc.what()) << std::endl;
+            std::wcerr << "OCRC::Profiler: Caught cslException: "
+		       << OCRCorrection::Utils::utf8(exc.what())
+		       << std::endl;
         return EXIT_FAILURE;
     }
     catch( std::exception& exc ) {

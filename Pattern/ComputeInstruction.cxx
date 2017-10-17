@@ -1,53 +1,62 @@
 #include "./ComputeInstruction.h"
 
 namespace csl {
-    ComputeInstruction::ComputeInstruction() : 
+    ComputeInstruction::ComputeInstruction() :
 	debug_( false ),
 	maxNumberOfInstructions_( (size_t) -1 ),
 	patternProbabilities_( 0 ),
 	instructions_( 0 ) {
 
 
-	/** 
+	/**
 	 * @todo Find a good, dynamic solution here!
 	 */
 	memset( matrix_, 0, 50 * 50 * sizeof( MatrixItem ) );
-	
+
     }
-    
+
     ComputeInstruction::~ComputeInstruction(){
     }
 
     void ComputeInstruction::connectPatternProbabilities( csl::PatternProbabilities const& patternProbabilities ){
 	patternProbabilities_ = &patternProbabilities;
     }
-    
-    
-    bool ComputeInstruction::computeInstruction( std::wstring const& wCorr, 
-						 std::wstring const& wErr, 
-						 std::vector< Instruction >* instructions ) {
+
+
+    bool ComputeInstruction::computeInstruction( std::wstring const& wCorr,
+						 std::wstring const& wErr,
+						 std::vector< Instruction >* instructions,
+						 bool unknown) {
+	    // if we have a candidate with unknown hist trace,
+	    // the ocr trace is also unknown.
+	    if (unknown and instructions) {
+		    Instruction i;
+		    i.emplace_back(PosPattern::Unknown());
+		    instructions->push_back(i);
+		    return true;
+	    }
 
 	if( wCorr.size() >= 45 || wErr.size() >= 45 ) {
 	    throw exceptions::badInput( "csl::ComputeInstruction; input words too long" );
 	}
-	
+
  	//std::wcerr << "compare " << wCorr << ", " << wErr << std::endl;
 
 	if( ! patternProbabilities_ ) {
 	    throw exceptions::LogicalError( "csl::ComputeInstruction::ComputeInstruction: No patternProbabilities loaded." );
 	    exit( 1 );
 	}
-	
+
 	//levProbabilities_->printFreqPattern();
 	//levProbabilities_->printFreqCorrect();
 	//levProbabilities_->printPatternProbabilities();
-	
+
 	wordCorr_ = L" " + wCorr;
 	wordErr_ = L" " + wErr;
-	
+
 	int matrixW = wordCorr_.length();
 	int matrixH = wordErr_.length();
-	
+
 	//Set the values for the first row
 	matrix_[0][0].value = 0;
 	for(int i=1; i < matrixW; ++i ) {
@@ -61,7 +70,7 @@ namespace csl {
 		matrix_[0][i].removePatternTypes();
 	    }
 	}
-	
+
 	//Set the values for the first column
 	for(int i=1; i < matrixH; ++i ) {
 	    double prob = patternProbabilities_->getWeight( Pattern( L"", wordErr_.substr( i, 1 ) ) );
@@ -75,7 +84,7 @@ namespace csl {
 	    }
 	}
 
-	
+
 	// Set the values of the matrix.
 	double prob = 0;
 
@@ -90,7 +99,7 @@ namespace csl {
 		}
 		else if( wordCorr_.at(x) == wordErr_.at(y) ) {
 		    newValue = matrix_[y-1][x-1].value;
-		    
+
 		    if( ( minValue == PatternProbabilities::UNDEF ) || ( newValue < minValue ) ) {
 			minValue = newValue;
 			matrix_[y][x].removePatternTypes();
@@ -105,7 +114,7 @@ namespace csl {
 
 		    if( ( positiveProb( prob ) ) ) {
 			newValue = matrix_[y-1][x-1].value + ( -log( prob ) );
-		    
+
 			if( ( minValue == PatternProbabilities::UNDEF ) || ( newValue < minValue ) ) {
 			    minValue = newValue;
 			    matrix_[y][x].removePatternTypes();
@@ -117,8 +126,8 @@ namespace csl {
 		    }
 		}
 
-		
-		
+
+
 		// Insert
 		if( ( matrix_[y-1][x].value != PatternProbabilities::UNDEF ) ) {
 		    prob = patternProbabilities_->getWeight( Pattern( L"", wordErr_.substr( y, 1 ) ) );
@@ -135,13 +144,13 @@ namespace csl {
 			}
 		    }
 		}
-		
+
 		// Delete
 		if( ( matrix_[y][x-1].value != PatternProbabilities::UNDEF ) ) {
 		    prob = patternProbabilities_->getWeight( Pattern( wordCorr_.substr( x, 1 ), L"" ) );
 		    if( ( positiveProb( prob ) ) ) {
 			newValue = matrix_[y][x-1].value + ( -log( prob ) );
-			
+
 			if( ( minValue == PatternProbabilities::UNDEF ) || ( newValue < minValue ) ) {
 			    minValue = newValue;
 			    matrix_[y][x].removePatternTypes();
@@ -152,9 +161,9 @@ namespace csl {
 			}
 		    }
 		}
-		
+
 		//std::wcout << "\"" << wordCorr_[x]<< " "<< wordErr_[y] << "\" | ";
-		
+
 		//Merge
 		if( ( x >= 2 ) && ( matrix_[y-1][x-2].value != PatternProbabilities::UNDEF ) ) {
 		    prob = patternProbabilities_->getWeight( Pattern( wordCorr_.substr( x-1, 2 ), wordErr_.substr( y, 1 ) ) );
@@ -176,11 +185,11 @@ namespace csl {
 		if( ( y >= 2 ) && ( matrix_[y-2][x-1].value != PatternProbabilities::UNDEF ) ) {
 		    prob = patternProbabilities_->getWeight( Pattern( wordCorr_.substr( x, 1 ), wordErr_.substr( y-1, 2 ) ) );
 
-		    
+
 		    prob = patternProbabilities_->getWeight( Pattern( wordCorr_.substr( x, 1 ), wordErr_.substr( y-1, 2 ) ) );
 		    if( positiveProb( prob ) ) {
 			newValue = matrix_[y-2][x-1].value + ( -log( prob ) );
-			
+
 
 			if( ( minValue == PatternProbabilities::UNDEF ) || ( newValue < minValue ) ) {
 			    minValue = newValue;
@@ -192,18 +201,18 @@ namespace csl {
 			}
 			else {
 			}
-			
+
 		    }
 		} // split
-				
-		
-		matrix_[y][x].value = minValue;				
-		
-		
+
+
+		matrix_[y][x].value = minValue;
+
+
 	    } // for( y = 1 .. matrixW )
-	    
+
 	    //std::wcout << "-------------------------------" <<std::endl;
-			
+
 	} // for(y = 1 .. matrixH)
 
 	if( debug_ ) {
@@ -213,31 +222,31 @@ namespace csl {
 	    std::wcout << "wordErr_ (wstring): " << "\'" << wordErr_ << "\'"<< std::endl;
 	    std::wcout << "matrixW (wordCorr_.length()): " << matrixW << std::endl;
 	    std::wcout << "matrixH (wordErr_.length()): " << matrixH << std::endl;
-	    
+
 	    std::wcout << std::endl << "  |" ;
 	    for(int x=0; x<matrixW; x++){
 		std::wcout << " " << wordCorr_[x] << " |";
 	    }
 	    std::wcout << std::endl;
-	    
+
 	    for(int y=0; y<matrixH; y++){
 		std::wcout << wordErr_[y] << " |";
 		for(int x = 0; x < matrixW; x++){
 		    std::wcout << " " << matrix_[y][x].value;
 		    if( matrix_[y][x].patternTypes ) {
-			std::wcout <<  "[" 
+			std::wcout <<  "["
 				   << matrix_[y][x].patternTypes->first << ","
 				   << matrix_[y][x].patternTypes->second << "]";
 		    }
 		    else std::wcout << "[   ]";
-		    
+
 		    std::wcout << " |";
-		    
+
 		}
 		std::wcout << std::endl;
 	    }
 	    std::wcout << std::endl;
-	    
+
 	    int x = matrixW - 1;
 	    int y = matrixH - 1;
 	    PatternTypeChain* patternType = matrix_[y][x].patternTypes;
@@ -252,17 +261,17 @@ namespace csl {
 		    x -= patternType->first;
 		    y -= patternType->second;
 		}
-		
+
 		patternType = matrix_[y][x].patternTypes;
 	    }
-	    
+
 	} // if debug_
 
 	bool doReturn = ( matrix_[matrixH-1][matrixW-1].value != PatternProbabilities::UNDEF );
-	
+
 	instructions_ = instructions;
-	
-	if( instructions_ ) { 
+
+	if( instructions_ ) {
 	    if( ! instructions_->empty() ) {
 		throw csl::exceptions::cslException( "csl::ComputeInstruction::computeInstruction: answer object 'instructions' not empty." );
 	    }
@@ -297,22 +306,22 @@ namespace csl {
 	}
 	else {
 	    PatternTypeChain* patternType = matrix_[y][x].patternTypes;
-	    
+
 	    if( patternType == 0 ) {
 		//return;
 		throw std::runtime_error( "patternType can not be 0" );
 	    }
-	    
+
 	    size_t countPatternTypes = 0;
 	    while( patternType ) {
 		size_t currentInstructionIndex = 0;
-		
+
 		if( patternType->first == 0 && patternType->second == 0 ) {
 		    throw std::runtime_error( "patternType can not be (0,0)" );
 		}
-		
+
 		if( patternType->next == 0  ) { // no need to clone for the last patternType
-		    currentInstructionIndex = instructionIndex; 
+		    currentInstructionIndex = instructionIndex;
 		    //std::wcerr<<"Do not clone: work on instr["<<instructionIndex<<"]"<<std::endl;
 		    //std::wcerr<<"instr.size() is "<<instructions_->size()<<std::endl;
 		}
@@ -331,42 +340,42 @@ namespace csl {
 
 		// match: continue
 		if( ( patternType->first == 1 ) && ( patternType->second == 1 ) && ( wordCorr_.at( x ) == wordErr_.at( y ) ) ) {
-		    getInstructions( x - 1, y - 1, 
+		    getInstructions( x - 1, y - 1,
 				     currentInstructionIndex ); // recursive call
 		}
 		else {
-		    
+
 		//std::wcout<< wordCorr_.substr( x-patternType->first + 1, patternType->first ) << "->" << wordErr_.substr( y - patternType->second + 1, patternType->second ) << " at pos " << x - patternType->first  << std::endl;
-		
-		    
-		    instructions_->at( currentInstructionIndex ).push_back( 
-			PosPattern( 
+
+
+		    instructions_->at( currentInstructionIndex ).push_back(
+			PosPattern(
 			    wordCorr_.substr( x-patternType->first + 1, patternType->first ),
 			    wordErr_.substr( y - patternType->second + 1, patternType->second ),
-			    x - patternType->first ) 
+			    x - patternType->first )
 			);
-		    
+
 		    //std::wcout << "Rec call(" << x - patternType->first<< "," << y - patternType->second << "," << currentInstructionIndex << std::endl;
-		    getInstructions(  x - patternType->first, y - patternType->second, 
+		    getInstructions(  x - patternType->first, y - patternType->second,
 				      currentInstructionIndex ); // recursive call
-		    
-		    
+
+
 		}
-		
+
 		patternType = patternType->next;
 		++countPatternTypes;
 
 	    }
-	    
+
 	} // if not at the left upper corner of the matrix
     } // getInstructions()
-    
-    
-    
-    
+
+
+
+
     void ComputeInstruction::setDebug( bool d ) {
 	debug_ = d;
     }
-    
+
 } // eon
 

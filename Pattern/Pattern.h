@@ -18,6 +18,7 @@ namespace csl {
      */
     class Pattern {
     public:
+	    static const std::wstring UNKNOWN;
 	/**
 	 * @brief Constructs an empty pattern with left == right == ""
 	 */
@@ -58,6 +59,10 @@ namespace csl {
 	    right_.clear();
 	}
 
+	inline bool isUnknown() const noexcept {
+		return getLeft() == UNKNOWN or getRight() == UNKNOWN;
+	}
+
 	/**
 	 * @brief get the left side of the pattern
 	 * @return the left side of the pattern
@@ -87,7 +92,7 @@ namespace csl {
 	 */
 	inline void strip();
 
-	inline void print( std::wostream& os = std::wcout ) const;
+	void print( std::wostream& os = std::wcout ) const;
 
 	inline std::wstring toString() const;
 
@@ -149,10 +154,6 @@ namespace csl {
 	if( (! left_.empty()) && ( left_.at( left_.size()-1 ) == Global::wordEndMarker ) ) left_.erase( left_.size()-1, 1 );
 	if( (! right_.empty()) && ( right_.at( 0 ) == Global::wordBeginMarker ) ) right_.erase( 0, 1 );
 	if( (! right_.empty()) && ( right_.at( right_.size()-1 ) == Global::wordEndMarker ) ) right_.erase( right_.size()-1, 1 );
-    }
-
-    void Pattern::print( std::wostream& os ) const {
-	os << getLeft() << leftRightDelimiter_ << getRight();
     }
 
     std::wstring Pattern::toString() const {
