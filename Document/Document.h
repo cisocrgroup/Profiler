@@ -651,6 +651,14 @@ namespace OCRCorrection {
 	    }
 	}
 
+	void addAdaptiveToken(const std::wstring& token) {
+		adaptiveTokens_.insert(token);
+	}
+
+	const std::set<std::wstring>& getAdaptiveTokens() const noexcept {
+		return adaptiveTokens_;
+	}
+
 	// THIS METHOD IS NOT NEEDED AS LONG AS THE TOKENS HAVE THEIR PAGINDEX AS ATTRIBUTE ANYWAY
 	/**
 	 * @brief For a given token index, finds the index of its page.
@@ -700,6 +708,7 @@ namespace OCRCorrection {
 	std::vector< Token* > tokens_;
 
         std::set< std::wstring > stringPool_;
+	std::set<std::wstring> adaptiveTokens_;
 
 	/**
 	 * @brief A vector of Page s.

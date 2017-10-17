@@ -20,6 +20,7 @@ namespace OCRCorrection {
 	    ;
 
 	size_t tokenCount = 0;
+	writeAdaptiveTokens(doc, xml_out);
 	if( ! doc.hasPages() ) {
 		writeTokens(doc.begin(), doc.end(), tokenCount, xml_out);
 	} else {
@@ -144,6 +145,14 @@ namespace OCRCorrection {
 	std::wcerr << "OCRC::DocXMLWriter::writeXML: xml written" << std::endl;
 
 	of.close();
+    }
+
+    void DocXMLWriter::writeAdaptiveTokens(const Document& doc, std::wostream& xml_out) const {
+	xml_out << "<adaptiveTokens>\n";
+	for (const auto& token: doc.getAdaptiveTokens()) {
+		xml_out << "<adaptiveToken>" << xml_escape(token) << "</adaptiveToken>\n";
+	}
+	xml_out << "</adaptiveTokens>\n";
     }
 
 

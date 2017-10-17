@@ -1,12 +1,13 @@
 #ifndef OCRC_DOCXMLWRITER_H
 #define OCRC_DOCXMLWRITER_H OCRC_DOCXMLWRITER_H
 
-#include<Document/Document.h>
+#include "Document/Document.h"
 #include<string>
 #include<locale>
 
 namespace OCRCorrection {
 
+	class Document;
     std::wstring xml_escape( std::wstring const& input ); // forward declaration
 
 
@@ -36,6 +37,7 @@ namespace OCRCorrection {
 	using TokenIterator = Document::const_iterator;
 	void writePages(PageIterator b, PageIterator e, size_t& count, std::wostream& xml_out) const;
 	void writeTokens(TokenIterator b, TokenIterator e, size_t& count, std::wostream& xml_out) const;
+	void writeAdaptiveTokens(const Document& doc, std::wostream& xml_out) const;
     };
 
     inline std::wstring xml_escape( std::wstring const& input ) {
