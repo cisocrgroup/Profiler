@@ -168,7 +168,7 @@ namespace OCRCorrection {
 
 
     void Document::findHyphenation() {
-	std::wstring hyphenationMarks = std::wstring( L"-\u00AC" );
+	std::wstring hyphenationMarks = std::wstring( L"-\u00AC\u2E17" );
 	std::wstring mergedWord;
 
 
