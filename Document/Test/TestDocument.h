@@ -290,6 +290,12 @@ namespace OCRCorrection {
 	doc.pushBackToken( L"\u00AC", false ); // using the "not" sign, unicode U+00AC
 	doc.pushBackToken( L"\n", false );
 	doc.pushBackToken( L"umbruch", true );
+	doc.pushBackToken( L"und", true );
+	doc.pushBackToken( L"zeilen", true );
+	doc.pushBackToken( L"\u2E17", false );  // Double Oblique Hyphen
+	doc.pushBackToken( L"\n", false );
+	doc.pushBackToken( L"umbruch", true );
+
 
 	doc.findHyphenation();
 	CPPUNIT_ASSERT( doc.at( 2 ).hasProperty( Token::HYPHENATION_1ST ) );
@@ -304,7 +310,11 @@ namespace OCRCorrection {
 	CPPUNIT_ASSERT( doc.at( 11 ).hasProperty( Token::HYPHENATION_2ND ) );
 	CPPUNIT_ASSERT( doc.at( 11 ).getHyphenationMerged() == L"zeilenumbruch" );
 
-
+	CPPUNIT_ASSERT( doc.at( 13 ).hasProperty( Token::HYPHENATION_1ST ) );
+	CPPUNIT_ASSERT( doc.at( 13 ).getHyphenationMerged() == L"zeilenumbruch" );
+	CPPUNIT_ASSERT( doc.at( 14 ).hasProperty( Token::HYPHENATION_MARK ) );
+	CPPUNIT_ASSERT( doc.at( 16 ).hasProperty( Token::HYPHENATION_2ND ) );
+	CPPUNIT_ASSERT( doc.at( 16 ).getHyphenationMerged() == L"zeilenumbruch" );
     }
 
 }
