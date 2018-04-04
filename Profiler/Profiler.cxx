@@ -3,6 +3,7 @@
 
 #include "./Profiler.h"
 #include "./Profiler_Token.tcc"
+#include "Cache.h"
 #include "Utils/NoThousandGrouping.h"
 
 namespace OCRCorrection {
@@ -225,6 +226,18 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
   histCounter_.clear();
   ocrCounter_.clear();
 
+  Cache cache;
+  for (const auto& token : document_) {
+    if ((config_.pageRestriction_ != (size_t)-1) &&
+        token.origin().getPageIndex() >= config_.pageRestriction_) {
+      break;
+    }
+    cache.put(token.origin(),
+              [this](const Token& token, csl::DictSearch::CandidateSet& cs) {
+                this->calculateCandidateSet(token, cs);
+              });
+  }
+
   for (Document_t::iterator token = document_.begin(); // for all tokens
        token != document_.end();
        ++token) {
@@ -271,7 +284,7 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
                    << stopwatch.readMilliseconds() << "ms" << std::endl;
         stopwatch.start();
       }
-      calculateCandidateSet(*token, tempCands);
+      calculateCandidateSet(token->origin(), tempCands);
       // tempCands.reset();
       // //std::wcout << "Profiler:: process Token " << token->getWOCR_lc() <<
       // std::endl; dictSearch_.query( token->getWOCR_lc(), &tempCands );

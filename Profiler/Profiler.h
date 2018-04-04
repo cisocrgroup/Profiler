@@ -33,6 +33,8 @@
 
 namespace OCRCorrection {
 
+	class Token;
+
     /**
      * @brief Read the {@link profiler_manual Profiler manual} to find out more about the purpose and use of the Profiler.
      *        Class Profiler analyzes an ocr-ed historical text
@@ -215,13 +217,13 @@ namespace OCRCorrection {
 
     private:
 	// Adaptive Profiling
-	void calculateCandidateSet(const Profiler_Token& t,
+	void calculateCandidateSet(const Token& t,
 			csl::DictSearch::CandidateSet& candidates);
-	void calculateAdaptiveCandidateSet(const Profiler_Token& t,
+	void calculateAdaptiveCandidateSet(const Token& t,
 			csl::DictSearch::CandidateSet& candidates);
-	void calculateNonAdaptiveCandidateSet(const Profiler_Token& t,
+	void calculateNonAdaptiveCandidateSet(const Token& t,
 			csl::DictSearch::CandidateSet& candidates);
-	void createCandidatesWithCorrection(const Profiler_Token& t,
+	void createCandidatesWithCorrection(const Token& t,
 		csl::DictSearch::CandidateSet& candidates);
 
 	void initGlobalOcrPatternProbs(int itn);
