@@ -221,12 +221,13 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
 
   std::map<std::wstring, double> counter;
 
-  csl::Stopwatch stopwatch;
-
   histCounter_.clear();
   ocrCounter_.clear();
 
+  // Calculate candidates for each type in the set;
   Cache cache;
+  csl::Stopwatch stopwatch;
+  std::wcerr << "calculating candidates\n";
   for (const auto& token : document_) {
     if ((config_.pageRestriction_ != (size_t)-1) &&
         token.origin().getPageIndex() >= config_.pageRestriction_) {
@@ -237,54 +238,55 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
                 this->calculateCandidateSet(token, cs);
               });
   }
+  std::wcerr << "done calculating candidates in "
+             << stopwatch.readMilliseconds() << "ms\n";
+  stopwatch.start();
 
-  for (Document_t::iterator token = document_.begin(); // for all tokens
-       token != document_.end();
-       ++token) {
+  for (auto& token : document_) {
     // std::wcout << "TOKEN: " << token->getWOCR() << std::endl;
     if ((config_.pageRestriction_ != (size_t)-1) &&
-        token->origin().getPageIndex() >= config_.pageRestriction_) {
+        token.origin().getPageIndex() >= config_.pageRestriction_) {
       break;
     }
 
     // remove old correction candidates from Document::Token
     // Don't confuse this with the Profiler_Interpretations!!
-    token->origin().removeCandidates();
+    token.origin().removeCandidates();
 
     /*
      * Those two statements refer only to Profiler_Interpretations
      */
     candidates_.clear();
-    token->setCandidateSet(&candidates_);
+    token.setCandidateSet(&candidates_);
 
-    Evaluation_Token evalToken(*token);
+    Evaluation_Token evalToken(token);
 
     //////////////// //////////////// //////////////// ////////////////
 
-    if (!token->isNormal()) {
+    if (!token.isNormal()) {
       ++counter[L"notNormal"];
-      token->setSuspicious(token->getAbbyySpecifics().isSuspicious());
-      htmlWriter_.registerToken(*token, evalToken, candidates_);
-    } else if (token->isShort()) {
+      token.setSuspicious(token.getAbbyySpecifics().isSuspicious());
+      htmlWriter_.registerToken(token, evalToken, candidates_);
+    } else if (token.isShort()) {
       ++counter[L"short"];
-      token->setSuspicious(token->getAbbyySpecifics().isSuspicious());
-      htmlWriter_.registerToken(*token, evalToken, candidates_);
-    } else if (token->isDontTouch()) {
+      token.setSuspicious(token.getAbbyySpecifics().isSuspicious());
+      htmlWriter_.registerToken(token, evalToken, candidates_);
+    } else if (token.isDontTouch()) {
       ++counter[L"dont_touch"];
-      token->setSuspicious(token->getAbbyySpecifics().isSuspicious());
-      htmlWriter_.registerToken(*token, evalToken, candidates_);
+      token.setSuspicious(token.getAbbyySpecifics().isSuspicious());
+      htmlWriter_.registerToken(token, evalToken, candidates_);
       evalToken.registerNoCandidates(); // this class of tokens is included in
                                         // evaluation
     } else {                            // normal
       ++counter[L"normalAndLongTokens"];
-      token->setTokenNr(static_cast<size_t>(counter[L"normalAndLongTokens"]));
+      token.setTokenNr(static_cast<size_t>(counter[L"normalAndLongTokens"]));
       if ((int)counter[L"normalAndLongTokens"] % 1000 == 0) {
         std::wcerr << counter[L"normalAndLongTokens"] / 1000 << "k/"
                    << document_.size() / 1000 << "k tokens processed in "
                    << stopwatch.readMilliseconds() << "ms" << std::endl;
         stopwatch.start();
       }
-      calculateCandidateSet(token->origin(), tempCands);
+      calculateCandidateSet(token.origin(), tempCands);
       // tempCands.reset();
       // //std::wcout << "Profiler:: process Token " << token->getWOCR_lc() <<
       // std::endl; dictSearch_.query( token->getWOCR_lc(), &tempCands );
@@ -319,7 +321,7 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
         // a -> b = not a or b
         assert(not is_unknown or (tempCands.size() == 1));
         instructionComputer_.computeInstruction(
-          cand->getWord(), token->getWOCR_lc(), &ocrInstructions, is_unknown);
+          cand->getWord(), token.getWOCR_lc(), &ocrInstructions, is_unknown);
 
         // std::wcout << "BLA: Finished" << std::endl;
 
@@ -420,7 +422,7 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
         // }
       }
 
-      token->setProbNormalizationFactor((double)1 / (double)sumOfProbabilities);
+      token.setProbNormalizationFactor((double)1 / (double)sumOfProbabilities);
 
       // this is an ugly thing: Evaluation_Token holds a COPY of the
       // Profiler_Token
@@ -479,7 +481,7 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
           ocrCounter_.registerPattern(*pat, cand->getVoteWeight());
 
           if (cand->getVoteWeight() > 0.5) {
-            ocrPatternsInWords[*pat].insert(token->getWOCR_lc());
+            ocrPatternsInWords[*pat].insert(token.getWOCR_lc());
           }
         }
 
@@ -512,32 +514,32 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
 
       ////// ERROR DETECTION //////////////
       if (candidates_.empty()) {
-        if (token->isDontTouch()) {
+        if (token.isDontTouch()) {
           // for "DontTouch" words, don't change Abbyy's judgment
-          token->setSuspicious(token->getAbbyySpecifics().isSuspicious());
+          token.setSuspicious(token.getAbbyySpecifics().isSuspicious());
         } else {
           // This applies to words which were actually profiled but don't have
           // any interpretations Treat those words as suspicious
-          token->setSuspicious(true);
+          token.setSuspicious(true);
         }
       } else if (candidates_.at(0).getOCRTrace().size() > 0) {
         Profiler_Interpretation const& topCand = candidates_.at(0);
-        token->setSuspicious(true);
+        token.setSuspicious(true);
         for (csl::Instruction::const_iterator pat =
                topCand.getOCRTrace().begin();
              pat != topCand.getOCRTrace().end();
              ++pat) {
           ocrPatterns2Types_[*pat].push_back(
-            std::make_pair(token->getWOCR_lc(), topCand.getWord()));
+            std::make_pair(token.getWOCR_lc(), topCand.getWord()));
         }
       } else {
-        token->setSuspicious(false);
+        token.setSuspicious(false);
       }
       ////////////////////////////////
 
       ////// MODIFY ORIGINAL TOKENS FOR CORRECTION SYSTEM //////////////
       if (lastIteration) {
-        token->origin().setSuspicious(token->isSuspicious());
+        token.origin().setSuspicious(token.isSuspicious());
 
         std::set<std::wstring> seen;
         for (std::vector<Profiler_Interpretation>::iterator cand =
@@ -556,14 +558,14 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
 
           // candidate string not suggested before
           if ((seen.insert(cand->getWord()).second == true)) {
-            token->origin().addCandidate(*cand);
+            token.origin().addCandidate(*cand);
           }
         }
       }
 
       ////////////////////////////////
 
-      htmlWriter_.registerToken(*token, evalToken, candidates_);
+      htmlWriter_.registerToken(token, evalToken, candidates_);
 
       if (candidates_.empty()) {
         ++counter[L"unknown"];
@@ -573,9 +575,7 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
 
     evaluation.registerToken(evalToken);
 
-    token->setCandidateSet(
-      0); // This makes clear that the pointer can't be used any more!!
-
+    token.setCandidateSet(0);
   } // for each token
   ///////////////////////////////////     END:  FOR EACH TOKEN
   /////////////////////////////////////
