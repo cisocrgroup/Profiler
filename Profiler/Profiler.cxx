@@ -30,6 +30,16 @@ Profiler::~Profiler()
   }
 }
 
+bool
+Profiler::eop(const Token& token) const
+{
+  if ((config_.pageRestriction_ != (size_t)-1) &&
+      token.getPageIndex() >= config_.pageRestriction_) {
+    return true;
+  }
+  return false;
+}
+
 void
 Profiler::readConfiguration(char const* configFile)
 {
@@ -229,8 +239,7 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
   csl::Stopwatch stopwatch;
   std::wcerr << "calculating candidates\n";
   for (const auto& token : document_) {
-    if ((config_.pageRestriction_ != (size_t)-1) &&
-        token.origin().getPageIndex() >= config_.pageRestriction_) {
+    if (eop(token.origin())) {
       break;
     }
     cache.put(token.origin(),
@@ -243,11 +252,10 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
   stopwatch.start();
 
   for (auto& token : document_) {
-    // std::wcout << "TOKEN: " << token->getWOCR() << std::endl;
-    if ((config_.pageRestriction_ != (size_t)-1) &&
-        token.origin().getPageIndex() >= config_.pageRestriction_) {
+    if (eop(token.origin())) {
       break;
     }
+    // std::wcout << "TOKEN: " << token->getWOCR() << std::endl;
 
     // remove old correction candidates from Document::Token
     // Don't confuse this with the Profiler_Interpretations!!

@@ -225,7 +225,7 @@ namespace OCRCorrection {
 			csl::DictSearch::CandidateSet& candidates);
 	void createCandidatesWithCorrection(const Token& t,
 		csl::DictSearch::CandidateSet& candidates);
-
+	bool eop(const Token& token) const;
 	void initGlobalOcrPatternProbs(int itn);
 
 	/**
