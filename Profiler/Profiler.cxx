@@ -11,8 +11,7 @@ Profiler::Profiler()
   : freqList_()
   , baseWordFrequencyDic_(0)
   , htmlStream_(0)
-{
-}
+{}
 
 Profiler::~Profiler()
 {
