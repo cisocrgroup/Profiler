@@ -25,7 +25,6 @@
 
 namespace OCRCorrection {
 
-
     /**
      * @brief Represents one token of a document and holds an array of correction candidates for the token.
      *
