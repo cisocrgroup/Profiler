@@ -7,13 +7,18 @@
 
 namespace OCRCorrection {
 	class Token;
+	class Profile;
+
 	class Profile {
 	public:
-		using Pair = std::pair<csl::DictSearch::CandidateSet, size_t>;
+		struct TokenType {
+			static const std::wstring NOT_NORMAL, DONT_TOUCH, SHORT, NORMAL;
+		};
+		using F = std::function<void(const Token&, csl::DictSearch::CandidateSet&)>;
+		using Pair = std::pair<size_t, csl::DictSearch::CandidateSet>;
 		using Map = std::unordered_map<std::wstring, Pair>;
 		using Iterator = Map::iterator;
 		using ConstIterator = Map::const_iterator;
-		using F = std::function<void(const Token&, csl::DictSearch::CandidateSet&)>;
 
 		Profile() = default;
 		size_t count(const Token& token) const;
@@ -25,6 +30,8 @@ namespace OCRCorrection {
 		Iterator end()  {return map_.end();}
 
 	private:
+		void updateCounts(const Token& token);
+
 		Map map_;
 		std::map<std::wstring, size_t> counter_;
 	};

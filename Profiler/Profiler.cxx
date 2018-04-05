@@ -50,7 +50,6 @@ Profiler::readConfiguration(char const* configFile)
 void
 Profiler::readConfiguration(csl::INIConfig const& iniConf)
 {
-
   config_.nrOfIterations_ = iniConf.getint("global:numberOfIterations");
   if (config_.nrOfIterations_ == (size_t)-1)
     throw OCRCException("OCRC::Profiler::readConfiguration: no value found for "
