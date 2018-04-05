@@ -3,10 +3,8 @@
 #include "Token/Token.h"
 
 using namespace OCRCorrection;
-using pair = std::pair<csl::DictSearch::CandidateSet, size_t>;
-using map = std::unordered_map<std::wstring, pair>;
-static const pair&
-mustGet(const map& map, const Token& token);
+static const Cache::Pair&
+mustGet(const Cache::Map& map, const Token& token);
 
 size_t
 Cache::count(const Token& token) const
@@ -25,15 +23,21 @@ Cache::put(const Token& token, F cb)
 {
   auto f = map_.find(token.getWOCR_lc());
   if (f == map_.end()) {
-    pair p;
+    Pair p;
     cb(token, p.first);
     f = map_.emplace_hint(f, token.getWOCR_lc(), std::move(p));
   }
   f->second.second++;
+  // if (not token.isNormal()) {
+  //   counter_[L"notNormal"]++;
+  //   token.setSuspicious(token.getAbbyySpecifics().isSuspicious());
+  // } else if (token.isShort()) {
+  //   counter_[L]
+  // }
 }
 
-const pair&
-mustGet(const map& map, const Token& token)
+const Cache::Pair&
+mustGet(const Cache::Map& map, const Token& token)
 {
   const auto f = map.find(token.getWOCR_lc());
   if (f == map.end()) {

@@ -201,14 +201,14 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
   csl::Stopwatch iterationTime;
 
   std::wcerr << "*** Iteration " << iterationNumber << " ***" << std::endl;
-  std::wcerr << L" STARTING OCR PROB (s:ſ): "
-             << globalProfile_.ocrPatternProbabilities_.getWeight(
-                  csl::Pattern(L"s", L"ſ"))
-             << "\n";
-  std::wcerr << L"STARTING HIST PROB (s:ſ): "
-             << globalProfile_.histPatternProbabilities_.getWeight(
-                  csl::Pattern(L"s", L"ſ"))
-             << "\n";
+  // std::wcerr << L" STARTING OCR PROB (s:ſ): "
+  //            << globalProfile_.ocrPatternProbabilities_.getWeight(
+  //                 csl::Pattern(L"s", L"ſ"))
+  //            << "\n";
+  // std::wcerr << L"STARTING HIST PROB (s:ſ): "
+  //            << globalProfile_.histPatternProbabilities_.getWeight(
+  //                 csl::Pattern(L"s", L"ſ"))
+  //            << "\n";
 
   // static_cast< csl::PatternProbabilities >(
   // globalProfile_.ocrPatternProbabilities_ ).print( std::wcout );
@@ -251,6 +251,8 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
              << stopwatch.readMilliseconds() << "ms\n";
   stopwatch.start();
 
+  // for (auto& p : cache) {
+  // }
   for (auto& token : document_) {
     if (eop(token.origin())) {
       break;

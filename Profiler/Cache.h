@@ -9,14 +9,24 @@ namespace OCRCorrection {
 	class Token;
 	class Cache {
 	public:
-		Cache() = default;
+		using Pair = std::pair<csl::DictSearch::CandidateSet, size_t>;
+		using Map = std::unordered_map<std::wstring, Pair>;
+		using Iterator = Map::iterator;
+		using ConstIterator = Map::const_iterator;
 		using F = std::function<void(const Token&, csl::DictSearch::CandidateSet&)>;
+
+		Cache() = default;
 		size_t count(const Token& token) const;
 		const csl::DictSearch::CandidateSet& candiates(const Token& token) const;
 		void put(const Token& token, F f);
+		ConstIterator begin() const {return map_.begin();}
+		ConstIterator end() const {return map_.end();}
+		Iterator begin() {return map_.begin();}
+		Iterator end()  {return map_.end();}
 
 	private:
-		std::unordered_map<std::wstring, std::pair<csl::DictSearch::CandidateSet, size_t>> map_;
+		Map map_;
+		std::map<std::wstring, size_t> counter_;
 	};
 }
 
