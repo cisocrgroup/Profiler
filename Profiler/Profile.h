@@ -1,5 +1,5 @@
-#ifndef OCRC_CACHE_H__
-#define OCRC_CACHE_H__
+#ifndef OCRC_PROFILE_H__
+#define OCRC_PROFILE_H__
 
 #include <unordered_map>
 #include <functional>
@@ -7,7 +7,7 @@
 
 namespace OCRCorrection {
 	class Token;
-	class Cache {
+	class Profile {
 	public:
 		using Pair = std::pair<csl::DictSearch::CandidateSet, size_t>;
 		using Map = std::unordered_map<std::wstring, Pair>;
@@ -15,7 +15,7 @@ namespace OCRCorrection {
 		using ConstIterator = Map::const_iterator;
 		using F = std::function<void(const Token&, csl::DictSearch::CandidateSet&)>;
 
-		Cache() = default;
+		Profile() = default;
 		size_t count(const Token& token) const;
 		const csl::DictSearch::CandidateSet& candiates(const Token& token) const;
 		void put(const Token& token, F f);
@@ -30,4 +30,4 @@ namespace OCRCorrection {
 	};
 }
 
-#endif // OCRC_CACHE_H__
+#endif // OCRC_PROFILE_H__

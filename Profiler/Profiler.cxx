@@ -3,7 +3,7 @@
 
 #include "./Profiler.h"
 #include "./Profiler_Token.tcc"
-#include "Cache.h"
+#include "Profile.h"
 #include "Utils/NoThousandGrouping.h"
 
 namespace OCRCorrection {
@@ -235,23 +235,23 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
   ocrCounter_.clear();
 
   // Calculate candidates for each type in the set;
-  Cache cache;
+  Profile profile;
   csl::Stopwatch stopwatch;
   std::wcerr << "calculating candidates\n";
   for (const auto& token : document_) {
     if (eop(token.origin())) {
       break;
     }
-    cache.put(token.origin(),
-              [this](const Token& token, csl::DictSearch::CandidateSet& cs) {
-                this->calculateCandidateSet(token, cs);
-              });
+    profile.put(token.origin(),
+                [this](const Token& token, csl::DictSearch::CandidateSet& cs) {
+                  this->calculateCandidateSet(token, cs);
+                });
   }
   std::wcerr << "done calculating candidates in "
              << stopwatch.readMilliseconds() << "ms\n";
   stopwatch.start();
 
-  // for (auto& p : cache) {
+  // for (auto& p : profile) {
   // }
   for (auto& token : document_) {
     if (eop(token.origin())) {

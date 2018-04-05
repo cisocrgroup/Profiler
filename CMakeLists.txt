@@ -88,7 +88,7 @@ SET( OCRCORRECTION_SOURCES
 	     CorrectionSystem/CorrectionSystem.cxx
 	     LevenshteinWeights/LevenshteinWeights.cxx
 	     Profiler/AdaptiveProfiling.cxx
-	     Profiler/Cache.cxx
+	     Profiler/Profile.cxx
 	     Profiler/Evaluation.cxx
 	     Profiler/Evaluator.cxx
 	     Profiler/HTMLWriter.cxx

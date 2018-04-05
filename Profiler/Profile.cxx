@@ -1,25 +1,25 @@
-#include "Cache.h"
+#include "Profile.h"
 #include "Document/Document.h"
 #include "Token/Token.h"
 
 using namespace OCRCorrection;
-static const Cache::Pair&
-mustGet(const Cache::Map& map, const Token& token);
+static const Profile::Pair&
+mustGet(const Profile::Map& map, const Token& token);
 
 size_t
-Cache::count(const Token& token) const
+Profile::count(const Token& token) const
 {
   return mustGet(this->map_, token).second;
 }
 
 const csl::DictSearch::CandidateSet&
-Cache::candiates(const Token& token) const
+Profile::candiates(const Token& token) const
 {
   return mustGet(map_, token).first;
 }
 
 void
-Cache::put(const Token& token, F cb)
+Profile::put(const Token& token, F cb)
 {
   auto f = map_.find(token.getWOCR_lc());
   if (f == map_.end()) {
@@ -36,12 +36,12 @@ Cache::put(const Token& token, F cb)
   // }
 }
 
-const Cache::Pair&
-mustGet(const Cache::Map& map, const Token& token)
+const Profile::Pair&
+mustGet(const Profile::Map& map, const Token& token)
 {
   const auto f = map.find(token.getWOCR_lc());
   if (f == map.end()) {
-    throw std::logic_error("invalid token lookup in cache");
+    throw std::logic_error("invalid token lookup in profile");
   }
   return f->second;
 }
