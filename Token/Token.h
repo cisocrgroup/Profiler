@@ -160,6 +160,11 @@ namespace OCRCorrection {
 	 */
 	inline bool isNormal() const;
 
+	bool isShort() const {
+	    return ( getWOCR().size() <= 3 );
+	}
+
+
 	bool isSpace() const {
 		return std::all_of(begin(getWOCR()), end(getWOCR()), iswspace);
 	}
