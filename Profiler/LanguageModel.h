@@ -1,22 +1,31 @@
+#ifndef OCRC_LANGUAGE_MODEL_H
+#define OCRC_LANGUAGE_MODEL_H
 
+namespace csl {
+	class Pattern;
+	class Interpretation;
+	class Instruction;
+}
 
-#include<csl/DictSearch/DictSearch.h>
+namespace OCRCorrection {
+	class GlobalProfile;
+	class FrequencyList;
 
+	class LanguageModel {
+	public:
+    LanguageModel() = default;
+		double combinedProbability(const csl::Interpretation& cand,
+															 const csl::Instruction& ocrtrace) const;
+		double languageProbability(const csl::Interpretation& cand) const;
+		double ocrPatternProbability(const csl::Pattern& pat) const;
+		double histPatternProbability(const csl::Pattern& pat) const;
 
-class LanguageModel {
-public:
-    LanguageModel() {
-    }
+	private:
+		GlobalProfile* gprof_;
+		FrequencyList* freqList_;
+		double ocrPatternStartProb_;
+		double histPatternStartProb_;
+	};
+}
 
-    
-    float getScore( csl::DictSearch::Interpretation ipt ) {
-	return 0.5;
-    }
-
-    
-
-private:
-//    csl::MinDic< int >& histFreq_;
-//    csl::MinDic< int >& modernFreq_;
-
-};
+#endif // OCRC_LANGUAGE_MODEL_H

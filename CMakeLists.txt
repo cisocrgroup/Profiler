@@ -83,32 +83,33 @@ add_subdirectory(tools)
 
 ###### TO DO: Move this (and all related headers and sources) to a separate folder ##########
 SET( OCRCORRECTION_SOURCES
-             Utils/Utils.cxx
-	     Document/Document.cxx
+	     AbbyyXmlParser/AbbyyXmlParser.cxx
+	     AltoXML/AltoEnrich.cxx
+	     AltoXML/AltoXMLReader.cxx
 	     CorrectionSystem/CorrectionSystem.cxx
+	     DocXML/DocXMLReader.cxx
+	     DocXML/DocXMLWriter.cxx
+	     DocXML/LegacyDocXMLReader.cxx
+	     DocXML/MergedGroundtruthReader.cxx
+	     Document/Document.cxx
+	     GlobalProfile/GlobalProfileXMLReader.cxx
+	     GlobalProfile/PatternContainerXMLReader.cxx
+	     GtDoc/AutoCorrector.cxx
+	     GtDoc/GtDoc.cxx
 	     LevenshteinWeights/LevenshteinWeights.cxx
+	     Pattern/Pattern.cxx
 	     Profiler/AdaptiveProfiling.cxx
-	     Profiler/Profile.cxx
 	     Profiler/Evaluation.cxx
 	     Profiler/Evaluator.cxx
 	     Profiler/HTMLWriter.cxx
+	     Profiler/LanguageModel.cxx
+	     Profiler/Profile.cxx
 	     Profiler/Profiler.cxx
 	     Profiler/SimpleOutputWriter.cxx
-	     AbbyyXmlParser/AbbyyXmlParser.cxx
-	     DocXML/DocXMLReader.cxx
-	     DocXML/LegacyDocXMLReader.cxx
-	     DocXML/DocXMLWriter.cxx
-	     DocXML/MergedGroundtruthReader.cxx
-	     AltoXML/AltoXMLReader.cxx
-	     AltoXML/AltoEnrich.cxx
-	     TXTReader/TXTReader.cxx
 	     TXTReader/AlignedTXTReader.cxx
+	     TXTReader/TXTReader.cxx
 	     Token/TokenImageInfoBox.cxx
-	     GlobalProfile/GlobalProfileXMLReader.cxx
-	     GlobalProfile/PatternContainerXMLReader.cxx
-	     Pattern/Pattern.cxx
-	     GtDoc/GtDoc.cxx
-	     GtDoc/AutoCorrector.cxx
+       Utils/Utils.cxx
 	     )
 
 add_library( OCRCorrection STATIC ${OCRCORRECTION_SOURCES})
