@@ -8,17 +8,15 @@ static double
 clampProb(double w, double start);
 
 double
-LanguageModel::combinedProbability(const csl::Interpretation& cand,
-                                   const csl::Instruction& ocrtrace) const
+LanguageModel::ocrTraceProbability(const csl::Instruction& ocrtrace) const
 {
   // See Profiler.cxx Profiler::getCombinedProb
-  const auto langProb = languageProbability(cand);
   double ocrProb = 1.0;
   for (const auto& pat : ocrtrace) {
     ocrProb *= ocrPatternProbability(pat);
     ocrProb = clampProb(ocrProb, ocrPatternStartProb_);
   }
-  return clampProb(ocrProb * langProb, ocrPatternStartProb_);
+  return ocrProb;
 }
 
 double

@@ -14,8 +14,7 @@ namespace OCRCorrection {
 	class LanguageModel {
 	public:
     LanguageModel() = default;
-		double combinedProbability(const csl::Interpretation& cand,
-															 const csl::Instruction& ocrtrace) const;
+		double ocrTraceProbability(const csl::Instruction& ocrtrace) const;
 		double languageProbability(const csl::Interpretation& cand) const;
 		double ocrPatternProbability(const csl::Pattern& pat) const;
 		double histPatternProbability(const csl::Pattern& pat) const;

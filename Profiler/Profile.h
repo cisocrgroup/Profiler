@@ -8,6 +8,7 @@
 namespace OCRCorrection {
 	class Token;
 	class Profile;
+	class LanguageModel;
 
 	class Profile {
 	public:
@@ -24,15 +25,16 @@ namespace OCRCorrection {
 		size_t count(const Token& token) const;
 		const csl::DictSearch::CandidateSet& candiates(const Token& token) const;
 		void put(const Token& token, F f);
-		ConstIterator begin() const {return map_.begin();}
-		ConstIterator end() const {return map_.end();}
-		Iterator begin() {return map_.begin();}
-		Iterator end()  {return map_.end();}
+		void profile(size_t i, bool last, const LanguageModel& lm);
+		ConstIterator begin() const {return types_.begin();}
+		ConstIterator end() const {return types_.end();}
+		Iterator begin() {return types_.begin();}
+		Iterator end()  {return types_.end();}
 
 	private:
 		void updateCounts(const Token& token);
 
-		Map map_;
+		Map types_;
 		std::map<std::wstring, size_t> counter_;
 	};
 }
