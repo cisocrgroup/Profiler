@@ -2,8 +2,9 @@
 #include "Document/Document.h"
 #include "LanguageModel.h"
 #include "Pattern/ComputeInstruction.h"
-#include "ProbabilityDistribution.h"
+#include "PatternCounter/PatternCounter.h"
 #include "Token/Token.h"
+#include "WeightedCandidate.h"
 #include <utility>
 
 using namespace OCRCorrection;
@@ -12,6 +13,11 @@ const std::wstring Profile::TokenType::NOT_NORMAL = L"notNormal";
 const std::wstring Profile::TokenType::SHORT = L"short";
 const std::wstring Profile::TokenType::DONT_TOUCH = L"dont_touch";
 const std::wstring Profile::TokenType::NORMAL = L"normalAndLongTokens";
+const std::wstring Profile::TokenType::UNKNOWN = L"unknown";
+const std::wstring Profile::TokenType::GUESSED_HIST_TRACE_NONEMPTY =
+  L"guessed_histTrace_nonempty";
+const std::wstring Profile::TokenType::GUESSED_OCR_TRACE_NONEMPTY =
+  L"guessed_ocrTrace_nonempty";
 
 static const Profile::Pair&
 mustGet(const Profile::Map& map, const Token& token);
@@ -45,6 +51,7 @@ Profile::put(const Token& token, F cb)
     f = types_.emplace_hint(f, token.getWOCR_lc(), std::move(p));
   }
   f->second.first++;
+  ocrCharacterCount_ += token.getWOCR().size();
 }
 
 void
@@ -63,13 +70,18 @@ Profile::updateCounts(const Token& token)
 }
 
 void
-Profile::profile(size_t i, bool last, const LanguageModel& lm)
+Profile::profile(bool first, const LanguageModel& lm)
 {
   csl::ComputeInstruction computer;
+  std::map<csl::Pattern, std::set<std::wstring>> ocrPatternsInWords;
+  std::unordered_map<std::string, double> baseWordFrequency;
+  PatternCounter histCounter, ocrCounter;
+
   for (const auto& t : types_) {
     double sum = 0;
-    std::vector<ProbabilityDistribution> ds;
+    std::vector<WeightedCandidate> cs;
 
+    // first run over all candiates
     for (const auto& cand : t.second.second) {
       if (skipCand(cand)) {
         continue;
@@ -87,17 +99,57 @@ Profile::profile(size_t i, bool last, const LanguageModel& lm)
         if (ins.size() > cand.getLevDistance()) {
           continue;
         }
-        ProbabilityDistribution d;
-        d.traces.ocr = ins;
-        d.traces.hist = cand.getHistInstruction();
-        d.langProb = lm.languageProbability(cand);
-        d.ocrProb = lm.ocrTraceProbability(ins);
+        WeightedCandidate c;
+        c.traces.ocr = ins;
+        c.traces.hist = cand.getHistInstruction();
+        c.langProb = lm.languageProbability(cand);
+        c.ocrProb = lm.ocrTraceProbability(ins);
+        c.dictModule = cand.getDictModule().getName();
+        c.word = cand.getWord();
+        c.baseWord = cand.getBaseWord();
         using namespace std::rel_ops;
-        if (ds.empty() || d.traces != ds.back().traces) {
-          sum += d.combinedProbability();
-          ds.push_back(std::move(d));
+        if (cs.empty() || c.traces != cs.back().traces) {
+          sum += c.combinedProbability();
+          cs.push_back(std::move(c));
         }
       }
+    }
+    // now run over the calculated distributions
+    for (auto& c : cs) {
+      c.weight = c.combinedProbability() / sum;
+      if (std::isnan(c.weight)) {
+        if (c.traces.hist.isUnknown()) {
+          c.weight = 1;
+        } else if (first) {
+          c.weight = lm.ocrPatternStartProbability();
+        } else {
+          c.weight = lm.ocrPatternSmoothingProbability();
+        }
+      }
+      for (const auto& pat : c.traces.ocr) {
+        ocrCounter.registerPattern(pat, c.weight);
+        if (c.weight > 0.5) {
+          ocrPatternsInWords[pat].insert(t.first);
+        }
+      }
+      for (const auto& pat : c.traces.hist) {
+        histCounter.registerPattern(pat, c.weight);
+      }
+      if (c.traces.hist.size() > 0) {
+        counter_[TokenType::GUESSED_HIST_TRACE_NONEMPTY] +=
+          (c.weight * t.second.first);
+      }
+      if (c.traces.ocr.size() > 0) {
+        counter_[TokenType::GUESSED_OCR_TRACE_NONEMPTY] +=
+          (c.weight * t.second.first);
+      }
+      ocrCounter.registerNGrams(c.word, c.weight);
+      histCounter.registerNGrams(c.baseWord, c.weight);
+      baseWordFrequency[c.baseWord] += (c.weight * t.second.second);
+      counter_[TokenType::WAS_PROFILED] += (c.weight * t.second.second);
+    }
+    if (cs.empty()) {
+      counter_[TokenType::UNKNOWN] += t.second.second;
     }
   }
 }

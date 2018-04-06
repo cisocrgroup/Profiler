@@ -1,17 +1,18 @@
-#ifndef OCRC_PROBABILITY_DISTRIBUTION_H
-#define OCRC_PROBABILITY_DISTRIBUTION_H
+#ifndef OCRC_WEIGHTED_CANDIATE_H
+#define OCRC_WEIGHTED_CANDIATE_H
 
 namespace OCRCorrection {
 	struct Traces {
 		csl::Instruction hist, ocr;
 	};
 
-	struct ProbabilityDistribution {
+	struct WeightedCandidate {
 		double combinedProbability() const {
 			return ocrProb * langProb;
 		}
 		Traces traces;
-		double langProb, ocrProb, norm;
+		std::wstring dictModule, word, baseWord;
+		double langProb, ocrProb, weight;
 	};
 
 	static inline bool operator==(const Traces& a, const Traces& b) {
@@ -19,4 +20,4 @@ namespace OCRCorrection {
 	}
 }
 
-#endif // OCRC_PROBABILITY_DISTRIBUTION_H
+#endif // OCRC_WEIGHTED_CANDIATE_H
