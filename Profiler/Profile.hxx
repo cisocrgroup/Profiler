@@ -26,8 +26,6 @@ public:
   using ConstIterator = Map::const_iterator;
 
   Profile() = default;
-  size_t count(const Token& token) const;
-  const csl::DictSearch::CandidateSet& candiates(const Token& token) const;
   void put(const Token& token, F f);
   void profile(bool first, const LanguageModel& lm);
   ConstIterator begin() const { return types_.begin(); }

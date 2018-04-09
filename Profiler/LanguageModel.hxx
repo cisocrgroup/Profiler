@@ -19,6 +19,7 @@ public:
   double languageProbability(const csl::Interpretation& cand) const;
   double ocrPatternProbability(const csl::Pattern& pat) const;
   double histPatternProbability(const csl::Pattern& pat) const;
+  GlobalProfile& globalProfile() const { return *gprof_; }
   double ocrPatternStartProbability() const { return ocrPatternStartProb_; }
   double ocrPatternSmoothingProbability() const
   {

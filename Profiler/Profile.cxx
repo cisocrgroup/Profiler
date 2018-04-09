@@ -20,22 +20,8 @@ const std::wstring Profile::TokenType::GUESSED_HIST_TRACE_NONEMPTY =
 const std::wstring Profile::TokenType::GUESSED_OCR_TRACE_NONEMPTY =
   L"guessed_ocrTrace_nonempty";
 
-static const Profile::Pair&
-mustGet(const Profile::Map& map, const Token& token);
 static bool
 skipCand(const csl::DictSearch::Interpretation& cand);
-
-size_t
-Profile::count(const Token& token) const
-{
-  return mustGet(this->types_, token).first;
-}
-
-const csl::DictSearch::CandidateSet&
-Profile::candiates(const Token& token) const
-{
-  return mustGet(types_, token).second;
-}
 
 void
 Profile::put(const Token& token, F cb)
@@ -153,16 +139,6 @@ Profile::profile(bool first, const LanguageModel& lm)
       counter_[TokenType::UNKNOWN] += t.second.first;
     }
   }
-}
-
-const Profile::Pair&
-mustGet(const Profile::Map& map, const Token& token)
-{
-  const auto f = map.find(token.getWOCR_lc());
-  if (f == map.end()) {
-    throw std::logic_error("invalid token lookup in profile");
-  }
-  return f->second;
 }
 
 bool
