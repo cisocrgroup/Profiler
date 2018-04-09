@@ -1,7 +1,8 @@
 #ifndef OCRC_PROFILE_HXX
 #define OCRC_PROFILE_HXX
 
-#include <DictSearch/DictSearch.h>
+#include "DictSearch/DictSearch.h"
+#include "WeightedCandidate.hxx"
 #include <functional>
 #include <unordered_map>
 
@@ -9,6 +10,7 @@ namespace OCRCorrection {
 class Token;
 class Profile;
 class LanguageModel;
+class PatternCounter;
 
 class Profile
 {
@@ -20,25 +22,30 @@ public:
       GUESSED_OCR_TRACE_NONEMPTY;
   };
   using F = std::function<void(const Token&, csl::DictSearch::CandidateSet&)>;
-  using Pair = std::pair<size_t, csl::DictSearch::CandidateSet>;
-  using Map = std::unordered_map<std::wstring, Pair>;
-  using Iterator = Map::iterator;
-  using ConstIterator = Map::const_iterator;
+  using Tuple = std::tuple<size_t,
+                           csl::DictSearch::CandidateSet,
+                           std::vector<WeightedCandidate>>;
+  using Map = std::unordered_map<std::wstring, Tuple>;
 
   Profile() = default;
   void put(const Token& token, F f);
-  void profile(bool first, const LanguageModel& lm);
-  ConstIterator begin() const { return types_.begin(); }
-  ConstIterator end() const { return types_.end(); }
-  Iterator begin() { return types_.begin(); }
-  Iterator end() { return types_.end(); }
+  void iteration(const LanguageModel& lm);
+  void finish();
+  void setCorrection(Token& token) const;
 
 private:
+  void updateGlobalHistPatterns(const LanguageModel& lm,
+                                const PatternCounter& counts) const;
+  void updateGlobalOCRPatterns(const LanguageModel& lm,
+                               const PatternCounter& counts) const;
+  void updateDictDistributions(const LanguageModel& lm) const;
   void updateCounts(const Token& token);
+  bool skipCutoff(double count, double cutoff) const;
 
   Map types_;
   std::map<std::wstring, size_t> counter_;
   size_t ocrCharacterCount_;
+  int iteration_;
 };
 }
 

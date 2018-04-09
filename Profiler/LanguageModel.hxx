@@ -19,7 +19,11 @@ public:
   double languageProbability(const csl::Interpretation& cand) const;
   double ocrPatternProbability(const csl::Pattern& pat) const;
   double histPatternProbability(const csl::Pattern& pat) const;
+  void clearHistPatternProbabilities() const;
+  void clearOCRPatternProbabilities() const;
   GlobalProfile& globalProfile() const { return *gprof_; }
+  double histPatternCutoff() const { return histPatternCutoff_; }
+  double ocrPatternCutoff() const { return ocrPatternCutoff_; }
   double ocrPatternStartProbability() const { return ocrPatternStartProb_; }
   double ocrPatternSmoothingProbability() const
   {
@@ -29,9 +33,13 @@ public:
 private:
   GlobalProfile* gprof_;
   FrequencyList* freqList_;
-  double ocrPatternStartProb_;
-  double ocrPatternSmoothingProb_;
-  double histPatternStartProb_;
+  const double ocrPatternStartProb_;
+  const double ocrPatternSmoothingProb_;
+  const double histPatternStartProb_;
+  const double histPatternCutoff_;
+  const double ocrPatternCutoff_;
+  const bool resetOCRPatternProbabilities_;
+  const bool resetHistPatternProbabilities_;
 };
 }
 

@@ -1,6 +1,8 @@
 #ifndef OCRC_WEIGHTED_CANDIATE_HXX
 #define OCRC_WEIGHTED_CANDIATE_HXX
 
+#include "Candidate/Candidate.h"
+
 namespace OCRCorrection {
 struct Traces
 {
@@ -10,8 +12,10 @@ struct Traces
 struct WeightedCandidate
 {
   double combinedProbability() const { return ocrProb * langProb; }
+  Candidate cand;
   Traces traces;
-  std::wstring dictModule, word, baseWord;
+  const csl::DictSearch::iDictModule* dictModule;
+  std::wstring word, baseWord;
   double langProb, ocrProb, weight;
 };
 

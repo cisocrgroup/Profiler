@@ -41,6 +41,22 @@ LanguageModel::histPatternProbability(const csl::Pattern& pat) const
                    histPatternStartProb_);
 }
 
+void
+LanguageModel::clearHistPatternProbabilities() const
+{
+  if (resetHistPatternProbabilities_) {
+    gprof_->histPatternProbabilities_.clear();
+  }
+}
+
+void
+LanguageModel::clearOCRPatternProbabilities() const
+{
+  if (resetOCRPatternProbabilities_) {
+    gprof_->ocrPatternProbabilities_.clearExplicitWeights();
+  }
+}
+
 double
 clampProb(double w, double start)
 {

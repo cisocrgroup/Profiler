@@ -14,6 +14,7 @@ namespace OCRCorrection {
 
 
 	typedef std::map< csl::Pattern, float >::iterator PatternIterator;
+	typedef std::map< csl::Pattern, float >::const_iterator ConstPatternIterator;
 
 	/**
 	 * @brief standard constructor
@@ -69,6 +70,12 @@ namespace OCRCorrection {
 	}
 
 	PatternIterator patternsEnd() {
+	    return patternCount_.end();
+	}
+	ConstPatternIterator begin() const {
+	    return patternCount_.begin();
+	}
+	ConstPatternIterator end() const {
 	    return patternCount_.end();
 	}
 
