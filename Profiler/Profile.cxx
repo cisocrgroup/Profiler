@@ -13,6 +13,7 @@ const std::wstring Profile::TokenType::NOT_NORMAL = L"notNormal";
 const std::wstring Profile::TokenType::SHORT = L"short";
 const std::wstring Profile::TokenType::DONT_TOUCH = L"dont_touch";
 const std::wstring Profile::TokenType::NORMAL = L"normalAndLongTokens";
+const std::wstring Profile::TokenType::WAS_PROFILED = L"wasProfiled";
 const std::wstring Profile::TokenType::UNKNOWN = L"unknown";
 const std::wstring Profile::TokenType::GUESSED_HIST_TRACE_NONEMPTY =
   L"guessed_histTrace_nonempty";
@@ -74,7 +75,7 @@ Profile::profile(bool first, const LanguageModel& lm)
 {
   csl::ComputeInstruction computer;
   std::map<csl::Pattern, std::set<std::wstring>> ocrPatternsInWords;
-  std::unordered_map<std::string, double> baseWordFrequency;
+  std::unordered_map<std::wstring, double> baseWordFrequency;
   PatternCounter histCounter, ocrCounter;
 
   for (const auto& t : types_) {
@@ -145,11 +146,11 @@ Profile::profile(bool first, const LanguageModel& lm)
       }
       ocrCounter.registerNGrams(c.word, c.weight);
       histCounter.registerNGrams(c.baseWord, c.weight);
-      baseWordFrequency[c.baseWord] += (c.weight * t.second.second);
-      counter_[TokenType::WAS_PROFILED] += (c.weight * t.second.second);
+      baseWordFrequency[c.baseWord] += (c.weight * t.second.first);
+      counter_[TokenType::WAS_PROFILED] += (c.weight * t.second.first);
     }
     if (cs.empty()) {
-      counter_[TokenType::UNKNOWN] += t.second.second;
+      counter_[TokenType::UNKNOWN] += t.second.first;
     }
   }
 }

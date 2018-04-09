@@ -13,8 +13,14 @@ namespace OCRCorrection {
 	class Profile {
 	public:
 		struct TokenType {
-			static const std::wstring NOT_NORMAL, DONT_TOUCH, SHORT, NORMAL,
-				UNKNOWN, GUESSED_HIST_TRACE_NONEMPTY, GUESSED_OCR_TRACE_NONEMPTY;
+			static const std::wstring NOT_NORMAL,
+				DONT_TOUCH,
+				SHORT,
+				NORMAL,
+				WAS_PROFILED,
+				UNKNOWN,
+				GUESSED_HIST_TRACE_NONEMPTY,
+				GUESSED_OCR_TRACE_NONEMPTY;
 		};
 		using F = std::function<void(const Token&, csl::DictSearch::CandidateSet&)>;
 		using Pair = std::pair<size_t, csl::DictSearch::CandidateSet>;
