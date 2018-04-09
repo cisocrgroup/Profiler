@@ -1,4 +1,4 @@
-#include "LanguageModel.h"
+#include "LanguageModel.hxx"
 #include "FrequencyList.h"
 #include "GlobalProfile/GlobalProfile.h"
 

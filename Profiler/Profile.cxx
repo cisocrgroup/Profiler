@@ -1,10 +1,10 @@
-#include "Profile.h"
+#include "Profile.hxx"
 #include "Document/Document.h"
-#include "LanguageModel.h"
+#include "LanguageModel.hxx"
 #include "Pattern/ComputeInstruction.h"
 #include "PatternCounter/PatternCounter.h"
 #include "Token/Token.h"
-#include "WeightedCandidate.h"
+#include "WeightedCandidate.hxx"
 #include <utility>
 
 using namespace OCRCorrection;

@@ -3,7 +3,7 @@
 
 #include "./Profiler.h"
 #include "./Profiler_Token.tcc"
-#include "Profile.h"
+#include "Profile.hxx"
 #include "Utils/NoThousandGrouping.h"
 
 namespace OCRCorrection {
