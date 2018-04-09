@@ -7,6 +7,20 @@ using namespace OCRCorrection;
 static double
 clampProb(double w, double start);
 
+LanguageModel::LanguageModel(const Profiler::Configuration& config,
+                             FrequencyList* freqList,
+                             GlobalProfile* gprof)
+  : gprof_(gprof)
+  , freqList_(freqList)
+  , ocrPatternStartProb_(config.ocrPatternStartProb_)
+  , ocrPatternSmoothingProb_(config.ocrPatternSmoothingProb_)
+  , histPatternStartProb_(config.histPatternSmoothingProb_)
+  , histPatternCutoff_(config.patternCutoff_hist_)
+  , ocrPatternCutoff_(config.patternCutoff_ocr_)
+  , resetOCRPatternProbabilities_(config.resetOCRPatternProbabilities_)
+  , resetHistPatternProbabilities_(config.resetHistPatternProbabilities_)
+{}
+
 double
 LanguageModel::ocrTraceProbability(const csl::Instruction& ocrtrace) const
 {

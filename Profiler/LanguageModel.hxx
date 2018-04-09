@@ -1,6 +1,8 @@
 #ifndef OCRC_LANGUAGE_MODEL_HXX
 #define OCRC_LANGUAGE_MODEL_HXX
 
+#include "Profiler.h"
+
 namespace csl {
 class Pattern;
 class Interpretation;
@@ -14,7 +16,9 @@ class FrequencyList;
 class LanguageModel
 {
 public:
-  LanguageModel() = default;
+  LanguageModel(const Profiler::Configuration& config,
+                FrequencyList* freqList,
+                GlobalProfile* gprof);
   double ocrTraceProbability(const csl::Instruction& ocrtrace) const;
   double languageProbability(const csl::Interpretation& cand) const;
   double ocrPatternProbability(const csl::Pattern& pat) const;

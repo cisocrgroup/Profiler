@@ -32,7 +32,7 @@
 #include "./FrequencyList.h"
 
 namespace OCRCorrection {
-
+	class LanguageModel;
 	class Token;
 
     /**
@@ -461,7 +461,7 @@ namespace OCRCorrection {
 	    }
 
 	}; // class Configuration
-
+	friend class LanguageModel;
 
 
 	/**
