@@ -1,3 +1,6 @@
+#ifndef OCRCORRECTION_PATTERN_COUNTER_H__
+#define OCRCORRECTION_PATTERN_COUNTER_H__
+
 #include<map>
 #include<Pattern/Pattern.h>
 
@@ -100,3 +103,4 @@ namespace OCRCorrection {
     };
 
 } // eon
+#endif // OCRCORRECTION_PATTERN_COUNTER_H__
