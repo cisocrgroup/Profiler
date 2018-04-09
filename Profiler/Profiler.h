@@ -138,6 +138,12 @@ namespace OCRCorrection {
 	const std::string& getAdaptiveDictionaryPath() const noexcept {
 		return config_.adaptiveDictionaryPath_;
 	}
+	bool types() const noexcept {
+		return config_.types_;
+	}
+	void setTypes(bool types) noexcept {
+		config_.types_ = types;
+	}
 
 	/**
 	 * @brief enable virtual unknown dictionary
@@ -232,6 +238,7 @@ namespace OCRCorrection {
 	 * Do calculate the profile
 	 */
 	void doCreateProfile(Document& sourceDoc);
+	void _doCreateProfile(Document& sourceDoc);
 
 	/**
 	 * @brief Execute one iteration of the profiling process.
@@ -433,6 +440,7 @@ namespace OCRCorrection {
 	    std::string adaptiveDictionaryPath_;
 	    bool writeAdaptiveDictionary_;
 	    bool adaptive_;
+			bool types_;
 
 	    void print( std::wostream& os = std::wcout ) {
 		os << "number of iterations:           " << nrOfIterations_ << std::endl
@@ -456,6 +464,7 @@ namespace OCRCorrection {
 		   << "writeAdaptiveDictionary:        " << writeAdaptiveDictionary_ << std::endl
 		   << "adaptiveDictionaryPath:         " << Utils::utf8(adaptiveDictionaryPath_) << std::endl
 		   << "adaptive_:                      " << adaptive_ << std::endl
+		   << "types_:                         " << types_ << std::endl
 		   << std::endl
 		    ;
 	    }

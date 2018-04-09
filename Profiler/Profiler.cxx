@@ -97,7 +97,11 @@ Profiler::readConfiguration(csl::INIConfig const& iniConf)
 void
 Profiler::createProfile(Document& sourceDoc)
 {
-  doCreateProfile(sourceDoc);
+  if (config_.types_) {
+    _doCreateProfile(sourceDoc);
+  } else {
+    doCreateProfile(sourceDoc);
+  }
   sourceDoc.set_global_profile(globalProfile_);
 }
 
@@ -129,6 +133,69 @@ Profiler::initGlobalOcrPatternProbs(int itn)
     globalProfile_.ocrPatternProbabilities_.setDefault(
       csl::PatternWeights::PatternType(1, 0), config_.ocrPatternSmoothingProb_);
   }
+}
+
+void
+Profiler::_doCreateProfile(Document& sourceDoc)
+{
+  config_.print(std::wcerr);
+
+  if (config_.nrOfIterations_ == 0) {
+    std::wcerr
+      << "OCRC::Profiler::createNonAdaptiveProfile: config says 0 iterations, "
+         "so I do nothing."
+      << std::endl;
+  }
+
+  prepareDocument(sourceDoc);
+
+  // this means never to take actual frequencies from the corpus but to always
+  // take the formula to compute that value. This switch is hard-wired now
+  // because we're not likely to change it.
+  freqList_.doApplyStaticFreqs(false);
+
+  freqList_.setHistPatternSmoothingProb(config_.histPatternSmoothingProb_);
+
+  instructionComputer_.connectPatternProbabilities(
+    globalProfile_.ocrPatternProbabilities_);
+
+  //////// 1ST ITERATION ///////////////////
+  initGlobalOcrPatternProbs(1);
+  globalProfile_.ocrPatternProbabilities_.setSmartMerge(); // this means that
+                                                           // pseudo-merges and
+                                                           // splits like ab<>b
+                                                           // ot ab<>a are not
+                                                           // allowed
+
+  //                --> true/false specifies if HTML output for 1st iteration is
+  //                to be written to stdout
+  bool doWriteHTML = (config_.nrOfIterations_ == 1);
+
+  doIteration(1, doWriteHTML);
+
+  //////// 2ND AND FURTHER ITERATIONS ///////////////////
+  initGlobalOcrPatternProbs(2);
+
+  freqList_.connectPatternProbabilities(
+    &globalProfile_.histPatternProbabilities_);
+  // connectBaseWordFrequency ... is connected below
+  freqList_.setNrOfTrainingTokens(nrOfProfiledTokens_);
+
+  for (size_t iterationNr = 2; iterationNr <= config_.nrOfIterations_;
+       ++iterationNr) {
+    // this has to be done again because the MinDic's position in memory changes
+    freqList_.connectBaseWordFrequency(baseWordFrequencyDic_);
+    //                     do print in the last iteration
+    doIteration(iterationNr, (iterationNr == config_.nrOfIterations_));
+  }
+
+  // 	std::wofstream histPatternFile( "./histPatterns.xml" );
+  // 	globalProfile_.histPatternProbabilities_.writeToXML( histPatternFile );
+  // 	histPatternFile.close();
+
+  // 	std::wofstream ocrPatternFile( "./ocrPatterns.xml" );
+  // 	globalProfile_.ocrPatternProbabilities_.writeToXML( ocrPatternFile );
+  // 	ocrPatternFile.close();
 }
 
 void

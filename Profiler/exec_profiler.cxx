@@ -78,6 +78,7 @@ printHelp()
     << std::endl
     << "[--enable-unknowns]         Enable handling of uninterpretable "
        "(unknown) tokens"
+    << "[--types]                   Profile usinging types not tokens"
     << std::endl;
 }
 
@@ -108,6 +109,7 @@ main(int argc, char const** argv)
     options.specifyOption("strict", csl::Getopt::STRING);
     options.specifyOption("autocorrect", csl::Getopt::STRING);
     options.specifyOption("enable-unknowns", csl::Getopt::VOID);
+    options.specifyOption("types", csl::Getopt::VOID);
 
     try {
       options.getOptionsAsSpecified(argc, argv);
@@ -205,6 +207,7 @@ main(int argc, char const** argv)
       profiler.setHTMLOutFile(options.getOption("out_html"));
     }
     profiler.setAdaptive(options.hasOption("adaptive"));
+    profiler.setTypes(options.hasOption("types"));
 
     OCRCorrection::Document document;
 
