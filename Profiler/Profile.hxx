@@ -6,6 +6,11 @@
 #include <functional>
 #include <unordered_map>
 
+namespace csl {
+template<class T>
+class MinDic;
+}
+
 namespace OCRCorrection {
 class Token;
 class Profile;
@@ -32,6 +37,7 @@ public:
   void iteration(const LanguageModel& lm);
   void finish();
   void setCorrection(Token& token) const;
+  int iteration() const { return iteration_; }
 
 private:
   void updateGlobalHistPatterns(const LanguageModel& lm,
@@ -40,10 +46,13 @@ private:
                                const PatternCounter& counts) const;
   void updateDictDistributions(const LanguageModel& lm) const;
   void updateCounts(const Token& token);
+  void updateBaseWordFrequencies(const LanguageModel& lm,
+                                 const std::map<std::wstring, double>& m);
   bool skipCutoff(double count, double cutoff) const;
 
   Map types_;
   std::map<std::wstring, size_t> counter_;
+  std::unique_ptr<csl::MinDic<float>> mindic_;
   size_t ocrCharacterCount_;
   int iteration_;
 };

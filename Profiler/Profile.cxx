@@ -24,6 +24,8 @@ static bool
 skipCand(const csl::DictSearch::Interpretation& cand);
 static bool
 isInsOrDel(const csl::Pattern& pat);
+static std::unique_ptr<csl::MinDic<float>>
+makeMinDic(const std::map<std::wstring, double>& m);
 
 void
 Profile::put(const Token& token, F cb)
@@ -62,11 +64,16 @@ void
 Profile::iteration(const LanguageModel& lm)
 {
   std::map<csl::Pattern, std::set<std::wstring>> ocrPatternsInWords;
-  std::unordered_map<std::wstring, double> baseWordFrequency;
+  std::map<std::wstring, double> baseWordFrequency;
   PatternCounter histCounter, ocrCounter;
-  csl::ComputeInstruction computer;
 
+  csl::ComputeInstruction computer;
+  computer.connectPatternProbabilities(
+    lm.globalProfile().ocrPatternProbabilities_);
   lm.globalProfile().dictDistribution_.clear();
+  lm.frequencyList().connectPatternProbabilities(
+    &lm.globalProfile().histPatternProbabilities_);
+
   for (auto& t : types_) {
     double sum = 0;
     std::get<2>(t.second).clear();
@@ -149,6 +156,7 @@ Profile::iteration(const LanguageModel& lm)
   updateGlobalHistPatterns(lm, histCounter);
   updateGlobalOCRPatterns(lm, ocrCounter);
   updateDictDistributions(lm);
+  updateBaseWordFrequencies(lm, baseWordFrequency);
   iteration_++;
 }
 
@@ -240,6 +248,28 @@ Profile::updateDictDistributions(const LanguageModel& lm) const
     d.second.proportion =
       d.second.frequency / counter_.at(TokenType::WAS_PROFILED);
   }
+}
+
+void
+Profile::updateBaseWordFrequencies(const LanguageModel& lm,
+                                   const std::map<std::wstring, double>& m)
+{
+  mindic_ = makeMinDic(m);
+  lm.frequencyList().setNrOfTrainingTokens(counter_[TokenType::WAS_PROFILED]);
+  lm.frequencyList().connectBaseWordFrequency(mindic_.get());
+}
+
+std::unique_ptr<csl::MinDic<float>>
+makeMinDic(const std::map<std::wstring, double>& m)
+{
+  std::unique_ptr<csl::MinDic<float>> dic;
+  dic.reset(new csl::MinDic<float>());
+  dic->initConstruction();
+  for (const auto& e : m) {
+    dic->addToken(e.first.data(), e.second);
+  }
+  dic->finishConstruction();
+  return std::move(dic);
 }
 
 bool

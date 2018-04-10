@@ -26,6 +26,7 @@ public:
   void clearHistPatternProbabilities() const;
   void clearOCRPatternProbabilities() const;
   GlobalProfile& globalProfile() const { return *gprof_; }
+  FrequencyList& frequencyList() const { return *freqList_; }
   double histPatternCutoff() const { return histPatternCutoff_; }
   double ocrPatternCutoff() const { return ocrPatternCutoff_; }
   double ocrPatternStartProbability() const { return ocrPatternStartProb_; }

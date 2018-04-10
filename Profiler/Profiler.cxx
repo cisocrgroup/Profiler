@@ -3,6 +3,7 @@
 
 #include "./Profiler.h"
 #include "./Profiler_Token.tcc"
+#include "LanguageModel.hxx"
 #include "Profile.hxx"
 #include "Utils/NoThousandGrouping.h"
 
@@ -139,63 +140,54 @@ void
 Profiler::_doCreateProfile(Document& sourceDoc)
 {
   config_.print(std::wcerr);
-
   if (config_.nrOfIterations_ == 0) {
     std::wcerr
       << "OCRC::Profiler::createNonAdaptiveProfile: config says 0 iterations, "
          "so I do nothing."
       << std::endl;
   }
-
   prepareDocument(sourceDoc);
-
-  // this means never to take actual frequencies from the corpus but to always
-  // take the formula to compute that value. This switch is hard-wired now
-  // because we're not likely to change it.
   freqList_.doApplyStaticFreqs(false);
-
   freqList_.setHistPatternSmoothingProb(config_.histPatternSmoothingProb_);
-
-  instructionComputer_.connectPatternProbabilities(
-    globalProfile_.ocrPatternProbabilities_);
-
-  //////// 1ST ITERATION ///////////////////
-  initGlobalOcrPatternProbs(1);
+  // Calculate candidates for each type in the set;
+  Profile profile;
+  csl::Stopwatch stopwatch;
+  std::wcerr << "calculating candidates\n";
+  for (const auto& token : document_) {
+    if (eop(token.origin())) {
+      break;
+    }
+    profile.put(token.origin(),
+                [this](const Token& token, csl::DictSearch::CandidateSet& cs) {
+                  this->calculateCandidateSet(token, cs);
+                });
+  }
+  std::wcerr << "done calculating candidates in "
+             << stopwatch.readMilliseconds() << "ms\n";
   globalProfile_.ocrPatternProbabilities_.setSmartMerge(); // this means that
                                                            // pseudo-merges and
                                                            // splits like ab<>b
                                                            // ot ab<>a are not
                                                            // allowed
-
-  //                --> true/false specifies if HTML output for 1st iteration is
-  //                to be written to stdout
-  bool doWriteHTML = (config_.nrOfIterations_ == 1);
-
-  doIteration(1, doWriteHTML);
-
-  //////// 2ND AND FURTHER ITERATIONS ///////////////////
-  initGlobalOcrPatternProbs(2);
-
-  freqList_.connectPatternProbabilities(
-    &globalProfile_.histPatternProbabilities_);
-  // connectBaseWordFrequency ... is connected below
-  freqList_.setNrOfTrainingTokens(nrOfProfiledTokens_);
-
-  for (size_t iterationNr = 2; iterationNr <= config_.nrOfIterations_;
-       ++iterationNr) {
-    // this has to be done again because the MinDic's position in memory changes
-    freqList_.connectBaseWordFrequency(baseWordFrequencyDic_);
-    //                     do print in the last iteration
-    doIteration(iterationNr, (iterationNr == config_.nrOfIterations_));
+  LanguageModel lm(config_, &freqList_, &globalProfile_);
+  std::wcerr << "doing iterations\n";
+  stopwatch.start();
+  for (size_t i = 0; i < config_.nrOfIterations_; i++) {
+    initGlobalOcrPatternProbs(i + 1);
+    profile.iteration(lm);
+    std::wcerr << "iteration " << i + 1 << " done after "
+               << stopwatch.readMilliseconds() << "ms\n";
+    stopwatch.start();
   }
+  profile.finish();
 
-  // 	std::wofstream histPatternFile( "./histPatterns.xml" );
-  // 	globalProfile_.histPatternProbabilities_.writeToXML( histPatternFile );
-  // 	histPatternFile.close();
-
-  // 	std::wofstream ocrPatternFile( "./ocrPatterns.xml" );
-  // 	globalProfile_.ocrPatternProbabilities_.writeToXML( ocrPatternFile );
-  // 	ocrPatternFile.close();
+  std::wcerr << "connecting corrections to tokens\n";
+  stopwatch.start();
+  for (auto& token : document_) {
+    profile.setCorrection(token.origin());
+  }
+  std::wcerr << "done connecting corrections in "
+             << stopwatch.readMilliseconds() << "ms\n";
 }
 
 void
@@ -223,15 +215,12 @@ Profiler::doCreateProfile(Document& sourceDoc)
     globalProfile_.ocrPatternProbabilities_);
 
   //////// 1ST ITERATION ///////////////////
-  initGlobalOcrPatternProbs(1);
   globalProfile_.ocrPatternProbabilities_.setSmartMerge(); // this means that
                                                            // pseudo-merges and
                                                            // splits like ab<>b
                                                            // ot ab<>a are not
                                                            // allowed
 
-  //                --> true/false specifies if HTML output for 1st iteration is
-  //                to be written to stdout
   bool doWriteHTML = (config_.nrOfIterations_ == 1);
 
   doIteration(1, doWriteHTML);
@@ -299,26 +288,7 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
 
   histCounter_.clear();
   ocrCounter_.clear();
-
-  // Calculate candidates for each type in the set;
-  Profile profile;
   csl::Stopwatch stopwatch;
-  std::wcerr << "calculating candidates\n";
-  for (const auto& token : document_) {
-    if (eop(token.origin())) {
-      break;
-    }
-    profile.put(token.origin(),
-                [this](const Token& token, csl::DictSearch::CandidateSet& cs) {
-                  this->calculateCandidateSet(token, cs);
-                });
-  }
-  std::wcerr << "done calculating candidates in "
-             << stopwatch.readMilliseconds() << "ms\n";
-  stopwatch.start();
-
-  // for (auto& p : profile) {
-  // }
   for (auto& token : document_) {
     if (eop(token.origin())) {
       break;
