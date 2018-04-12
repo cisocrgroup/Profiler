@@ -51,7 +51,7 @@ private:
   bool skipCutoff(double count, double cutoff) const;
 
   Map types_;
-  std::map<std::wstring, size_t> counter_;
+  std::map<std::wstring, double> counter_;
   std::unique_ptr<csl::MinDic<float>> mindic_;
   size_t ocrCharacterCount_;
   int iteration_;

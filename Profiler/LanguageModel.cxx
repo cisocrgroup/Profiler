@@ -9,9 +9,11 @@ clampProb(double w, double start);
 
 LanguageModel::LanguageModel(const Profiler::Configuration& config,
                              FrequencyList* freqList,
-                             GlobalProfile* gprof)
+                             GlobalProfile* gprof,
+                             csl::ComputeInstruction* computer)
   : gprof_(gprof)
   , freqList_(freqList)
+  , computer_(computer)
   , ocrPatternStartProb_(config.ocrPatternStartProb_)
   , ocrPatternSmoothingProb_(config.ocrPatternSmoothingProb_)
   , histPatternStartProb_(config.histPatternSmoothingProb_)
@@ -19,7 +21,9 @@ LanguageModel::LanguageModel(const Profiler::Configuration& config,
   , ocrPatternCutoff_(config.patternCutoff_ocr_)
   , resetOCRPatternProbabilities_(config.resetOCRPatternProbabilities_)
   , resetHistPatternProbabilities_(config.resetHistPatternProbabilities_)
-{}
+{
+  computer_->connectPatternProbabilities(gprof_->ocrPatternProbabilities_);
+}
 
 double
 LanguageModel::ocrTraceProbability(const csl::Instruction& ocrtrace) const
@@ -37,6 +41,12 @@ double
 LanguageModel::languageProbability(const csl::Interpretation& cand) const
 {
   // See Profiler.cxx Profiler::getCombinedProb
+  std::wcerr << "LangProb(" << cand
+             << "): " << freqList_->getLanguageProbability(cand) << "\n";
+  std::wcerr << "LangProb(" << cand << "): "
+             << clampProb(freqList_->getLanguageProbability(cand),
+                          ocrPatternStartProb_)
+             << "\n";
   return clampProb(freqList_->getLanguageProbability(cand),
                    ocrPatternStartProb_);
 }

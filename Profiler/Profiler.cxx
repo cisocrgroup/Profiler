@@ -104,6 +104,14 @@ Profiler::createProfile(Document& sourceDoc)
     doCreateProfile(sourceDoc);
   }
   sourceDoc.set_global_profile(globalProfile_);
+  for (const auto& ocr : globalProfile_.ocrPatternProbabilities_) {
+    std::wcerr << "OCR:  " << ocr.first.getLeft() << ":" << ocr.first.getRight()
+               << ": " << ocr.second << "\n";
+  }
+  for (const auto& hist : globalProfile_.histPatternProbabilities_) {
+    std::wcerr << "HIST: " << hist.first.getLeft() << ":"
+               << hist.first.getRight() << ": " << hist.second << "\n";
+  }
 }
 
 void
@@ -169,11 +177,15 @@ Profiler::_doCreateProfile(Document& sourceDoc)
                                                            // splits like ab<>b
                                                            // ot ab<>a are not
                                                            // allowed
-  LanguageModel lm(config_, &freqList_, &globalProfile_);
+  csl::ComputeInstruction computer;
+  LanguageModel lm(config_, &freqList_, &globalProfile_, &computer);
   std::wcerr << "doing iterations\n";
   stopwatch.start();
+
   for (size_t i = 0; i < config_.nrOfIterations_; i++) {
-    initGlobalOcrPatternProbs(i + 1);
+    if (i < 2) { // do this for first and second iteration only
+      initGlobalOcrPatternProbs(i + 1);
+    }
     profile.iteration(lm);
     std::wcerr << "iteration " << i + 1 << " done after "
                << stopwatch.readMilliseconds() << "ms\n";
@@ -215,6 +227,7 @@ Profiler::doCreateProfile(Document& sourceDoc)
     globalProfile_.ocrPatternProbabilities_);
 
   //////// 1ST ITERATION ///////////////////
+  initGlobalOcrPatternProbs(1);
   globalProfile_.ocrPatternProbabilities_.setSmartMerge(); // this means that
                                                            // pseudo-merges and
                                                            // splits like ab<>b
@@ -283,7 +296,7 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
 
   htmlWriter_.newIteration(iterationNumber, lastIteration);
   nrOfProfiledTokens_ = 0;
-
+  size_t n = 0;
   std::map<std::wstring, double> counter;
 
   histCounter_.clear();
@@ -333,6 +346,10 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
         stopwatch.start();
       }
       calculateCandidateSet(token.origin(), tempCands);
+      std::wcerr << "ocrCharacterCount: " << ocrCharacterCount_ << "\n";
+      std::wcerr << token.origin().getWOCR_lc() << ": " << tempCands.size()
+                 << " suggestions\n";
+
       // tempCands.reset();
       // //std::wcout << "Profiler:: process Token " << token->getWOCR_lc() <<
       // std::endl; dictSearch_.query( token->getWOCR_lc(), &tempCands );
@@ -346,14 +363,17 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
              tempCands.begin();
            cand != tempCands.end();
            ++cand) {
+        std::wcerr << "CAND: " << *cand << "\n";
         std::vector<csl::Instruction> ocrInstructions;
 
         if (cand->getWord().length() < 4) {
+          std::wcerr << "skipping " << *cand << "(0)\n";
           continue;
         }
         // throw away candidates containing a hyphen
         // Yes, there are such words in staticlex :-/
         if (cand->getWord().find('-') != std::wstring::npos) {
+          std::wcerr << "skipping " << *cand << "(1)\n";
           continue;
         }
 
@@ -368,7 +388,8 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
         assert(not is_unknown or (tempCands.size() == 1));
         instructionComputer_.computeInstruction(
           cand->getWord(), token.getWOCR_lc(), &ocrInstructions, is_unknown);
-
+        std::wcerr << "ocrInstructions.size(): " << ocrInstructions.size()
+                   << "\n";
         // std::wcout << "BLA: Finished" << std::endl;
 
         // std::wcerr << cand->toString() << std::endl;
@@ -379,7 +400,8 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
         // lev. distance but not by the distance defined with the patternWeights
         // object. In that case, drop the candidate.
         if (ocrInstructions.empty()) {
-          std::wcerr << "NO OCR INSTRUCTIONS\n";
+          std::wcerr << "SKIPPING EMPTY OCR INSTRUCTIONS: " << *cand << "\n";
+          // std::wcerr << "NO OCR INSTRUCTIONS\n";
           continue;
         }
 
@@ -430,6 +452,7 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
             // 	std::wcerr << " " << i;
             // }
             // std::wcerr << "\nFOO\n";
+            std::wcerr << "skipping " << *cand << "(2)\n";
             continue;
           }
 
@@ -449,10 +472,18 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
           if (candidates_.empty() || (!myEquals(current, candidates_.back()))) {
             // if( ( iterationNumber < 2 ) || current.getCombinedProbability() >
             // 1e-8 ) { // EXPERIMENTAL
+            std::wcerr << "LPROB:   " << current.getLangProbability() << " ("
+                       << current << ")\n";
+            std::wcerr << "OCRPROB: " << current.getChannelProbability()
+                       << "\n";
+            std::wcerr << "COMB:    " << current.getCombinedProbability()
+                       << "\n";
             sumOfProbabilities += current.getCombinedProbability();
+            n++;
             candidates_.push_back(current);
             //}
           } else {
+            std::wcerr << "skipping " << *cand << "(3)\n";
             // 			    std::wcout << "Remove duplicate:" <<
             // std::endl
             // 				       << candidates_.back() <<
@@ -467,7 +498,8 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
         // ) ) { 	break;
         // }
       }
-
+      std::wcerr << "N: " << n << "\n";
+      std::wcerr << "SUM: " << sumOfProbabilities << "\n";
       token.setProbNormalizationFactor((double)1 / (double)sumOfProbabilities);
 
       // this is an ugly thing: Evaluation_Token holds a COPY of the
@@ -795,9 +827,10 @@ Profiler::getCombinedProb(Profiler_Interpretation& cand) const
   // lang Probability
   double langProb = freqList_.getLanguageProbability(cand);
   // give each pattern at least a small probability
+  std::wcerr << "LANGPROP: " << langProb << "\n";
   if (langProb == 0)
     langProb = config_.ocrPatternStartProb_;
-  // std::wcerr << "LANGPROP: " << langProb << "\n";
+  std::wcerr << "LANGPROP: " << langProb << "\n";
 
   cand.setLangProbability(langProb);
 

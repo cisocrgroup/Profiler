@@ -22,7 +22,13 @@ struct WeightedCandidate
 static inline bool
 operator==(const Traces& a, const Traces& b)
 {
-  return a.hist == b.hist && a.ocr == b.ocr;
+  return a.hist == b.hist and a.ocr == b.ocr;
+}
+
+static inline std::wostream&
+operator<<(std::wostream& os, const Traces& t)
+{
+  return os << "hist" << t.hist << ",ocr" << t.ocr;
 }
 }
 
