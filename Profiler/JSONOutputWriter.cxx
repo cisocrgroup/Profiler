@@ -13,52 +13,6 @@ JSONOutputWriter::write() const
   }
 }
 
-// {
-//   "Vnheilfolles": {
-//     "OCR": "Vnheilfolles",
-//     "Candidates": [
-//       {
-//         "Suggestion": "Unheilvolles",
-//         "Modern": "unheilvolles",
-//         "Dict": "dict_modern_hypothetic_errors",
-//         "HistPatterns": null,
-//         "OCRPatterns": [
-//           {
-//             "Left": "u",
-//             "Right": "v",
-//             "Pos": 0
-//           },
-//           {
-//             "Left": "v",
-//             "Right": "f",
-//             "Pos": 6
-//           }
-//         ],
-//         "Distance": 2,
-//         "Weight": 0.777747
-//       },
-//       {
-//         "Suggestion": "Vnheilvolles",
-//         "Modern": "unheilvolles",
-//         "Dict": "dict_modern_hypothetic_errors",
-//         "HistPatterns": [
-//           {
-//             "Left": "u",
-//             "Right": "v",
-//             "Pos": 0
-//           }
-//         ],
-//         "OCRPatterns": [
-//           {
-//             "Left": "v",
-//             "Right": "f",
-//             "Pos": 6
-//           }
-//         ],
-//         "Distance": 1,
-//         "Weight": 0.11111
-//       },
-
 static std::wostream&
 writeString(std::wostream& out, const std::wstring& str)
 {
@@ -134,25 +88,3 @@ JSONOutputWriter::writeInstruction(const csl::PosPattern& instr) const
   writeKeyVal(out_, L"Pos", instr.getPosition()) << "\n";
   out_ << "},\n";
 }
-
-//       {
-//         "Suggestion": "Vnheilvolles",
-//         "Modern": "unheilvolles",
-//         "Dict": "dict_modern_hypothetic_errors",
-//         "HistPatterns": [
-//           {
-//             "Left": "u",
-//             "Right": "v",
-//             "Pos": 0
-//           }
-//         ],
-//         "OCRPatterns": [
-//           {
-//             "Left": "v",
-//             "Right": "f",
-//             "Pos": 6
-//           }
-//         ],
-//         "Distance": 1,
-//         "Weight": 0.11111
-//       },
