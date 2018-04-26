@@ -10,6 +10,7 @@
 #include "DictSearch/AdaptiveLex.h"
 #include "GtDoc/AutoCorrector.h"
 #include "GtDoc/GtDoc.h"
+#include "JSONOutputWriter.hxx"
 #include "Profiler/Evaluator.h"
 #include "SimpleOutputWriter.h"
 #include <AltoXML/AltoXMLReader.h>
@@ -64,6 +65,7 @@ printHelp()
     << std::endl
     << "[--simpleOutput]            Print simple text output to stdout"
     << std::endl
+    << "[--jsonOutput]              Print json formatted output" << std::endl
     << "[--adaptive]                Use adaptive profiler, that uses "
        "correction information"
     << std::endl
@@ -104,6 +106,7 @@ main(int argc, char const** argv)
     options.specifyOption("imageDir", csl::Getopt::STRING, "_NO_IMAGE_DIR_");
     options.specifyOption("createConfigFile", csl::Getopt::VOID);
     options.specifyOption("simpleOutput", csl::Getopt::VOID);
+    options.specifyOption("jsonOutput", csl::Getopt::VOID);
     options.specifyOption("adaptive", csl::Getopt::VOID);
     options.specifyOption("evaluate", csl::Getopt::STRING);
     options.specifyOption("strict", csl::Getopt::STRING);
@@ -161,7 +164,8 @@ main(int argc, char const** argv)
 
     if (!(options.hasOption("out_xml") || options.hasOption("out_html") ||
           options.hasOption("out_doc") || options.hasOption("out_none") ||
-          options.hasOption("simpleOutput"))) {
+          options.hasOption("simpleOutput") ||
+          options.hasOption("jsonOutput"))) {
       std::wcerr << "Specify some output." << std::endl
                  << "If you really want to run without any output, say this "
                     "explicitly using --out_none"
@@ -261,6 +265,9 @@ main(int argc, char const** argv)
 
     if (options.hasOption("simpleOutput")) {
       OCRCorrection::SimpleOutputWriter(std::wcout, document).write();
+    }
+    if (options.hasOption("jsonOutput")) {
+      OCRCorrection::JSONOutputWriter(std::wcout, document).write();
     }
     if (options.hasOption("evaluate")) {
       OCRCorrection::Evaluator eval;
