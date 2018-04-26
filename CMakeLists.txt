@@ -106,6 +106,7 @@ SET( OCRCORRECTION_SOURCES
 	     Profiler/Profile.cxx
 	     Profiler/Profiler.cxx
 	     Profiler/SimpleOutputWriter.cxx
+			 Profiler/JSONOutputWriter.cxx
 	     TXTReader/AlignedTXTReader.cxx
 	     TXTReader/TXTReader.cxx
 	     Token/TokenImageInfoBox.cxx
