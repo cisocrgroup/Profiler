@@ -29,8 +29,6 @@ ComputeInstruction::computeInstruction(std::wstring const& wCorr,
                                        std::vector<Instruction>* instructions,
                                        bool unknown)
 {
-  std::wcerr << "COMPUTING \"" << wCorr << "\" \"" << wErr
-             << "\" unknown:" << unknown << "\n";
   // if we have a candidate with unknown hist trace,
   // the ocr trace is also unknown.
   if (unknown and instructions) {

@@ -41,12 +41,6 @@ double
 LanguageModel::languageProbability(const csl::Interpretation& cand) const
 {
   // See Profiler.cxx Profiler::getCombinedProb
-  std::wcerr << "LangProb(" << cand
-             << "): " << freqList_->getLanguageProbability(cand) << "\n";
-  std::wcerr << "LangProb(" << cand << "): "
-             << clampProb(freqList_->getLanguageProbability(cand),
-                          ocrPatternStartProb_)
-             << "\n";
   return clampProb(freqList_->getLanguageProbability(cand),
                    ocrPatternStartProb_);
 }

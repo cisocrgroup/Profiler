@@ -44,9 +44,9 @@ Profile::put(const Token& token, F cb)
   }
   std::get<0>(f->second)++;
   ocrCharacterCount_ += token.getWOCR().size();
-  std::wcerr << "ocrCharacterCount: " << ocrCharacterCount_ << "\n";
-  std::wcerr << f->first << ": " << std::get<1>(f->second).size()
-             << " suggestions\n";
+  // std::wcerr << "ocrCharacterCount: " << ocrCharacterCount_ << "\n";
+  // std::wcerr << f->first << ": " << std::get<1>(f->second).size()
+  //            << " suggestions\n";
 }
 
 void
@@ -93,10 +93,10 @@ Profile::iteration(const LanguageModel& lm)
       assert(not isUnknown or (std::get<2>(t.second).size() == 1));
       lm.computer().computeInstruction(
         cand.getWord(), t.first, &ocrInstructions, isUnknown);
-      std::wcerr << "ocrInstructions.size(): " << ocrInstructions.size()
-                 << "\n";
+      // std::wcerr << "ocrInstructions.size(): " << ocrInstructions.size()
+      //            << "\n";
       if (ocrInstructions.empty()) {
-        std::wcerr << "SKIPPING EMPTY OCR INSTRUCTIONS: " << cand << "\n";
+        // std::wcerr << "SKIPPING EMPTY OCR INSTRUCTIONS: " << cand << "\n";
         continue;
       }
       // ocrInstructions are a list of different possible ocr instructions.
@@ -125,17 +125,17 @@ Profile::iteration(const LanguageModel& lm)
         using namespace std::rel_ops;
         if (std::get<2>(t.second).empty() ||
             c.traces != std::get<2>(t.second).back().traces) {
-          std::wcerr << "LPROB:   " << c.langProb << " (" << c.cand << ")\n";
-          std::wcerr << "OCRPROB: " << c.ocrProb << "\n";
-          std::wcerr << "COMB:    " << c.combinedProbability() << "\n";
+          // std::wcerr << "LPROB:   " << c.langProb << " (" << c.cand << ")\n";
+          // std::wcerr << "OCRPROB: " << c.ocrProb << "\n";
+          // std::wcerr << "COMB:    " << c.combinedProbability() << "\n";
           sum += c.combinedProbability();
           n++;
           std::get<2>(t.second).push_back(std::move(c));
         }
       }
     }
-    std::wcerr << "N: " << n << "\n";
-    std::wcerr << "SUM: " << sum << "\n";
+    // std::wcerr << "N: " << n << "\n";
+    // std::wcerr << "SUM: " << sum << "\n";
     const double norm = 1 / sum;
     // now run over the calculated distributions
     for (auto& c : std::get<2>(t.second)) {
@@ -169,11 +169,7 @@ Profile::iteration(const LanguageModel& lm)
       ocrCounter.registerNGrams(c.word, weight);
       histCounter.registerNGrams(c.baseWord, weight);
       baseWordFrequency[c.baseWord] += weight;
-      std::wcerr << "BEFORE WAS PROF: " << counter_[TokenType::WAS_PROFILED]
-                 << "\n";
       counter_[TokenType::WAS_PROFILED] += weight;
-      std::wcerr << "AFTER WAS PROF: " << counter_[TokenType::WAS_PROFILED]
-                 << "\n";
       lm.globalProfile().dictDistribution_[c.dictModule->getName()].frequency +=
         weight;
     }
