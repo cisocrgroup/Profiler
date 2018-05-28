@@ -1,5 +1,6 @@
 #include "JSONOutputWriter.hxx"
 #include "Document/Document.h"
+#include <unordered_set>
 
 using namespace OCRCorrection;
 
@@ -40,10 +41,12 @@ writeKeyVal(std::wostream& out,
 void
 JSONOutputWriter::write() const
 {
+  std::unordered_set<std::wstring> types;
   out_ << "{";
   wchar_t pre = L'\n';
   for (const auto& token : doc_) {
-    if (token.isNormal()) {
+    if (token.isNormal() && !types.count(token.getWOCR())) {
+      types.insert(token.getWOCR());
       writeNormalToken(pre, token);
     }
     pre = L',';
