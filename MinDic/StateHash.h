@@ -124,9 +124,9 @@ namespace csl {
 	try {
 	    table_ = new ChainLink*[tableSize_];
 	    memset( table_, 0, tableSize_ * sizeof(ChainLink*) );
-	} catch( std::bad_alloc exc ) {
-	    std::cout<<"csl::StateHash: Could not allocate hashtable: " <<  exc.what() << std::endl;
-	    throw exc;
+	} catch( std::bad_alloc& e ) {
+	    std::cout<<"csl::StateHash: Could not allocate hashtable: " <<  e.what() << std::endl;
+	    throw e;
 	}
     }
 

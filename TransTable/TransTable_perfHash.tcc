@@ -47,8 +47,8 @@ namespace csl {
     TransTable< TT_PERFHASH, InternalCharType__, SizeType__ >
     ::walk( StateId_t state, wchar_t c ) const {
 	assert( cells_[state].isState() );
-	return ( ( c > 0 ) && 
-		 ( state + c < sizeOfUsedCells_  ) && 
+	return ( ( c > 0 ) &&
+		 ( state + c < sizeOfUsedCells_  ) &&
 		 ( cells_[state + c].getKey() == c ) ) ? cells_[state + c].getValue() : 0;
     }
 
@@ -102,7 +102,7 @@ namespace csl {
     TransTable< TT_PERFHASH, InternalCharType__, SizeType__ >
     ::isFinal( StateId_t state ) const {
 	return cells_[state].isFinalState();
-	
+
     }
 
     template< typename InternalCharType__, typename SizeType__ >
@@ -111,7 +111,7 @@ namespace csl {
     ::getSusoString( StateId_t state ) const {
 	return ( susoStrings_ + cells_[state].getThirdValue() );
     }
-    
+
     template< typename InternalCharType__, typename SizeType__ >
     bool
     TransTable< TT_PERFHASH, InternalCharType__, SizeType__ >
@@ -128,8 +128,8 @@ namespace csl {
     ::getStateAnnotation( StateId_t state ) const {
 	return ( cells_[state].getValue() );
     }
-    
-    
+
+
 
 
     /******************** CONSTRUCTION ********************/
@@ -158,7 +158,7 @@ namespace csl {
     void TransTable< TT_PERFHASH, InternalCharType__, SizeType__ >
     ::finishConstruction() {
 	nrOfCells_ = sizeOfUsedCells_;
-	
+
 	lengthOfSusoStrings_ = susoHash_->getLengthOfKeyStrings();
 	delete( susoHash_ );
 	susoHash_ = 0;
@@ -168,6 +168,8 @@ namespace csl {
     }
 
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
     /**
      * resize the array of cells
      */
@@ -179,6 +181,7 @@ namespace csl {
 	nrOfCells_ = newNrOfCells;
 // std::cout<<"Resized array cells to "<<newNrOfCells<<" cells."<<std::endl;
     }
+#pragma GCC diagnostic pop
 
     template< typename InternalCharType__, typename SizeType__ >
     typename TransTable< TT_PERFHASH, InternalCharType__, SizeType__ >::StateId_t
@@ -203,13 +206,13 @@ namespace csl {
 
 	// insert all transitions
 	InternalChar_t label = 0;
-	for ( typename TempState< TransTable_t >::const_TransIterator it = state.transBegin(); 
-		  it != state.transEnd() ; 
+	for ( typename TempState< TransTable_t >::const_TransIterator it = state.transBegin();
+		  it != state.transEnd() ;
 		  ++it ) {
 	    label = it->getLabel(); // we need this outside the loop
 	    cells_[slot + label].setTrans( label, it->getTarget(), it->getPhNumber() );
 	}
-	
+
 	// update sizeOfUsedCells_
 	sizeOfUsedCells_ = std::max( sizeOfUsedCells_, (size_t)( slot + label + 10 ) ); // 10 is a cautious value here ...
 	// sizeOfUsedCells_ = ( sizeOfUsedCells_ > (size_t)( slot + label + 10 ) ) ? sizeOfUsedCells_ : (size_t)( slot + label + 10 );
@@ -259,8 +262,8 @@ namespace csl {
 	    mightFit = true;
 
 	    // check if all required cells for transitions are available
-	    for ( typename TempState< TransTable_t >::const_TransIterator it = state.transBegin(); 
-		  it != state.transEnd() ; 
+	    for ( typename TempState< TransTable_t >::const_TransIterator it = state.transBegin();
+		  it != state.transEnd() ;
 		  ++it ) {
 		if ( !cells_[slot + it->getLabel()].isEmpty() ) {
 		    mightFit = false;
@@ -283,8 +286,8 @@ namespace csl {
 
 	const wchar_t* c_comp = getSusoString( comp );
 	typename TempState< TransTable_t >::const_TransIterator tempIt = temp.transBegin();
-	for ( ; 
-		 ( tempIt != temp.transEnd() ) && ( *c_comp != 0 ); 
+	for ( ;
+		 ( tempIt != temp.transEnd() ) && ( *c_comp != 0 );
 		  ++tempIt, ++c_comp ) {
 		if( tempIt->getLabel() != *c_comp ) return false; // both must have the same char as next label
 		if ( tempIt->getTarget() != walk( comp, *c_comp ) ) return false; // both must point to the same state
@@ -317,7 +320,7 @@ namespace csl {
     }
 
     template< typename InternalCharType__, typename SizeType__ >
-    void 
+    void
     TransTable< TT_PERFHASH, InternalCharType__, SizeType__ >
     ::loadFromStream( FILE* fi ) {
 	if( fread( &header_, sizeof( Header ), 1, fi ) != 1 ) {
@@ -336,28 +339,28 @@ namespace csl {
 
 	cells_ = (Cell_t*) malloc( nrOfCells_ * sizeof( Cell_t ) );
 	if( fread( cells_, sizeof( Cell_t ), nrOfCells_, fi ) != nrOfCells_ ) {
-	  throw exceptions::badDictFile( "csl::TransTable::loadFromStream: Read error while reading transTable" );	  
+	  throw exceptions::badDictFile( "csl::TransTable::loadFromStream: Read error while reading transTable" );
 	}
 
 	susoStrings_ = (wchar_t*) malloc( lengthOfSusoStrings_ * sizeof( wchar_t ) );
 	if( fread( susoStrings_, sizeof( wchar_t ), lengthOfSusoStrings_, fi ) != lengthOfSusoStrings_ ) {
 	  throw exceptions::badDictFile( "csl::TransTable::loadFromStream: Read error while reading suso strings" );
 	}
-	
+
 	sizeOfUsedCells_ = nrOfCells_;
 	ready_ = 1;
     }
-    
+
 
     template< typename InternalCharType__, typename SizeType__ >
-    void 
+    void
     TransTable< TT_PERFHASH, InternalCharType__, SizeType__ >
     ::createBinary( char* compFile ) {
 	writeToFile( compFile );
     }
 
     template< typename InternalCharType__, typename SizeType__ >
-    void 
+    void
     TransTable< TT_PERFHASH, InternalCharType__, SizeType__ >
     ::writeToFile( char* compFile ) {
 	FILE * fo = fopen( compFile, "wb" );
@@ -373,7 +376,7 @@ namespace csl {
     }
 
     template< typename InternalCharType__, typename SizeType__ >
-    void 
+    void
     TransTable< TT_PERFHASH, InternalCharType__, SizeType__ >
     ::writeToStream( FILE* fo ) const {
 	if ( !fo ) {
@@ -382,7 +385,7 @@ namespace csl {
 	std::cerr << "Writing TransTable"<<std::endl;
 	fwrite( &header_, sizeof( Header ), 1, fo );
 	fwrite( cells_, sizeof( Cell_t ), sizeOfUsedCells_, fo );
-	
+
 	fwrite( susoStrings_, sizeof( wchar_t ), lengthOfSusoStrings_, fo );
     }
 
@@ -422,14 +425,14 @@ namespace csl {
 	for ( size_t i = 1; i < sizeOfUsedCells_; ++i ) {
 	    if ( cells_[i].isTransition() ) {
 		StateId_t base = i - cells_[i].getKey();
-		
+
 		wprintf( L"%d->%d[label=\"%lc (%d)\"] //DOTCODE\n", base, cells_[i].getValue(), cells_[i].getKey(), cells_[i].getThirdValue()  );
 	    } else if ( cells_[i].isState() ) {
 		int peripheries = ( cells_[i].isFinalState() ) ? 2 : 1;
 		wprintf( L"%d[peripheries=%d] //DOTCODE\n", i, peripheries );
-		wprintf( L"%lu->%lu[label=\"%d,%d\"] //DOTCODE\n", 
+		wprintf( L"%lu->%lu[label=\"%d,%d\"] //DOTCODE\n",
 			 (unsigned long)i, (unsigned long)i, cells_[i].getValue(), cells_[i].getThirdValue() ) ;
-		
+
 	    }
 	}
 	wprintf( L"} //DOTCODE\n" );
@@ -449,7 +452,7 @@ namespace csl {
 	    else if ( cells_[i].isTransition() ) ++transitions;
 	}
 
-	double emptyRatio = ( double( empty ) / double( sizeOfUsedCells_ ) ) * 100; 
+	double emptyRatio = ( double( empty ) / double( sizeOfUsedCells_ ) ) * 100;
 	float cells_MB = (float)( sizeOfUsedCells_ * sizeof( Cell_t ) ) / 1000000;
 	float susoStrings_MB = (float)( header_.getLengthOfSusoStrings() * sizeof( wchar_t ) ) / 1000000;
 

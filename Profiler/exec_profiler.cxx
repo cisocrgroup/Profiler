@@ -116,7 +116,7 @@ main(int argc, char const** argv)
 
     try {
       options.getOptionsAsSpecified(argc, argv);
-    } catch (csl::Getopt::Exception exc) {
+    } catch (csl::Getopt::Exception& exc) {
 
       std::wcerr << "OCRC::profiler: Syntax error in command line call."
                  << std::endl
