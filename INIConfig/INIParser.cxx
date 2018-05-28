@@ -251,7 +251,7 @@ iniparser_dump_ini(dictionary* d, FILE* f)
     secname = iniparser_getsecname(d, i);
     seclen = (int)strlen(secname);
     fprintf(f, "\n[%s]\n", secname);
-    snprintf(keym, 3 * ASCIILINESZ, "%s:", secname);
+    snprintf(keym, ASCIILINESZ, "%s:", secname);
     for (j = 0; j < d->size; j++) {
       if (d->key[j] == NULL)
         continue;
