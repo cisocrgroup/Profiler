@@ -21,9 +21,9 @@ public:
   void write() const;
 
 private:
-  void writeNormalToken(const Token& token) const;
-  void writeCandidate(const Candidate& candidate) const;
-  void writeInstruction(const csl::PosPattern& instr) const;
+  void writeNormalToken(wchar_t pre, const Token& token) const;
+  void writeCandidate(wchar_t pre, const Candidate& candidate) const;
+  void writeInstruction(wchar_t pre, const csl::PosPattern& instr) const;
   const Document& doc_;
   std::wostream& out_;
 };

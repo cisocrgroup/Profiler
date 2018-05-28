@@ -3,16 +3,6 @@
 
 using namespace OCRCorrection;
 
-void
-JSONOutputWriter::write() const
-{
-  for (const auto& token : doc_) {
-    if (token.isNormal()) {
-      writeNormalToken(token);
-    }
-  }
-}
-
 static std::wostream&
 writeString(std::wostream& out, const std::wstring& str)
 {
@@ -48,43 +38,66 @@ writeKeyVal(std::wostream& out,
 }
 
 void
-JSONOutputWriter::writeNormalToken(const Token& token) const
+JSONOutputWriter::write() const
 {
-  writeString(out_, token.getWOCR()) << ": {\n";
-  writeKeyVal(out_, L"OCR", token.getWOCR()) << "\n";
-  writeString(out_, L"Candidates") << ": [\n";
-  for (auto i = token.candidatesBegin(); i != token.candidatesEnd(); ++i) {
-    writeCandidate(*i);
+  out_ << "{";
+  wchar_t pre = L'\n';
+  for (const auto& token : doc_) {
+    if (token.isNormal()) {
+      writeNormalToken(pre, token);
+    }
+    pre = L',';
   }
-  out_ << "]\n}\n";
+  out_ << "}\n";
 }
 
 void
-JSONOutputWriter::writeCandidate(const Candidate& candidate) const
+JSONOutputWriter::writeNormalToken(wchar_t pre, const Token& token) const
 {
-  out_ << "{\n";
+  out_ << pre;
+  writeString(out_, token.getWOCR()) << ": {\n";
+  writeKeyVal(out_, L"OCR", token.getWOCR()) << ",\n";
+  pre = L'\n';
+  writeString(out_, L"Candidates") << ": [";
+  for (auto i = token.candidatesBegin(); i != token.candidatesEnd(); ++i) {
+    writeCandidate(pre, *i);
+    pre = L',';
+  }
+  out_ << "]\n}";
+}
+
+void
+JSONOutputWriter::writeCandidate(wchar_t pre, const Candidate& candidate) const
+{
+  out_ << pre << "{\n";
   writeKeyVal(out_, L"Suggestion", candidate.getString()) << ",\n";
   writeKeyVal(out_, L"Modern", candidate.getString()) << ",\n";
   writeKeyVal(out_, L"Dict", candidate.getDictModule().getName()) << ",\n";
-  writeString(out_, L"HistPatterns") << ": [\n";
+  writeString(out_, L"HistPatterns") << ": [";
+  pre = L'\n';
   for (const auto& histp : candidate.getHistInstruction()) {
-    writeInstruction(histp);
+    writeInstruction(pre, histp);
+    pre = L',';
   }
+  out_ << "],\n";
+  pre = L'\n';
+  writeString(out_, L"OCRPatterns") << ": [";
   for (const auto& ocrp : candidate.getOCRTrace()) {
-    writeInstruction(ocrp);
+    writeInstruction(pre, ocrp);
+    pre = L',';
   }
+  out_ << "],\n";
   writeKeyVal(out_, L"Distance", candidate.getDlev()) << ",\n";
   writeKeyVal(out_, L"Weight", candidate.getVoteWeight()) << "\n";
-  out_ << "],\n";
-  out_ << "},\n";
+  out_ << "}";
 }
 
 void
-JSONOutputWriter::writeInstruction(const csl::PosPattern& instr) const
+JSONOutputWriter::writeInstruction(wchar_t pre,
+                                   const csl::PosPattern& instr) const
 {
-  out_ << "{\n";
-  writeKeyVal(out_, L"Left", instr.getLeft()) << ",\n";
-  writeKeyVal(out_, L"Right", instr.getRight()) << ",\n";
-  writeKeyVal(out_, L"Pos", instr.getPosition()) << "\n";
-  out_ << "},\n";
+  out_ << pre << "{";
+  writeKeyVal(out_, L"Left", instr.getLeft()) << ",";
+  writeKeyVal(out_, L"Right", instr.getRight()) << ",";
+  writeKeyVal(out_, L"Pos", instr.getPosition()) << "}\n";
 }
