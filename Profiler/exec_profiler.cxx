@@ -65,7 +65,7 @@ printHelp()
     << std::endl
     << "[--simpleOutput]            Print simple text output to stdout"
     << std::endl
-    << "[--jsonOutput]              Print json formatted output" << std::endl
+    << "[--jsonOutput <outputFile>] Print json formatted output" << std::endl
     << "[--adaptive]                Use adaptive profiler, that uses "
        "correction information"
     << std::endl
@@ -106,7 +106,7 @@ main(int argc, char const** argv)
     options.specifyOption("imageDir", csl::Getopt::STRING, "_NO_IMAGE_DIR_");
     options.specifyOption("createConfigFile", csl::Getopt::VOID);
     options.specifyOption("simpleOutput", csl::Getopt::VOID);
-    options.specifyOption("jsonOutput", csl::Getopt::VOID);
+    options.specifyOption("jsonOutput", csl::Getopt::STRING);
     options.specifyOption("adaptive", csl::Getopt::VOID);
     options.specifyOption("evaluate", csl::Getopt::STRING);
     options.specifyOption("strict", csl::Getopt::STRING);
@@ -267,7 +267,9 @@ main(int argc, char const** argv)
       OCRCorrection::SimpleOutputWriter(std::wcout, document).write();
     }
     if (options.hasOption("jsonOutput")) {
-      OCRCorrection::JSONOutputWriter(std::wcout, document).write();
+      auto out = std::wofstream(options.getOption("jsonOutput"));
+      OCRCorrection::JSONOutputWriter(out, document).write();
+      out.close();
     }
     if (options.hasOption("evaluate")) {
       OCRCorrection::Evaluator eval;
