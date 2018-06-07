@@ -74,7 +74,7 @@ JSONOutputWriter::writeCandidate(wchar_t pre, const Candidate& candidate) const
 {
   out_ << pre << "{\n";
   writeKeyVal(out_, L"Suggestion", candidate.getString()) << ",\n";
-  writeKeyVal(out_, L"Modern", candidate.getString()) << ",\n";
+  writeKeyVal(out_, L"Modern", candidate.getBaseWord()) << ",\n";
   writeKeyVal(out_, L"Dict", candidate.getDictModule().getName()) << ",\n";
   writeString(out_, L"HistPatterns") << ": [";
   pre = L'\n';
