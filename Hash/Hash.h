@@ -59,7 +59,7 @@ private:
   /**
    * @return a const reference to the hashtable
    */
-  inline const std::vector<uint_t>& getTable() const;
+  inline const std::vector<size_t>& getTable() const;
 
   /**
    * computes a hashcode for a given string.
