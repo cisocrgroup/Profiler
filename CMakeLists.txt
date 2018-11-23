@@ -40,7 +40,7 @@ INCLUDE_DIRECTORIES( "." ${JAVA_INCLUDE_PATH} ${JAVA_INCLUDE_PATH2} )
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules/")
 
 ##### CPPUNIT ##############
-SET( USER_SOFTWARE_DIR /mounts/Users/student/uli/soft )
+#SET( USER_SOFTWARE_DIR /mounts/Users/student/uli/soft )
 #  Finds:
 #   CPPUNIT_INCLUDE_DIR
 #   CPPUNIT_LIBRARIES
@@ -83,31 +83,34 @@ add_subdirectory(tools)
 
 ###### TO DO: Move this (and all related headers and sources) to a separate folder ##########
 SET( OCRCORRECTION_SOURCES
-             Utils/Utils.cxx
-	     Document/Document.cxx
-	     CorrectionSystem/CorrectionSystem.cxx
-	     LevenshteinWeights/LevenshteinWeights.cxx
-	     Profiler/Profiler.cxx
-	     Profiler/AdaptiveProfiling.cxx
-	     Profiler/Evaluator.cxx
-	     Profiler/HTMLWriter.cxx
-	     Profiler/Evaluation.cxx
-	     Profiler/SimpleOutputWriter.cxx
 	     AbbyyXmlParser/AbbyyXmlParser.cxx
-	     DocXML/DocXMLReader.cxx
-	     DocXML/LegacyDocXMLReader.cxx
-	     DocXML/DocXMLWriter.cxx
-	     DocXML/MergedGroundtruthReader.cxx
-	     AltoXML/AltoXMLReader.cxx
 	     AltoXML/AltoEnrich.cxx
-	     TXTReader/TXTReader.cxx
-	     TXTReader/AlignedTXTReader.cxx
-	     Token/TokenImageInfoBox.cxx
+	     AltoXML/AltoXMLReader.cxx
+	     CorrectionSystem/CorrectionSystem.cxx
+	     DocXML/DocXMLReader.cxx
+	     DocXML/DocXMLWriter.cxx
+	     DocXML/LegacyDocXMLReader.cxx
+	     DocXML/MergedGroundtruthReader.cxx
+	     Document/Document.cxx
 	     GlobalProfile/GlobalProfileXMLReader.cxx
 	     GlobalProfile/PatternContainerXMLReader.cxx
-	     Pattern/Pattern.cxx
-	     GtDoc/GtDoc.cxx
 	     GtDoc/AutoCorrector.cxx
+	     GtDoc/GtDoc.cxx
+	     LevenshteinWeights/LevenshteinWeights.cxx
+	     Pattern/Pattern.cxx
+	     Profiler/AdaptiveProfiling.cxx
+	     Profiler/Evaluation.cxx
+	     Profiler/Evaluator.cxx
+	     Profiler/HTMLWriter.cxx
+	     Profiler/LanguageModel.cxx
+	     Profiler/Profile.cxx
+	     Profiler/Profiler.cxx
+	     Profiler/SimpleOutputWriter.cxx
+			 Profiler/JSONOutputWriter.cxx
+	     TXTReader/AlignedTXTReader.cxx
+	     TXTReader/TXTReader.cxx
+	     Token/TokenImageInfoBox.cxx
+       Utils/Utils.cxx
 	     )
 
 add_library( OCRCorrection STATIC ${OCRCORRECTION_SOURCES})

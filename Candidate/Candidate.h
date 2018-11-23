@@ -20,8 +20,7 @@ namespace OCRCorrection {
      *
      * In the 2010 version it inherits from csl::DictSearch::Interpretation.
      */
-    class Candidate :
-	public csl::DictSearch::Interpretation
+    class Candidate :	public csl::DictSearch::Interpretation
     {
     public:
 

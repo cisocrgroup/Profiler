@@ -25,7 +25,6 @@
 
 namespace OCRCorrection {
 
-
     /**
      * @brief Represents one token of a document and holds an array of correction candidates for the token.
      *
@@ -160,6 +159,11 @@ namespace OCRCorrection {
 	 * @return true iff token is marked as normal
 	 */
 	inline bool isNormal() const;
+
+	bool isShort() const {
+	    return ( getWOCR().size() <= 3 );
+	}
+
 
 	bool isSpace() const {
 		return std::all_of(begin(getWOCR()), end(getWOCR()), iswspace);

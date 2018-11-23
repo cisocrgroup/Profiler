@@ -1,3 +1,6 @@
+#ifndef OCRCORRECTION_PATTERN_COUNTER_H__
+#define OCRCORRECTION_PATTERN_COUNTER_H__
+
 #include<map>
 #include<Pattern/Pattern.h>
 
@@ -14,6 +17,7 @@ namespace OCRCorrection {
 
 
 	typedef std::map< csl::Pattern, float >::iterator PatternIterator;
+	typedef std::map< csl::Pattern, float >::const_iterator ConstPatternIterator;
 
 	/**
 	 * @brief standard constructor
@@ -71,6 +75,12 @@ namespace OCRCorrection {
 	PatternIterator patternsEnd() {
 	    return patternCount_.end();
 	}
+	ConstPatternIterator begin() const {
+	    return patternCount_.begin();
+	}
+	ConstPatternIterator end() const {
+	    return patternCount_.end();
+	}
 
 
 	/////////  P R I V A T E  /////////////////
@@ -93,3 +103,4 @@ namespace OCRCorrection {
     };
 
 } // eon
+#endif // OCRCORRECTION_PATTERN_COUNTER_H__

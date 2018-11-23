@@ -3,6 +3,8 @@
 
 #include "./Profiler.h"
 #include "./Profiler_Token.tcc"
+#include "LanguageModel.hxx"
+#include "Profile.hxx"
 #include "Utils/NoThousandGrouping.h"
 
 namespace OCRCorrection {
@@ -11,8 +13,7 @@ Profiler::Profiler()
   : freqList_()
   , baseWordFrequencyDic_(0)
   , htmlStream_(0)
-{
-}
+{}
 
 Profiler::~Profiler()
 {
@@ -30,6 +31,16 @@ Profiler::~Profiler()
   }
 }
 
+bool
+Profiler::eop(const Token& token) const
+{
+  if ((config_.pageRestriction_ != (size_t)-1) &&
+      token.getPageIndex() >= config_.pageRestriction_) {
+    return true;
+  }
+  return false;
+}
+
 void
 Profiler::readConfiguration(char const* configFile)
 {
@@ -40,7 +51,6 @@ Profiler::readConfiguration(char const* configFile)
 void
 Profiler::readConfiguration(csl::INIConfig const& iniConf)
 {
-
   config_.nrOfIterations_ = iniConf.getint("global:numberOfIterations");
   if (config_.nrOfIterations_ == (size_t)-1)
     throw OCRCException("OCRC::Profiler::readConfiguration: no value found for "
@@ -88,8 +98,22 @@ Profiler::readConfiguration(csl::INIConfig const& iniConf)
 void
 Profiler::createProfile(Document& sourceDoc)
 {
-  doCreateProfile(sourceDoc);
+  config_.print(std::wcerr);
+  if (config_.types_) {
+    _doCreateProfile(sourceDoc);
+  } else {
+    doCreateProfile(sourceDoc);
+  }
   sourceDoc.set_global_profile(globalProfile_);
+  // for (const auto& ocr : globalProfile_.ocrPatternProbabilities_) {
+  //   std::wcerr << "OCR:  " << ocr.first.getLeft() << ":" <<
+  //   ocr.first.getRight()
+  //              << ": " << ocr.second << "\n";
+  // }
+  // for (const auto& hist : globalProfile_.histPatternProbabilities_) {
+  //   std::wcerr << "HIST: " << hist.first.getLeft() << ":"
+  //              << hist.first.getRight() << ": " << hist.second << "\n";
+  // }
 }
 
 void
@@ -123,9 +147,65 @@ Profiler::initGlobalOcrPatternProbs(int itn)
 }
 
 void
+Profiler::_doCreateProfile(Document& sourceDoc)
+{
+  if (config_.nrOfIterations_ == 0) {
+    std::wcerr
+      << "OCRC::Profiler::createNonAdaptiveProfile: config says 0 iterations, "
+         "so I do nothing."
+      << std::endl;
+  }
+  prepareDocument(sourceDoc);
+  freqList_.doApplyStaticFreqs(false);
+  freqList_.setHistPatternSmoothingProb(config_.histPatternSmoothingProb_);
+  // Calculate candidates for each type in the set;
+  Profile profile;
+  csl::Stopwatch stopwatch;
+  std::wcerr << "calculating candidates\n";
+  for (const auto& token : document_) {
+    if (eop(token.origin())) {
+      break;
+    }
+    profile.put(token.origin(),
+                [this](const Token& token, csl::DictSearch::CandidateSet& cs) {
+                  this->calculateCandidateSet(token, cs);
+                });
+  }
+  std::wcerr << "done calculating candidates in "
+             << stopwatch.readMilliseconds() << "ms\n";
+  globalProfile_.ocrPatternProbabilities_.setSmartMerge(); // this means that
+                                                           // pseudo-merges and
+                                                           // splits like ab<>b
+                                                           // ot ab<>a are not
+                                                           // allowed
+  csl::ComputeInstruction computer;
+  LanguageModel lm(config_, &freqList_, &globalProfile_, &computer);
+  std::wcerr << "doing iterations\n";
+  stopwatch.start();
+
+  for (size_t i = 0; i < config_.nrOfIterations_; i++) {
+    if (i < 2) { // do this for first and second iteration only
+      initGlobalOcrPatternProbs(i + 1);
+    }
+    profile.iteration(lm);
+    std::wcerr << "iteration " << i + 1 << " done after "
+               << stopwatch.readMilliseconds() << "ms\n";
+    stopwatch.start();
+  }
+  profile.finish();
+
+  std::wcerr << "connecting corrections to tokens\n";
+  stopwatch.start();
+  for (auto& token : document_) {
+    profile.setCorrection(token.origin());
+  }
+  std::wcerr << "done connecting corrections in "
+             << stopwatch.readMilliseconds() << "ms\n";
+}
+
+void
 Profiler::doCreateProfile(Document& sourceDoc)
 {
-  config_.print(std::wcerr);
 
   if (config_.nrOfIterations_ == 0) {
     std::wcerr
@@ -154,8 +234,6 @@ Profiler::doCreateProfile(Document& sourceDoc)
                                                            // ot ab<>a are not
                                                            // allowed
 
-  //                --> true/false specifies if HTML output for 1st iteration is
-  //                to be written to stdout
   bool doWriteHTML = (config_.nrOfIterations_ == 1);
 
   doIteration(1, doWriteHTML);
@@ -191,14 +269,14 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
   csl::Stopwatch iterationTime;
 
   std::wcerr << "*** Iteration " << iterationNumber << " ***" << std::endl;
-  std::wcerr << L" STARTING OCR PROB (s:ſ): "
-             << globalProfile_.ocrPatternProbabilities_.getWeight(
-                  csl::Pattern(L"s", L"ſ"))
-             << "\n";
-  std::wcerr << L"STARTING HIST PROB (s:ſ): "
-             << globalProfile_.histPatternProbabilities_.getWeight(
-                  csl::Pattern(L"s", L"ſ"))
-             << "\n";
+  // std::wcerr << L" STARTING OCR PROB (s:ſ): "
+  //            << globalProfile_.ocrPatternProbabilities_.getWeight(
+  //                 csl::Pattern(L"s", L"ſ"))
+  //            << "\n";
+  // std::wcerr << L"STARTING HIST PROB (s:ſ): "
+  //            << globalProfile_.histPatternProbabilities_.getWeight(
+  //                 csl::Pattern(L"s", L"ſ"))
+  //            << "\n";
 
   // static_cast< csl::PatternProbabilities >(
   // globalProfile_.ocrPatternProbabilities_ ).print( std::wcout );
@@ -218,61 +296,60 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
 
   htmlWriter_.newIteration(iterationNumber, lastIteration);
   nrOfProfiledTokens_ = 0;
-
+  size_t n = 0;
   std::map<std::wstring, double> counter;
-
-  csl::Stopwatch stopwatch;
 
   histCounter_.clear();
   ocrCounter_.clear();
-
-  for (Document_t::iterator token = document_.begin(); // for all tokens
-       token != document_.end();
-       ++token) {
-    // std::wcout << "TOKEN: " << token->getWOCR() << std::endl;
-    if ((config_.pageRestriction_ != (size_t)-1) &&
-        token->origin().getPageIndex() >= config_.pageRestriction_) {
+  csl::Stopwatch stopwatch;
+  for (auto& token : document_) {
+    if (eop(token.origin())) {
       break;
     }
+    // std::wcout << "TOKEN: " << token->getWOCR() << std::endl;
 
     // remove old correction candidates from Document::Token
     // Don't confuse this with the Profiler_Interpretations!!
-    token->origin().removeCandidates();
+    token.origin().removeCandidates();
 
     /*
      * Those two statements refer only to Profiler_Interpretations
      */
     candidates_.clear();
-    token->setCandidateSet(&candidates_);
+    token.setCandidateSet(&candidates_);
 
-    Evaluation_Token evalToken(*token);
+    Evaluation_Token evalToken(token);
 
     //////////////// //////////////// //////////////// ////////////////
 
-    if (!token->isNormal()) {
+    if (!token.isNormal()) {
       ++counter[L"notNormal"];
-      token->setSuspicious(token->getAbbyySpecifics().isSuspicious());
-      htmlWriter_.registerToken(*token, evalToken, candidates_);
-    } else if (token->isShort()) {
+      token.setSuspicious(token.getAbbyySpecifics().isSuspicious());
+      htmlWriter_.registerToken(token, evalToken, candidates_);
+    } else if (token.isShort()) {
       ++counter[L"short"];
-      token->setSuspicious(token->getAbbyySpecifics().isSuspicious());
-      htmlWriter_.registerToken(*token, evalToken, candidates_);
-    } else if (token->isDontTouch()) {
+      token.setSuspicious(token.getAbbyySpecifics().isSuspicious());
+      htmlWriter_.registerToken(token, evalToken, candidates_);
+    } else if (token.isDontTouch()) {
       ++counter[L"dont_touch"];
-      token->setSuspicious(token->getAbbyySpecifics().isSuspicious());
-      htmlWriter_.registerToken(*token, evalToken, candidates_);
+      token.setSuspicious(token.getAbbyySpecifics().isSuspicious());
+      htmlWriter_.registerToken(token, evalToken, candidates_);
       evalToken.registerNoCandidates(); // this class of tokens is included in
                                         // evaluation
     } else {                            // normal
       ++counter[L"normalAndLongTokens"];
-      token->setTokenNr(static_cast<size_t>(counter[L"normalAndLongTokens"]));
+      token.setTokenNr(static_cast<size_t>(counter[L"normalAndLongTokens"]));
       if ((int)counter[L"normalAndLongTokens"] % 1000 == 0) {
         std::wcerr << counter[L"normalAndLongTokens"] / 1000 << "k/"
                    << document_.size() / 1000 << "k tokens processed in "
                    << stopwatch.readMilliseconds() << "ms" << std::endl;
         stopwatch.start();
       }
-      calculateCandidateSet(*token, tempCands);
+      calculateCandidateSet(token.origin(), tempCands);
+      // std::wcerr << "ocrCharacterCount: " << ocrCharacterCount_ << "\n";
+      // std::wcerr << token.origin().getWOCR_lc() << ": " << tempCands.size()
+      //            << " suggestions\n";
+
       // tempCands.reset();
       // //std::wcout << "Profiler:: process Token " << token->getWOCR_lc() <<
       // std::endl; dictSearch_.query( token->getWOCR_lc(), &tempCands );
@@ -286,6 +363,7 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
              tempCands.begin();
            cand != tempCands.end();
            ++cand) {
+        // std::wcerr << "CAND: " << *cand << "\n";
         std::vector<csl::Instruction> ocrInstructions;
 
         if (cand->getWord().length() < 4) {
@@ -307,8 +385,7 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
         // a -> b = not a or b
         assert(not is_unknown or (tempCands.size() == 1));
         instructionComputer_.computeInstruction(
-          cand->getWord(), token->getWOCR_lc(), &ocrInstructions, is_unknown);
-
+          cand->getWord(), token.getWOCR_lc(), &ocrInstructions, is_unknown);
         // std::wcout << "BLA: Finished" << std::endl;
 
         // std::wcerr << cand->toString() << std::endl;
@@ -319,7 +396,7 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
         // lev. distance but not by the distance defined with the patternWeights
         // object. In that case, drop the candidate.
         if (ocrInstructions.empty()) {
-          std::wcerr << "NO OCR INSTRUCTIONS\n";
+          // std::wcerr << "NO OCR INSTRUCTIONS\n";
           continue;
         }
 
@@ -389,7 +466,14 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
           if (candidates_.empty() || (!myEquals(current, candidates_.back()))) {
             // if( ( iterationNumber < 2 ) || current.getCombinedProbability() >
             // 1e-8 ) { // EXPERIMENTAL
+            // std::wcerr << "LPROB:   " << current.getLangProbability() << " ("
+            //            << current << ")\n";
+            // std::wcerr << "OCRPROB: " << current.getChannelProbability()
+            //            << "\n";
+            // std::wcerr << "COMB:    " << current.getCombinedProbability()
+            //            << "\n";
             sumOfProbabilities += current.getCombinedProbability();
+            n++;
             candidates_.push_back(current);
             //}
           } else {
@@ -407,8 +491,9 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
         // ) ) { 	break;
         // }
       }
-
-      token->setProbNormalizationFactor((double)1 / (double)sumOfProbabilities);
+      // std::wcerr << "N: " << n << "\n";
+      // std::wcerr << "SUM: " << sumOfProbabilities << "\n";
+      token.setProbNormalizationFactor((double)1 / (double)sumOfProbabilities);
 
       // this is an ugly thing: Evaluation_Token holds a COPY of the
       // Profiler_Token
@@ -467,7 +552,7 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
           ocrCounter_.registerPattern(*pat, cand->getVoteWeight());
 
           if (cand->getVoteWeight() > 0.5) {
-            ocrPatternsInWords[*pat].insert(token->getWOCR_lc());
+            ocrPatternsInWords[*pat].insert(token.getWOCR_lc());
           }
         }
 
@@ -500,32 +585,32 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
 
       ////// ERROR DETECTION //////////////
       if (candidates_.empty()) {
-        if (token->isDontTouch()) {
+        if (token.isDontTouch()) {
           // for "DontTouch" words, don't change Abbyy's judgment
-          token->setSuspicious(token->getAbbyySpecifics().isSuspicious());
+          token.setSuspicious(token.getAbbyySpecifics().isSuspicious());
         } else {
           // This applies to words which were actually profiled but don't have
           // any interpretations Treat those words as suspicious
-          token->setSuspicious(true);
+          token.setSuspicious(true);
         }
       } else if (candidates_.at(0).getOCRTrace().size() > 0) {
         Profiler_Interpretation const& topCand = candidates_.at(0);
-        token->setSuspicious(true);
+        token.setSuspicious(true);
         for (csl::Instruction::const_iterator pat =
                topCand.getOCRTrace().begin();
              pat != topCand.getOCRTrace().end();
              ++pat) {
           ocrPatterns2Types_[*pat].push_back(
-            std::make_pair(token->getWOCR_lc(), topCand.getWord()));
+            std::make_pair(token.getWOCR_lc(), topCand.getWord()));
         }
       } else {
-        token->setSuspicious(false);
+        token.setSuspicious(false);
       }
       ////////////////////////////////
 
       ////// MODIFY ORIGINAL TOKENS FOR CORRECTION SYSTEM //////////////
       if (lastIteration) {
-        token->origin().setSuspicious(token->isSuspicious());
+        token.origin().setSuspicious(token.isSuspicious());
 
         std::set<std::wstring> seen;
         for (std::vector<Profiler_Interpretation>::iterator cand =
@@ -544,14 +629,14 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
 
           // candidate string not suggested before
           if ((seen.insert(cand->getWord()).second == true)) {
-            token->origin().addCandidate(*cand);
+            token.origin().addCandidate(*cand);
           }
         }
       }
 
       ////////////////////////////////
 
-      htmlWriter_.registerToken(*token, evalToken, candidates_);
+      htmlWriter_.registerToken(token, evalToken, candidates_);
 
       if (candidates_.empty()) {
         ++counter[L"unknown"];
@@ -561,9 +646,7 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
 
     evaluation.registerToken(evalToken);
 
-    token->setCandidateSet(
-      0); // This makes clear that the pointer can't be used any more!!
-
+    token.setCandidateSet(0);
   } // for each token
   ///////////////////////////////////     END:  FOR EACH TOKEN
   /////////////////////////////////////
@@ -721,14 +804,14 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
   std::wcerr << "Finished iteration in " << iterationTime.readSeconds()
              << " seconds." << std::endl;
 
-  std::wcerr << L" FINISH OCR PROB (s:ſ): "
-             << globalProfile_.ocrPatternProbabilities_.getWeight(
-                  csl::Pattern(L"s", L"ſ"))
-             << "\n";
-  std::wcerr << L"FINISH HIST PROB (s:ſ): "
-             << globalProfile_.histPatternProbabilities_.getWeight(
-                  csl::Pattern(L"s", L"ſ"))
-             << "\n";
+  // std::wcerr << L" FINISH OCR PROB (s:ſ): "
+  //            << globalProfile_.ocrPatternProbabilities_.getWeight(
+  //                 csl::Pattern(L"s", L"ſ"))
+  //            << "\n";
+  // std::wcerr << L"FINISH HIST PROB (s:ſ): "
+  //            << globalProfile_.histPatternProbabilities_.getWeight(
+  //                 csl::Pattern(L"s", L"ſ"))
+  //            << "\n";
 } // void doIteration
 
 double
@@ -739,7 +822,6 @@ Profiler::getCombinedProb(Profiler_Interpretation& cand) const
   // give each pattern at least a small probability
   if (langProb == 0)
     langProb = config_.ocrPatternStartProb_;
-  // std::wcerr << "LANGPROP: " << langProb << "\n";
 
   cand.setLangProbability(langProb);
 

@@ -660,8 +660,8 @@ Profiler::Evaluation::registerToken(Evaluation_Token& evalTok)
         } else {
           getCounter(L"ocrCorrect_suggestionWrong") += 1;
           // std::wcout << "MAGIC::ocrCorrect_suggestionWrong(log)=" <<
-          // (int)(log( evalTok.tok_.getProbNormalizationFactor() ) / log(10)) <<
-          // std::endl;
+          // (int)(log( evalTok.tok_.getProbNormalizationFactor() ) / log(10))
+          // << std::endl;
         }
 
         if (evalTok.tok_.getAbbyySpecifics().isSuspicious()) {
@@ -807,8 +807,8 @@ Profiler::Evaluation::finish()
     // << it->first.toString()
     // 		       <<", ( " << it->second << " / " <<
     // histPatternCounter_.getNGramCount( it->first.getLeft() ) << " ) )"
-    // 		       << "=" << ( it->second / histPatternCounter_.getNGramCount(
-    // it->first.getLeft() ) ) << std::endl;
+    // 		       << "=" << ( it->second /
+    // histPatternCounter_.getNGramCount( it->first.getLeft() ) ) << std::endl;
   }
 
   // compute probabilities for ocr patterns

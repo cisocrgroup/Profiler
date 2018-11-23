@@ -92,15 +92,13 @@ class Profiler_Token {
 
 	void setLevDistance( float stdDist, float weightLev);
 
-	bool isShort() const {
-	    return ( getWOCR().size() <= 3 );
-	}
-
 	inline void setSuspicious( bool b ) {
 	    isSuspicious_ = b;
 	}
 
-
+	bool isShort() const {
+		return origin().isShort();
+	}
 
 	void setTokenNr( size_t tn ) {
 	    tokenNr_ = tn;
@@ -297,6 +295,3 @@ class Profiler_Token {
 
 
     }; // class Token
-
-
-

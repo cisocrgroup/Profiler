@@ -121,7 +121,7 @@ namespace csl {
 	     * @brief get a pointer to the dictModule which the interpretation came from
 	     * @see dictModule_
 	     */
-	    iDictModule const& getDictModule() const { return *dictModule_; }
+	    const iDictModule& getDictModule() const { return *dictModule_; }
 
 	    void print( std::wostream& os = std::wcout ) const {
 		csl::Interpretation::print( os );

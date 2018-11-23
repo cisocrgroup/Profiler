@@ -710,5 +710,4 @@ Profiler::HTMLWriter::xml_escape(std::wstring const& input) const
   }
   return str;
 }
-
 }

@@ -1,2 +1,3 @@
 build/*
 TAGS
+.dir-locals.el
