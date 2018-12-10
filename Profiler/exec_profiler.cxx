@@ -80,9 +80,9 @@ printHelp()
     << std::endl
     << "[--enable-unknowns]         Enable handling of uninterpretable "
        "(unknown) tokens"
+    << std::endl
+    << "[--types]                   Profile usinging types not tokens"
     << std::endl;
-  << "[--types]                   Profile usinging types not tokens"
-  << std::endl;
 }
 
 int
