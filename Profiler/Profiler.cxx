@@ -39,6 +39,7 @@ Profiler::addExternalDictModule(csl::DictSearch::iDictModule* d)
     return;
   }
   externalDictModules_.push_back(d);
+  dictSearch_.addExternalDictModule(*d);
 }
 
 bool
