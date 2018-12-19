@@ -23,6 +23,7 @@ AdditionalLex::AdditionalLex(const std::string& path,
 bool
 AdditionalLex::query(const std::wstring& q, Receiver* receiver)
 {
+  // std::wcerr << "(AdditionalLex) query: " << q << "\n";
   const auto i = cache_.find(q);
   if (i != end(cache_)) {
     for (const auto& p : i->second) {
@@ -54,7 +55,7 @@ AdditionalLex::add_candidate(const std::wstring& gt,
   i.setBaseWord(gt.data());
   i.setBaseWordScore(0);
   i.setLevDistance(lev);
-  std::wcerr << "(AdditionalLex) Interpretation: " << i << "\n";
+  // std::wcerr << "(AdditionalLex) Interpretation: " << i << "\n";
   static_cast<csl::iInterpretationReceiver&>(receiver).receive(i);
 }
 
@@ -70,7 +71,8 @@ AdditionalLex::read(const std::string& path)
   std::wstring word;
   while (is >> word) {
     std::transform(word.begin(), word.end(), word.begin(), ::towlower);
-    std::wcerr << "(AdditionalLex) additional lexicon entry: " << word << "\n";
+    // std::wcerr << "(AdditionalLex) additional lexicon entry: " << word <<
+    // "\n";
     set.insert(word);
   }
   is.close();
