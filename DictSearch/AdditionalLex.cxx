@@ -69,6 +69,7 @@ AdditionalLex::read(const std::string& path)
   }
   std::wstring word;
   while (is >> word) {
+    std::wcerr << "(AdditionalLex) additional lexicon entry: " << word << "\n";
     set.insert(word);
   }
   is.close();
