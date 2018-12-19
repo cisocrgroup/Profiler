@@ -315,6 +315,15 @@ public:
     return getOption(key);
   }
 
+  size_t getOptionAsSizeT(const std::string& key)
+  {
+    if (not hasOption(key)) {
+      throw std::runtime_error("csl::Getopt::getOption: no such key defined: " +
+                               key);
+    }
+    return static_cast<size_t>(stoul(getOption(key)));
+  }
+
   typedef std::map<std::string, ValueType>::const_iterator OptionIterator;
 
   OptionIterator optionsBegin() const { return optionTypes_.begin(); }
