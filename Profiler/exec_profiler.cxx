@@ -2,12 +2,14 @@
 
 #include <cstdlib>
 #include <dirent.h>
+#include <memory>
 #include <stdexcept>
 #include <sys/types.h>
 
 #include "../Exceptions.h"
 #include "./Profiler.h"
 #include "DictSearch/AdaptiveLex.h"
+#include "DictSearch/AdditionalLex.h"
 #include "GtDoc/AutoCorrector.h"
 #include "GtDoc/GtDoc.h"
 #include "JSONOutputWriter.hxx"
@@ -82,6 +84,17 @@ printHelp()
        "(unknown) tokens"
     << std::endl
     << "[--types]                   Profile usinging types not tokens"
+    << std::endl
+    << "[--additionalLex <lex>]     Add additional dynamic lexicon (one word "
+       "per line)"
+    << std::endl
+    << "[--additionalLexRank <r>]   Set the rank of the addional lexicon "
+       "(default: 1)"
+       "per line)"
+    << std::endl
+    << "[--additionalLexMaxLev <k>] Set the max levenshtein distance for the "
+       "addional lexicon (default: 2)"
+       "per line)"
     << std::endl;
 }
 
@@ -114,7 +127,9 @@ main(int argc, char const** argv)
     options.specifyOption("autocorrect", csl::Getopt::STRING);
     options.specifyOption("enable-unknowns", csl::Getopt::VOID);
     options.specifyOption("types", csl::Getopt::VOID);
-
+    options.specifyOption("additionalLex", csl::Getopt::STRING);
+    options.specifyOption("additionalLexRank", csl::Getopt::STRING, "1");
+    options.specifyOption("additionalLexMaxLev", csl::Getopt::STRING, "2");
     try {
       options.getOptionsAsSpecified(argc, argv);
     } catch (csl::Getopt::Exception& exc) {
@@ -210,6 +225,15 @@ main(int argc, char const** argv)
 
     if (options.hasOption("out_html")) {
       profiler.setHTMLOutFile(options.getOption("out_html"));
+    }
+    if (options.hasOption("additionalLex")) {
+      const auto path = options["additionalLex"];
+      const auto rank = options.getOptionAsSizeT("additionalLexRank");
+      const auto maxlev = options.getOptionAsSizeT("additionalLexMaxLev");
+      std::unique_ptr<csl::AdditionalLex> addLex(
+        new csl::AdditionalLex(path, rank, maxlev));
+      // memory of lex is managed by the profiler
+      profiler.addExternalDictModule(addLex.release());
     }
     profiler.setAdaptive(options.hasOption("adaptive"));
     profiler.setTypes(options.hasOption("types"));

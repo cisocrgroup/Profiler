@@ -31,6 +31,17 @@ Profiler::~Profiler()
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+void
+Profiler::addExternalDictModule(csl::DictSearch::iDictModule* d)
+{
+  if (d == nullptr) {
+    return;
+  }
+  externalDictModules_.push_back(d);
+  dictSearch_.addExternalDictModule(*d);
+}
+
 bool
 Profiler::eop(const Token& token) const
 {
