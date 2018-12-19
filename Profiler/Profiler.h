@@ -6,30 +6,24 @@
 #include <map>
 #include <sstream>
 #include <string>
-#include <vector>
-
-#include <DictSearch/DictSearch.h>
-#include <Pattern/ComputeInstruction.h>
-#include <Pattern/PatternWeights.h>
-#include <Stopwatch.h>
-#include <TransTable/TransTable.h>
-#include <Utils/Utils.h>
-
-#include <Document/Document.h>
-#include <INIConfig/INIConfig.h>
-#include <LevenshteinWeights/LevenshteinWeights.h>
-#include <PatternCounter/PatternCounter.h>
-
 #include <time.h>
-
-#include <AbbyyXmlParser/AbbyyXmlParser.h>
-
-#include <GlobalProfile/GlobalProfile.h>
-
-#include <MinDic/MinDic.h>
+#include <vector>
 
 #include "./CompoundDictModule.h"
 #include "./FrequencyList.h"
+#include <AbbyyXmlParser/AbbyyXmlParser.h>
+#include <DictSearch/DictSearch.h>
+#include <Document/Document.h>
+#include <GlobalProfile/GlobalProfile.h>
+#include <INIConfig/INIConfig.h>
+#include <LevenshteinWeights/LevenshteinWeights.h>
+#include <MinDic/MinDic.h>
+#include <Pattern/ComputeInstruction.h>
+#include <Pattern/PatternWeights.h>
+#include <PatternCounter/PatternCounter.h>
+#include <Stopwatch.h>
+#include <TransTable/TransTable.h>
+#include <Utils/Utils.h>
 
 namespace OCRCorrection {
 class LanguageModel;
@@ -131,17 +125,6 @@ public:
   void setNumberOfIterations(size_t nr) { config_.nrOfIterations_ = nr; }
 
   /**
-   * @brief Set path to addional lexicon resource (one line per word)
-   */
-  void setAddtionalLex(const std::string& addLex)
-  {
-    config_.additionalLexiconPath_ = addLex;
-  }
-  const std::string& additionalLex() const
-  {
-    return config_.additionalLexiconPath_;
-  }
-  /**
    * @brief Enable/disable adaptive profiling
    */
   void setAdaptive(bool adaptive) noexcept { config_.adaptive_ = adaptive; }
@@ -169,6 +152,11 @@ public:
    */
   void setPageRestriction(size_t n) { config_.pageRestriction_ = n; }
 
+  /**
+   * @brief Add an external dictionary module. The module is managed
+   * byt the profiler.
+   */
+  void addExternalDictModule(csl::DictSearch::iDictModule* d);
   /**
    * @brief Write an xml representation of the text profile to @a filename
    */
@@ -391,7 +379,6 @@ private:
       , donttouch_hyphenation_(true)
       , donttouch_lineborders_(false)
       , adaptiveDictionaryPath_()
-      , additionalLexiconPath_()
       , writeAdaptiveDictionary_(false)
       , adaptive_(false)
     {}
@@ -455,7 +442,6 @@ private:
     bool donttouch_lineborders_;
 
     std::string adaptiveDictionaryPath_;
-    std::string additionalLexiconPath_;
     bool writeAdaptiveDictionary_;
     bool adaptive_;
     bool types_;
