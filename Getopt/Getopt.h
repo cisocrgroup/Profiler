@@ -79,8 +79,8 @@ public:
 
     // 	std::cout<<"Options:"<<std::endl;
     // 	for( std::map< std::string, std::string >::iterator it =
-    // options_.begin(); it != options_.end(); ++it ) { 	    std::cout<<it->first<<"
-    // = "<<it->second<<std::endl;
+    // options_.begin(); it != options_.end(); ++it ) {
+    // std::cout<<it->first<<" = "<<it->second<<std::endl;
     // 	}
     // 	std::cout<<"arguments:"<<std::endl;
     // 	for( std::vector< std::string >::iterator it = arguments_.begin(); it !=
@@ -308,6 +308,11 @@ public:
     if (!hasOption(key))
       throw std::runtime_error("csl::Getopt::getOption: no such key defined");
     return optionValues_[key];
+  }
+
+  const std::string& operator[](const std::string& key)
+  {
+    return getOption(key);
   }
 
   typedef std::map<std::string, ValueType>::const_iterator OptionIterator;
