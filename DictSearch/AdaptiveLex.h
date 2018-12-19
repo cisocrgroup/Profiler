@@ -9,6 +9,18 @@ class Document;
 }
 
 namespace csl {
+class Levenshtein
+{
+public:
+  Levenshtein()
+    : COSTS()
+  {}
+  size_t operator()(const std::wstring& a, const std::wstring& b);
+
+private:
+  std::vector<size_t> COSTS;
+};
+
 class AdaptiveLex : public csl::DictSearch::iDictModule
 {
 public:
@@ -40,7 +52,7 @@ private:
 
   static std::map<std::tuple<std::wstring, std::wstring>, size_t> CACHE;
   static std::unordered_map<std::wstring, size_t> LEX;
-  static std::vector<size_t> COSTS;
+  static Levenshtein LEV;
 };
 }
 
