@@ -82,6 +82,9 @@ printHelp()
        "(unknown) tokens"
     << std::endl
     << "[--types]                   Profile usinging types not tokens"
+    << std::endl
+    << "[--additionalLex <lex>]     Add additional dynamic lexicon (one word "
+       "per line)"
     << std::endl;
 }
 
@@ -114,7 +117,7 @@ main(int argc, char const** argv)
     options.specifyOption("autocorrect", csl::Getopt::STRING);
     options.specifyOption("enable-unknowns", csl::Getopt::VOID);
     options.specifyOption("types", csl::Getopt::VOID);
-
+    options.specifyOption("additionalLe", csl::Getopt::STRING);
     try {
       options.getOptionsAsSpecified(argc, argv);
     } catch (csl::Getopt::Exception& exc) {
@@ -210,6 +213,9 @@ main(int argc, char const** argv)
 
     if (options.hasOption("out_html")) {
       profiler.setHTMLOutFile(options.getOption("out_html"));
+    }
+    if (options.hasOption("additionalLex")) {
+      profiler.setAddtionalLex(options["additionalLex"]);
     }
     profiler.setAdaptive(options.hasOption("adaptive"));
     profiler.setTypes(options.hasOption("types"));

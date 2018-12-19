@@ -131,6 +131,17 @@ public:
   void setNumberOfIterations(size_t nr) { config_.nrOfIterations_ = nr; }
 
   /**
+   * @brief Set path to addional lexicon resource (one line per word)
+   */
+  void setAddtionalLex(const std::string& addLex)
+  {
+    config_.additionalLexiconPath_ = addLex;
+  }
+  const std::string& additionalLex() const
+  {
+    return config_.additionalLexiconPath_;
+  }
+  /**
    * @brief Enable/disable adaptive profiling
    */
   void setAdaptive(bool adaptive) noexcept { config_.adaptive_ = adaptive; }
@@ -380,6 +391,7 @@ private:
       , donttouch_hyphenation_(true)
       , donttouch_lineborders_(false)
       , adaptiveDictionaryPath_()
+      , additionalLexiconPath_()
       , writeAdaptiveDictionary_(false)
       , adaptive_(false)
     {}
@@ -443,6 +455,7 @@ private:
     bool donttouch_lineborders_;
 
     std::string adaptiveDictionaryPath_;
+    std::string additionalLexiconPath_;
     bool writeAdaptiveDictionary_;
     bool adaptive_;
     bool types_;
