@@ -48,8 +48,8 @@ JSONOutputWriter::write() const
     if (token.isNormal() && !types.count(token.getWOCR())) {
       types.insert(token.getWOCR());
       writeNormalToken(pre, token);
+      pre = L',';
     }
-    pre = L',';
   }
   out_ << "}\n";
 }
