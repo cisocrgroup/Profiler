@@ -1,6 +1,7 @@
 #include "AdditionalLex.h"
 #include "Document/Document.h"
 #include "Utils/IStr.h"
+#include <libgen.h>
 #include <memory>
 #include <system_error>
 #include <unordered_set>
@@ -8,32 +9,31 @@
 using namespace csl;
 
 ////////////////////////////////////////////////////////////////////////////////
-AdditionalLex::AdditionalLex(const std::string& path,
-                             size_t rank,
-                             size_t max_lev)
-  : DictModule(rank)
-  , name_(L"additional-lex")
-  , lex_(read(path))
-  , cache_()
-  , lev_()
-  , max_lev_(max_lev)
-{}
+static std::wstring wbasename(const std::string &path) {
+  auto cp = path; // copy path so original path is not modified
+  auto bn = basename(const_cast<char *>(cp.data()));
+  return OCRCorrection::Utils::utf8(std::string(bn));
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-bool
-AdditionalLex::query(const std::wstring& q, Receiver* receiver)
-{
+AdditionalLex::AdditionalLex(const std::string &path, size_t rank,
+                             size_t max_lev)
+    : DictModule(rank), name_(L"additional-lex-" + wbasename(path)),
+      lex_(read(path)), cache_(), lev_(), max_lev_(max_lev) {}
+
+////////////////////////////////////////////////////////////////////////////////
+bool AdditionalLex::query(const std::wstring &q, Receiver *receiver) {
   // std::wcerr << "(AdditionalLex) query: " << q << "\n";
   const auto i = cache_.find(q);
   if (i != end(cache_)) {
-    for (const auto& p : i->second) {
+    for (const auto &p : i->second) {
       add_candidate(p.first, p.second, *receiver);
     }
     return true;
   }
   // not cached
   bool res = false;
-  for (const auto& cand : lex_) {
+  for (const auto &cand : lex_) {
     const auto k = lev_(q, cand);
     if (k <= max_lev_) {
       res = true;
@@ -45,24 +45,19 @@ AdditionalLex::query(const std::wstring& q, Receiver* receiver)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void
-AdditionalLex::add_candidate(const std::wstring& gt,
-                             size_t lev,
-                             Receiver& receiver)
-{
+void AdditionalLex::add_candidate(const std::wstring &gt, size_t lev,
+                                  Receiver &receiver) {
   csl::Interpretation i;
   i.setWord(gt.data());
   i.setBaseWord(gt.data());
   i.setBaseWordScore(0);
   i.setLevDistance(lev);
   // std::wcerr << "(AdditionalLex) Interpretation: " << i << "\n";
-  static_cast<csl::iInterpretationReceiver&>(receiver).receive(i);
+  static_cast<csl::iInterpretationReceiver &>(receiver).receive(i);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::unordered_set<std::wstring>
-AdditionalLex::read(const std::string& path)
-{
+std::unordered_set<std::wstring> AdditionalLex::read(const std::string &path) {
   std::unordered_set<std::wstring> set;
   std::wifstream is(path);
   if (not is.good()) {
