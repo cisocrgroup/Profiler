@@ -22,6 +22,11 @@ AdditionalLex::AdditionalLex(const std::string &path, size_t rank,
       lex_(read(path)), cache_(), lev_(), max_lev_(max_lev) {}
 
 ////////////////////////////////////////////////////////////////////////////////
+AdditionalLex::AdditionalLex(size_t rank, size_t max_lev)
+    : DictModule(rank), name_(L"additional-lex-dynamic"), lex_(), cache_(),
+      lev_(), max_lev_(max_lev) {}
+
+////////////////////////////////////////////////////////////////////////////////
 bool AdditionalLex::query(const std::wstring &q, Receiver *receiver) {
   // std::wcerr << "(AdditionalLex) query: " << q << "\n";
   const auto i = cache_.find(q);
@@ -42,6 +47,13 @@ bool AdditionalLex::query(const std::wstring &q, Receiver *receiver) {
     }
   }
   return res;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void AdditionalLex::add(const std::wstring &word) {
+  std::wstring lcw = word;
+  std::transform(word.begin(), word.end(), lcw.begin(), ::towlower);
+  lex_.insert(lcw);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

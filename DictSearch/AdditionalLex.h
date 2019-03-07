@@ -16,12 +16,15 @@ public:
   using DictModule = csl::DictSearch::iDictModule;
   using Receiver = csl::DictSearch::iResultReceiver;
 
+  AdditionalLex(size_t rank, size_t max_lev);
   AdditionalLex(const std::string& path, size_t rank, size_t max_lev);
+
   virtual ~AdditionalLex() noexcept override = default;
   virtual const std::wstring& getName() const override { return name_; }
   virtual bool query(const std::wstring& q, Receiver* res) override;
+  void add(const std::wstring &word);
 
-private:
+ private:
   static void add_candidate(const std::wstring& gt,
                             size_t lev,
                             Receiver& receiver);
