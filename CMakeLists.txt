@@ -92,6 +92,7 @@ SET( OCRCORRECTION_SOURCES
 	DocXML/LegacyDocXMLReader.cxx
 	DocXML/MergedGroundtruthReader.cxx
 	Document/Document.cxx
+	ExtReader/ExtReader.cxx
 	GlobalProfile/GlobalProfileXMLReader.cxx
 	GlobalProfile/PatternContainerXMLReader.cxx
 	GtDoc/AutoCorrector.cxx
