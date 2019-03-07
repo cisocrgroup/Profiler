@@ -22,7 +22,7 @@ namespace OCRCorrection {
 	 * @param[out] document object that is filled by the parser
 	 */
 	void parseDir( std::string const& txtDir, std::string const& imageDir, Document* doc );
-	
+
     private:
 
 

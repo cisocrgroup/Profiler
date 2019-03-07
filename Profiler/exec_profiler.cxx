@@ -21,86 +21,85 @@
 #include <Getopt/Getopt.h>
 #include <IBMGroundtruth/IBMGTReader.h>
 
-void
-printHelp()
-{
+void printHelp() {
   std::wcerr
-    << "Use like: profiler --config=<iniFile> --sourceFile=<xmlFile>"
-    << std::endl
-    << "--sourceFormat DocXML | AltoXML | DocGt | ABBYY_XML_DIR | TXT   "
-       "(Default: DocXML)"
-    << std::endl
-    << "[--out_xml  <outputFile> ]  Prints xml containing the lists of hist. "
-       "variants and ocr errors."
-    << std::endl
-    << "[--out_html <outputFile> ]  Prints all kinds of things to control the "
-       "Profiler's performance to html."
-    << std::endl
-    << "[--out_doc  <outputFile> ]  Prints the document in DocXML format, "
-       "including correction suggestions."
-    << std::endl
-    << std::endl
-    << "[--iterations n]            Sets the number of iterations. This "
-       "overrides the setting in the config file."
-    << std::endl
-    << std::endl
-    << "[--pageRestriction n]       Restrict processing to the initial n pages "
-       "of the document."
-    << std::endl
-    << std::endl
-    << "[--createConfigFile]        Prints a template for a config file to "
-       "stdout. As specified above, such"
-    << std::endl
-    << "                            a config file in ini format is needed to "
-       "run the profiler."
-    << std::endl
-    << std::endl
-    << "[--imageDir dir]            Only applies to ABBYY_XML_DIR input mode - "
-       "sets the appropriate image dir."
-    << std::endl
-    << std::endl
-    << "[--out_gtxml <outputFile>]  Prints xml containing the GROUNDTRUTH "
-       "lists of hist. variants and ocr errors. (if available)"
-    << std::endl
-    << "                            (Only for evaluation with groundtruth "
-       "documents.)"
-    << std::endl
-    << "[--simpleOutput]            Print simple text output to stdout"
-    << std::endl
-    << "[--jsonOutput <outputFile>] Print json formatted output" << std::endl
-    << "[--adaptive]                Use adaptive profiler, that uses "
-       "correction information"
-    << std::endl
-    << "[--evaluate <out-dir>]       Calculate recall and precision of the "
-       "profiler and write results to <out-dir>"
-    << std::endl
-    << "[--strict yes|no|very]      set the strictness of the evaluation"
-    << std::endl
-    << "[--autocorrect patterns]    Autocorrect a comma separated list of "
-       "patterns. Tokens that match one of the given patterns are "
-       "\"corrected\" with their groundtruth"
-    << std::endl
-    << "[--enable-unknowns]         Enable handling of uninterpretable "
-       "(unknown) tokens"
-    << std::endl
-    << "[--types]                   Profile usinging types not tokens"
-    << std::endl
-    << "[--additionalLex <lex>]     Add additional dynamic lexicon (one word "
-       "per line)"
-    << std::endl
-    << "[--additionalLexRank <r>]   Set the rank of the addional lexicon "
-       "(default: 1)"
-       "per line)"
-    << std::endl
-    << "[--additionalLexMaxLev <k>] Set the max levenshtein distance for the "
-       "addional lexicon (default: 2)"
-       "per line)"
-    << std::endl;
+      << "Use like: profiler --config=<iniFile> --sourceFile=<xmlFile>"
+      << std::endl
+      << "--sourceFormat DocXML | AltoXML | DocGt | ABBYY_XML_DIR | TXT   "
+         "(Default: DocXML)"
+      << std::endl
+      << "[--out_xml  <outputFile> ]  Prints xml containing the lists of hist. "
+         "variants and ocr errors."
+      << std::endl
+      << "[--out_html <outputFile> ]  Prints all kinds of things to control "
+         "the "
+         "Profiler's performance to html."
+      << std::endl
+      << "[--out_doc  <outputFile> ]  Prints the document in DocXML format, "
+         "including correction suggestions."
+      << std::endl
+      << std::endl
+      << "[--iterations n]            Sets the number of iterations. This "
+         "overrides the setting in the config file."
+      << std::endl
+      << std::endl
+      << "[--pageRestriction n]       Restrict processing to the initial n "
+         "pages "
+         "of the document."
+      << std::endl
+      << std::endl
+      << "[--createConfigFile]        Prints a template for a config file to "
+         "stdout. As specified above, such"
+      << std::endl
+      << "                            a config file in ini format is needed to "
+         "run the profiler."
+      << std::endl
+      << std::endl
+      << "[--imageDir dir]            Only applies to ABBYY_XML_DIR input mode "
+         "- "
+         "sets the appropriate image dir."
+      << std::endl
+      << std::endl
+      << "[--out_gtxml <outputFile>]  Prints xml containing the GROUNDTRUTH "
+         "lists of hist. variants and ocr errors. (if available)"
+      << std::endl
+      << "                            (Only for evaluation with groundtruth "
+         "documents.)"
+      << std::endl
+      << "[--simpleOutput]            Print simple text output to stdout"
+      << std::endl
+      << "[--jsonOutput <outputFile>] Print json formatted output" << std::endl
+      << "[--adaptive]                Use adaptive profiler, that uses "
+         "correction information"
+      << std::endl
+      << "[--evaluate <out-dir>]       Calculate recall and precision of the "
+         "profiler and write results to <out-dir>"
+      << std::endl
+      << "[--strict yes|no|very]      set the strictness of the evaluation"
+      << std::endl
+      << "[--autocorrect patterns]    Autocorrect a comma separated list of "
+         "patterns. Tokens that match one of the given patterns are "
+         "\"corrected\" with their groundtruth"
+      << std::endl
+      << "[--enable-unknowns]         Enable handling of uninterpretable "
+         "(unknown) tokens"
+      << std::endl
+      << "[--types]                   Profile usinging types not tokens"
+      << std::endl
+      << "[--additionalLex <lex>]     Add additional dynamic lexicon (one word "
+         "per line)"
+      << std::endl
+      << "[--additionalLexRank <r>]   Set the rank of the addional lexicon "
+         "(default: 1)"
+         "per line)"
+      << std::endl
+      << "[--additionalLexMaxLev <k>] Set the max levenshtein distance for the "
+         "addional lexicon (default: 2)"
+         "per line)"
+      << std::endl;
 }
 
-int
-main(int argc, char const** argv)
-{
+int main(int argc, char const **argv) {
 
   try {
     std::locale::global(std::locale("en_US.UTF-8"));
@@ -132,7 +131,7 @@ main(int argc, char const** argv)
     options.specifyOption("additionalLexMaxLev", csl::Getopt::STRING, "2");
     try {
       options.getOptionsAsSpecified(argc, argv);
-    } catch (csl::Getopt::Exception& exc) {
+    } catch (csl::Getopt::Exception &exc) {
 
       std::wcerr << "OCRC::profiler: Syntax error in command line call."
                  << std::endl
@@ -146,14 +145,14 @@ main(int argc, char const** argv)
     // for backwards compatibility
     if (options.hasOption("xmlOut")) {
       std::wcerr
-        << "WARNING: option --xmlOut is deprecated, was renamed to out_xml."
-        << std::endl;
+          << "WARNING: option --xmlOut is deprecated, was renamed to out_xml."
+          << std::endl;
       options.setOption("out_xml", options.getOption("xmlOut"));
     }
     if (options.hasOption("htmlOut")) {
       std::wcerr
-        << "WARNING: option --htmlOut is deprecated, was renamed to out_html."
-        << std::endl;
+          << "WARNING: option --htmlOut is deprecated, was renamed to out_html."
+          << std::endl;
       options.setOption("out_html", options.getOption("htmlOut"));
     }
 
@@ -172,9 +171,9 @@ main(int argc, char const** argv)
     ////// check for missing options for running the profiler
     if (!(options.hasOption("config") && options.hasOption("sourceFile"))) {
       std::wcerr
-        << "Please specify obligatory options --config and --sourceFile"
-        << std::endl
-        << "Use --help to learn more." << std::endl;
+          << "Please specify obligatory options --config and --sourceFile"
+          << std::endl
+          << "Use --help to learn more." << std::endl;
       exit(EXIT_FAILURE);
     }
 
@@ -199,7 +198,7 @@ main(int argc, char const** argv)
                  << OCRCorrection::Utils::utf8(options.getOption("config"))
                  << std::endl;
       profiler.readConfiguration(options.getOption("config").c_str());
-    } catch (std::exception const& exc) {
+    } catch (std::exception const &exc) {
       std::wstring wideWhat(OCRCorrection::Utils::utf8(exc.what()));
       ;
       // csl::CSLLocale::string2wstring( exc.what(), wideWhat );
@@ -215,12 +214,12 @@ main(int argc, char const** argv)
      */
     if (options.hasOption("iterations")) {
       profiler.setNumberOfIterations(
-        atol(options.getOption("iterations").c_str()));
+          atol(options.getOption("iterations").c_str()));
     }
 
     if (options.hasOption("pageRestriction")) {
       profiler.setPageRestriction(
-        atol(options.getOption("pageRestriction").c_str()));
+          atol(options.getOption("pageRestriction").c_str()));
     }
 
     if (options.hasOption("out_html")) {
@@ -231,7 +230,7 @@ main(int argc, char const** argv)
       const auto rank = options.getOptionAsSizeT("additionalLexRank");
       const auto maxlev = options.getOptionAsSizeT("additionalLexMaxLev");
       std::unique_ptr<csl::AdditionalLex> addLex(
-        new csl::AdditionalLex(path, rank, maxlev));
+          new csl::AdditionalLex(path, rank, maxlev));
       // memory of lex is managed by the profiler
       profiler.addExternalDictModule(addLex.release());
     }
@@ -253,8 +252,7 @@ main(int argc, char const** argv)
       } else if (options.getOption("sourceFormat") == "ABBYY_XML_DIR") {
         OCRCorrection::AbbyyXmlParser reader;
         reader.parseDirToDocument(options.getOption("sourceFile"),
-                                  options.getOption("imageDir"),
-                                  &document);
+                                  options.getOption("imageDir"), &document);
       } else if (options.getOption("sourceFormat") == "IBM_GROUNDTRUTH") {
         OCRCorrection::IBMGTReader r;
         r.parse(options.getOption("sourceFile").c_str(), &document);
@@ -319,7 +317,7 @@ main(int argc, char const** argv)
         std::wcerr << L"OCRC::profiler: Could not open file for xml output"
                    << std::endl;
         throw std::runtime_error(
-          "OCRC::profiler: Could not open file for xml output");
+            "OCRC::profiler: Could not open file for xml output");
       }
       profiler.profile2xml(os);
       os.close();
@@ -332,15 +330,15 @@ main(int argc, char const** argv)
       writer.writeXML(document, options.getOption("out_doc").c_str());
     }
 
-  } catch (OCRCorrection::OCRCException& exc) {
+  } catch (OCRCorrection::OCRCException &exc) {
     std::wcerr << "OCRC::Profiler: Caught OCRCException:"
                << OCRCorrection::Utils::utf8(exc.what()) << std::endl;
     return EXIT_FAILURE;
-  } catch (csl::exceptions::cslException& exc) {
+  } catch (csl::exceptions::cslException &exc) {
     std::wcerr << "OCRC::Profiler: Caught cslException: "
                << OCRCorrection::Utils::utf8(exc.what()) << std::endl;
     return EXIT_FAILURE;
-  } catch (std::exception& exc) {
+  } catch (std::exception &exc) {
     wprintf(L"profiler: caught exception: %s\n", exc.what());
     return EXIT_FAILURE;
   }
