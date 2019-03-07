@@ -83,35 +83,35 @@ add_subdirectory(tools)
 
 ###### TO DO: Move this (and all related headers and sources) to a separate folder ##########
 SET( OCRCORRECTION_SOURCES
-	     AbbyyXmlParser/AbbyyXmlParser.cxx
-	     AltoXML/AltoEnrich.cxx
-	     AltoXML/AltoXMLReader.cxx
-	     CorrectionSystem/CorrectionSystem.cxx
-	     DocXML/DocXMLReader.cxx
-	     DocXML/DocXMLWriter.cxx
-	     DocXML/LegacyDocXMLReader.cxx
-	     DocXML/MergedGroundtruthReader.cxx
-	     Document/Document.cxx
-	     GlobalProfile/GlobalProfileXMLReader.cxx
-	     GlobalProfile/PatternContainerXMLReader.cxx
-	     GtDoc/AutoCorrector.cxx
-	     GtDoc/GtDoc.cxx
-	     LevenshteinWeights/LevenshteinWeights.cxx
-	     Pattern/Pattern.cxx
-	     Profiler/AdaptiveProfiling.cxx
-	     Profiler/Evaluation.cxx
-	     Profiler/Evaluator.cxx
-	     Profiler/HTMLWriter.cxx
-	     Profiler/LanguageModel.cxx
-	     Profiler/Profile.cxx
-	     Profiler/Profiler.cxx
-	     Profiler/SimpleOutputWriter.cxx
-			 Profiler/JSONOutputWriter.cxx
-	     TXTReader/AlignedTXTReader.cxx
-	     TXTReader/TXTReader.cxx
-	     Token/TokenImageInfoBox.cxx
-       Utils/Utils.cxx
-	     )
+	AbbyyXmlParser/AbbyyXmlParser.cxx
+	AltoXML/AltoEnrich.cxx
+	AltoXML/AltoXMLReader.cxx
+	CorrectionSystem/CorrectionSystem.cxx
+	DocXML/DocXMLReader.cxx
+	DocXML/DocXMLWriter.cxx
+	DocXML/LegacyDocXMLReader.cxx
+	DocXML/MergedGroundtruthReader.cxx
+	Document/Document.cxx
+	GlobalProfile/GlobalProfileXMLReader.cxx
+	GlobalProfile/PatternContainerXMLReader.cxx
+	GtDoc/AutoCorrector.cxx
+	GtDoc/GtDoc.cxx
+	LevenshteinWeights/LevenshteinWeights.cxx
+	Pattern/Pattern.cxx
+	Profiler/AdaptiveProfiling.cxx
+	Profiler/Evaluation.cxx
+	Profiler/Evaluator.cxx
+	Profiler/HTMLWriter.cxx
+	Profiler/JSONOutputWriter.cxx
+	Profiler/LanguageModel.cxx
+	Profiler/Profile.cxx
+	Profiler/Profiler.cxx
+	Profiler/SimpleOutputWriter.cxx
+	TXTReader/AlignedTXTReader.cxx
+	TXTReader/TXTReader.cxx
+	Token/TokenImageInfoBox.cxx
+	Utils/Utils.cxx
+)
 
 add_library( OCRCorrection STATIC ${OCRCORRECTION_SOURCES})
 target_link_libraries(OCRCorrection LevDEA Pattern INIConfig DictSearch)
