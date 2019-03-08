@@ -23,10 +23,10 @@ void parse(char const *path, Document &document, csl::AdditionalLex &alex) {
       continue;
     }
     // all other lines a are tokens with a possible empty correction
-    // seperated by '/'; its an error if a token with no correction
-    // does not end with '/'. A line only consiting of one '/' is
+    // seperated by ':'; its an error if a token with no correction
+    // does not end with ':'. A line only consiting of one ':' is
     // skipped.
-    const auto pos = line.find_last_of('/');
+    const auto pos = line.find_last_of(L':');
     if (pos == std::wstring::npos) {
       throw std::runtime_error("invalid input line: missing seperator");
     }
