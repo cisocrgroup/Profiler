@@ -10,6 +10,7 @@
 #include "./Profiler.h"
 #include "DictSearch/AdaptiveLex.h"
 #include "DictSearch/AdditionalLex.h"
+#include "ExtReader/ExtReader.h"
 #include "GtDoc/AutoCorrector.h"
 #include "GtDoc/GtDoc.h"
 #include "JSONOutputWriter.hxx"
@@ -25,7 +26,7 @@ void printHelp() {
   std::wcerr
       << "Use like: profiler --config=<iniFile> --sourceFile=<xmlFile>"
       << std::endl
-      << "--sourceFormat DocXML | AltoXML | DocGt | ABBYY_XML_DIR | TXT   "
+      << "--sourceFormat DocXML | AltoXML | DocGt | ABBYY_XML_DIR | TXT | EXT  "
          "(Default: DocXML)"
       << std::endl
       << "[--out_xml  <outputFile> ]  Prints xml containing the lists of hist. "
@@ -225,14 +226,14 @@ int main(int argc, char const **argv) {
     if (options.hasOption("out_html")) {
       profiler.setHTMLOutFile(options.getOption("out_html"));
     }
+    std::unique_ptr<csl::AdditionalLex> alex;
     if (options.hasOption("additionalLex")) {
       const auto path = options["additionalLex"];
       const auto rank = options.getOptionAsSizeT("additionalLexRank");
       const auto maxlev = options.getOptionAsSizeT("additionalLexMaxLev");
-      std::unique_ptr<csl::AdditionalLex> addLex(
-          new csl::AdditionalLex(path, rank, maxlev));
+      alex.reset(new csl::AdditionalLex(path, rank, maxlev));
       // memory of lex is managed by the profiler
-      profiler.addExternalDictModule(addLex.release());
+      profiler.addExternalDictModule(alex.release());
     }
     profiler.setAdaptive(options.hasOption("adaptive"));
     profiler.setTypes(options.hasOption("types"));
@@ -260,6 +261,17 @@ int main(int argc, char const **argv) {
         OCRCorrection::GtDoc gtdoc;
         gtdoc.load(options.getOption("sourceFile"));
         gtdoc.parse(document);
+      } else if (options.getOption("sourceFormat") == "EXT") {
+        // setup additional lex (if it has not already been done).
+        if (not alex) {
+          const auto rank = options.getOptionAsSizeT("additionalLexRank");
+          const auto maxlev = options.getOptionAsSizeT("additionalLexMaxLev");
+          alex.reset(new csl::AdditionalLex(rank, maxlev));
+          profiler.addExternalDictModule(alex.release());
+        }
+        profiler.setAdaptive(true); // EXT reader implies adaptive lexicon
+        OCRCorrection::ExtReader reader;
+        reader.parse(options.getOption("sourceFile"), document, *alex);
       } else {
         std::wcerr << "Unknown sourceFormat! Use: profiler --help" << std::endl;
         exit(1);

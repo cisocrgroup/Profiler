@@ -6,7 +6,8 @@
 using namespace OCRCorrection;
 
 ////////////////////////////////////////////////////////////////////////////////
-void parse(char const *path, Document &document, csl::AdditionalLex &alex) {
+void ExtReader::parse(const std::string &path, Document &document,
+                      csl::AdditionalLex &alex) {
   std::wifstream is(path);
   if (not is.good()) {
     throw std::runtime_error("cannot open: " + std::string(path));
