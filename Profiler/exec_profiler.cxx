@@ -267,11 +267,11 @@ int main(int argc, char const **argv) {
           const auto rank = options.getOptionAsSizeT("additionalLexRank");
           const auto maxlev = options.getOptionAsSizeT("additionalLexMaxLev");
           alex.reset(new csl::AdditionalLex(rank, maxlev));
-          profiler.addExternalDictModule(alex.release());
         }
         profiler.setAdaptive(true); // EXT reader implies adaptive lexicon
         OCRCorrection::ExtReader reader;
         reader.parse(options.getOption("sourceFile"), document, *alex);
+        profiler.addExternalDictModule(alex.release());
       } else {
         std::wcerr << "Unknown sourceFormat! Use: profiler --help" << std::endl;
         exit(1);
