@@ -1,7 +1,7 @@
 #include "JSONOutputWriter.hxx"
 #include "Document/Document.h"
 #include <iterator>
-#include <unordered_set>
+#include <unordered_map>
 
 using namespace OCRCorrection;
 
@@ -42,25 +42,30 @@ static std::wostream &writeKeyVal(std::wostream &out, const std::wstring &key,
 }
 
 void JSONOutputWriter::write() const {
-  std::unordered_set<std::wstring> types;
+  std::unordered_map<std::wstring, std::pair<size_t, const Token *>> types;
+  for (auto i = doc_.begin(); i != doc_.end(); ++i) {
+    auto wocr = i->getWOCR();
+    std::transform(wocr.begin(), wocr.end(), wocr.begin(), ::towlower);
+    types[wocr].first++;
+    types[wocr].second = i.operator->();
+  }
   out_ << "{";
   wchar_t pre = L'\n';
-  for (const auto &token : doc_) {
-    auto wocr = token.getWOCR();
-    std::transform(wocr.begin(), wocr.end(), wocr.begin(), ::towlower);
-    if (token.isNormal() && !types.count(wocr)) {
-      types.insert(wocr);
-      writeNormalToken(pre, token);
+  for (const auto &t : types) {
+    if (t.second.second->isNormal()) {
+      writeNormalToken(pre, *t.second.second, t.second.first);
       pre = L',';
     }
   }
   out_ << "}\n";
 }
 
-void JSONOutputWriter::writeNormalToken(wchar_t pre, const Token &token) const {
+void JSONOutputWriter::writeNormalToken(wchar_t pre, const Token &token,
+                                        size_t n) const {
   out_ << pre;
   writeString(out_, token.getWOCR(), true) << ": {\n";
   writeKeyVal(out_, L"OCR", token.getWOCR(), true) << ",\n";
+  writeKeyVal(out_, L"N", n) << ",\n";
   pre = L'\n';
   writeString(out_, L"Candidates") << ": [";
   for (auto i = token.candidatesBegin(); i != token.candidatesEnd(); ++i) {
