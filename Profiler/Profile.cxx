@@ -16,20 +16,16 @@ const std::wstring Profile::TokenType::NORMAL = L"normalAndLongTokens";
 const std::wstring Profile::TokenType::WAS_PROFILED = L"wasProfiled";
 const std::wstring Profile::TokenType::UNKNOWN = L"unknown";
 const std::wstring Profile::TokenType::GUESSED_HIST_TRACE_NONEMPTY =
-  L"guessed_histTrace_nonempty";
+    L"guessed_histTrace_nonempty";
 const std::wstring Profile::TokenType::GUESSED_OCR_TRACE_NONEMPTY =
-  L"guessed_ocrTrace_nonempty";
+    L"guessed_ocrTrace_nonempty";
 
-static bool
-skipCand(const csl::DictSearch::Interpretation& cand);
-static bool
-isInsOrDel(const csl::Pattern& pat);
+static bool skipCand(const csl::DictSearch::Interpretation &cand);
+static bool isInsOrDel(const csl::Pattern &pat);
 static std::unique_ptr<csl::MinDic<float>>
-makeMinDic(const std::map<std::wstring, double>& m);
+makeMinDic(const std::map<std::wstring, double> &m);
 
-void
-Profile::put(const Token& token, F cb)
-{
+void Profile::put(const Token &token, F cb) {
   updateCounts(token);
   // skip short, notNormal etc...
   if (not token.isNormal()) {
@@ -49,9 +45,7 @@ Profile::put(const Token& token, F cb)
   //            << " suggestions\n";
 }
 
-void
-Profile::updateCounts(const Token& token)
-{
+void Profile::updateCounts(const Token &token) {
   if (not token.isNormal()) {
     counter_[TokenType::NOT_NORMAL]++;
     //    token.setSuspicious(token.getAbbyySpecifics().isSuspicious());
@@ -64,9 +58,7 @@ Profile::updateCounts(const Token& token)
   }
 }
 
-void
-Profile::iteration(const LanguageModel& lm)
-{
+void Profile::iteration(const LanguageModel &lm) {
   // std::map<csl::Pattern, std::set<std::wstring>> ocrPatternsInWords;
   std::map<std::wstring, double> baseWordFrequency;
   PatternCounter histCounter, ocrCounter;
@@ -75,13 +67,13 @@ Profile::iteration(const LanguageModel& lm)
   counter_[TokenType::UNKNOWN] = 0;
   counter_[TokenType::GUESSED_HIST_TRACE_NONEMPTY] = 0;
   counter_[TokenType::GUESSED_OCR_TRACE_NONEMPTY] = 0;
-  for (auto& t : types_) {
+  for (auto &t : types_) {
     // std::wcerr << "TYPE: " << t.first << "\n";
     double sum = 0;
     std::get<2>(t.second).clear();
     size_t n = 0;
     // first run over all candiates
-    for (const auto& cand : std::get<1>(t.second)) {
+    for (const auto &cand : std::get<1>(t.second)) {
       if (skipCand(cand)) {
         continue;
       }
@@ -91,8 +83,8 @@ Profile::iteration(const LanguageModel& lm)
       // the unkown candiate is the only candidate for this token.
       // a -> b = not a or b
       assert(not isUnknown or (std::get<2>(t.second).size() == 1));
-      lm.computer().computeInstruction(
-        cand.getWord(), t.first, &ocrInstructions, isUnknown);
+      lm.computer().computeInstruction(cand.getWord(), t.first,
+                                       &ocrInstructions, isUnknown);
       // std::wcerr << "ocrInstructions.size(): " << ocrInstructions.size()
       //            << "\n";
       if (ocrInstructions.empty()) {
@@ -100,7 +92,7 @@ Profile::iteration(const LanguageModel& lm)
         continue;
       }
       // ocrInstructions are a list of different possible ocr instructions.
-      for (const auto& ins : ocrInstructions) {
+      for (const auto &ins : ocrInstructions) {
         // if (t.first == L"vntergang") {
         //   std::wcerr << "ins: " << ins << "\n";
         // }
@@ -138,7 +130,7 @@ Profile::iteration(const LanguageModel& lm)
     // std::wcerr << "SUM: " << sum << "\n";
     const double norm = 1 / sum;
     // now run over the calculated distributions
-    for (auto& c : std::get<2>(t.second)) {
+    for (auto &c : std::get<2>(t.second)) {
       c.weight = c.combinedProbability() / sum;
       if (std::isnan(c.weight)) {
         if (c.traces.hist.isUnknown()) {
@@ -150,14 +142,14 @@ Profile::iteration(const LanguageModel& lm)
         }
       }
       const double weight = c.weight * std::get<0>(t.second);
-      for (const auto& pat : c.traces.ocr) {
+      for (const auto &pat : c.traces.ocr) {
         ocrCounter.registerPattern(pat, weight);
         // Check for the individual weight of the candidate.
         // if (c.weight > 0.5) {
         //   ocrPatternsInWords[pat].insert(t.first);
         // }
       }
-      for (const auto& pat : c.traces.hist) {
+      for (const auto &pat : c.traces.hist) {
         histCounter.registerPattern(pat, weight);
       }
       if (c.traces.hist.size() > 0) {
@@ -171,7 +163,7 @@ Profile::iteration(const LanguageModel& lm)
       baseWordFrequency[c.baseWord] += weight;
       counter_[TokenType::WAS_PROFILED] += weight;
       lm.globalProfile().dictDistribution_[c.dictModule->getName()].frequency +=
-        weight;
+          weight;
     }
     if (std::get<2>(t.second).empty()) {
       counter_[TokenType::UNKNOWN] += std::get<0>(t.second);
@@ -183,30 +175,26 @@ Profile::iteration(const LanguageModel& lm)
   updateBaseWordFrequencies(lm, baseWordFrequency);
   iteration_++;
   lm.frequencyList().connectPatternProbabilities(
-    &lm.globalProfile().histPatternProbabilities_);
+      &lm.globalProfile().histPatternProbabilities_);
 }
 
-void
-Profile::finish()
-{
+void Profile::finish() {
   using std::begin;
   using std::end;
   using std::get;
-  for (auto& t : types_) {
+  for (auto &t : types_) {
     // discard candidate set
     get<1>(t.second).clear();
     // sort candidates by (vote) weight
-    std::sort(begin(get<2>(t.second)),
-              end(get<2>(t.second)),
-              [](const WeightedCandidate& a, const WeightedCandidate& b) {
+    std::sort(begin(get<2>(t.second)), end(get<2>(t.second)),
+              [](const WeightedCandidate &a, const WeightedCandidate &b) {
                 // sort in descending order of vote weigths
                 return b.weight < a.weight;
               });
     // remove non unique suggestions
     std::set<std::wstring> seen;
-    auto it = std::remove_if(begin(get<2>(t.second)),
-                             end(get<2>(t.second)),
-                             [&](const WeightedCandidate& c) {
+    auto it = std::remove_if(begin(get<2>(t.second)), end(get<2>(t.second)),
+                             [&](const WeightedCandidate &c) {
                                if (seen.count(c.cand.getWord())) {
                                  return true;
                                }
@@ -214,49 +202,42 @@ Profile::finish()
                                return false;
                              });
     get<2>(t.second).erase(it, end(get<2>(t.second)));
-    for (auto& cand : get<2>(t.second)) {
+    for (auto &cand : get<2>(t.second)) {
       cand.cand.setVoteWeight(cand.weight);
       cand.cand.setDictModule(*cand.dictModule);
     }
   }
 }
 
-void
-Profile::setCorrection(Token& token) const
-{
+void Profile::setCorrection(Token &token) const {
   const auto f = types_.find(token.getWOCR_lc());
   if (f == types_.end()) {
     return;
   }
-  for (const auto& cand : std::get<2>(f->second)) {
+  for (const auto &cand : std::get<2>(f->second)) {
     token.addCandidate(cand.cand);
   }
 }
 
-void
-Profile::updateGlobalHistPatterns(const LanguageModel& lm,
-                                  const PatternCounter& counts) const
-{
+void Profile::updateGlobalHistPatterns(const LanguageModel &lm,
+                                       const PatternCounter &counts) const {
   lm.clearHistPatternProbabilities();
-  for (const auto& count : counts) {
+  for (const auto &count : counts) {
     if (skipCutoff(count.second, lm.histPatternCutoff())) {
       continue;
     }
     auto sp = count.first;
     sp.strip();
     lm.globalProfile().histPatternProbabilities_.setWeight(
-      count.first,
-      count.second / counts.getNGramCount(sp.getLeft()),
-      count.second);
+        count.first, count.second / counts.getNGramCount(sp.getLeft()),
+        count.second);
   }
 }
 
-void
-Profile::updateGlobalOCRPatterns(const LanguageModel& lm,
-                                 const PatternCounter& counts) const
-{
+void Profile::updateGlobalOCRPatterns(const LanguageModel &lm,
+                                      const PatternCounter &counts) const {
   lm.clearOCRPatternProbabilities();
-  for (const auto& count : counts) {
+  for (const auto &count : counts) {
     if (isInsOrDel(count.first)) {
       continue;
     }
@@ -274,24 +255,20 @@ Profile::updateGlobalOCRPatterns(const LanguageModel& lm,
     }
     if ((count.second / denom) > 1e-25) {
       lm.globalProfile().ocrPatternProbabilities_.setWeight(
-        count.first, count.second / denom, count.second);
+          count.first, count.second / denom, count.second);
     }
   }
 }
 
-void
-Profile::updateDictDistributions(const LanguageModel& lm) const
-{
-  for (auto& d : lm.globalProfile().dictDistribution_) {
+void Profile::updateDictDistributions(const LanguageModel &lm) const {
+  for (auto &d : lm.globalProfile().dictDistribution_) {
     d.second.proportion =
-      d.second.frequency / counter_.at(TokenType::WAS_PROFILED);
+        d.second.frequency / counter_.at(TokenType::WAS_PROFILED);
   }
 }
 
-void
-Profile::updateBaseWordFrequencies(const LanguageModel& lm,
-                                   const std::map<std::wstring, double>& m)
-{
+void Profile::updateBaseWordFrequencies(
+    const LanguageModel &lm, const std::map<std::wstring, double> &m) {
   mindic_ = makeMinDic(m);
   lm.frequencyList().connectBaseWordFrequency(mindic_.get());
   double nr = counter_.at(TokenType::WAS_PROFILED);
@@ -304,33 +281,27 @@ Profile::updateBaseWordFrequencies(const LanguageModel& lm,
 }
 
 std::unique_ptr<csl::MinDic<float>>
-makeMinDic(const std::map<std::wstring, double>& m)
-{
+makeMinDic(const std::map<std::wstring, double> &m) {
   std::unique_ptr<csl::MinDic<float>> dic;
   dic.reset(new csl::MinDic<float>());
   dic->initConstruction();
-  for (const auto& e : m) {
+  for (const auto &e : m) {
     dic->addToken(e.first.data(), e.second);
   }
   dic->finishConstruction();
-  return std::move(dic);
+  // return std::move(dic);
+  return dic; // <- this should be moved because of copy elision
 }
 
-bool
-Profile::skipCutoff(double count, double cutoff) const
-{
+bool Profile::skipCutoff(double count, double cutoff) const {
   return count <= (cutoff * (counter_.at(TokenType::WAS_PROFILED) / 1000));
 }
 
-bool
-isInsOrDel(const csl::Pattern& pat)
-{
+bool isInsOrDel(const csl::Pattern &pat) {
   return pat.getLeft().size() + pat.getRight().size() == 1;
 }
 
-bool
-skipCand(const csl::DictSearch::Interpretation& cand)
-{
+bool skipCand(const csl::DictSearch::Interpretation &cand) {
   return cand.getWord().length() < 4 ||
          cand.getWord().find('-') != std::wstring::npos;
 }
