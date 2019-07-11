@@ -103,7 +103,7 @@ void printHelp() {
 int main(int argc, char const **argv) {
 
   try {
-    std::locale::global(std::locale("en_US.UTF-8"));
+    std::locale::global(std::locale(""));
     csl::Getopt options;
     options.specifyOption("help", csl::Getopt::VOID);
     options.specifyOption("config", csl::Getopt::STRING);
