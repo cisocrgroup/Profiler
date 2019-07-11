@@ -5,18 +5,19 @@ ENV PROFILER_BACKEND='/language-data'
 ENV GITURL="https://github.com/cisocrgroup"
 ENV DEPS='cppunit-dev xerces-c icu-dev'
 ENV BUILD_DEPS='g++ make build-base cmake git perl'
-ENV LANG="en_US.UTF-8"
-ENV MUSL_LOCPATH="/usr/share/i18n/locales/musl"
-ENV LC_ALL='en_US.UTF-8'
+ENV LANG='C'
+ENV MUSL_LOCPATH="/usr/local/share/i18n/locales/musl"
+ENV LC_ALL='C'
 
 # locale
 RUN apk --no-cache add libintl \
 	&& apk --no-cache --virtual .locale_build add cmake make musl-dev gcc gettext-dev git \
 	&& git clone https://gitlab.com/rilian-la-te/musl-locales \
-	&& cd musl-locales && cmake -DLOCALE_PROFILE=OFF -DCMAKE_INSTALL_PREFIX:PATH=/usr . && make && make install \
+	&& cd musl-locales \
+	&& cmake -DLOCALE_PROFILE=OFF -DCMAKE_INSTALL_PREFIX:PATH=/usr . \
+	&& make && make install \
 	&& cd .. && rm -r musl-locales \
 	&& apk del .locale_build
-
 
 COPY . /build
 RUN apk add -U --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ ${DEPS} ${BUILD_DEPS} \
