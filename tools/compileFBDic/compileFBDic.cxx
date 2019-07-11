@@ -6,18 +6,14 @@
 /**
  * @todo
  */
-void
-printHelp()
-{
+void printHelp() {
   std::wcerr << "Use like: compileFBDic <inFile.lex> [<outFile.fbdic>]"
              << std::endl
              << "If no <binDic> is provided, output is written to inFile.fbdic."
              << std::endl;
 }
 
-int
-main(int argc, char const** argv)
-{
+int main(int argc, char const **argv) {
   std::locale::global(std::locale(""));
 
   csl::Getopt options;
@@ -54,7 +50,7 @@ main(int argc, char const** argv)
   try {
     t.compileDic(inFile.c_str());
     t.writeToFile(outFile.c_str());
-  } catch (csl::exceptions::cslException& ex) {
+  } catch (csl::exceptions::cslException &ex) {
     std::wcout << "compileFBDic failed: " << ex.what() << std::endl;
     return EXIT_FAILURE;
   }
