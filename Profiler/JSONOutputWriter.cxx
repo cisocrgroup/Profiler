@@ -85,6 +85,8 @@ void JSONOutputWriter::writeNormalToken(wchar_t pre, const Token &token,
   writeString(out_, token.getWOCR(), true) << ": {\n";
   writeKeyVal(out_, L"OCR", token.getWOCR(), true) << ",\n";
   writeKeyVal(out_, L"N", n) << ",\n";
+  const bool hc = token.candidatesBegin() != token.candidatesEnd();
+  writeKeyVal(out_, L"HasCandidates", hc) << ",\n";
   pre = L'\n';
   writeString(out_, L"Candidates") << ": [";
   for (auto i = token.candidatesBegin(); i != token.candidatesEnd(); ++i) {
