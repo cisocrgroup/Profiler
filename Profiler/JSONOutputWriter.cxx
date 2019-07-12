@@ -22,12 +22,9 @@ static std::wostream &writeString(std::wostream &out, const std::wstring &str,
 static std::wostream &writeKeyVal(std::wostream &out, const std::wstring &key,
                                   double val) {
   writeString(out, key);
-  out.imbue(std::locale("C"));
-  // std::wstringstream wss;
-  // wss.imbue(std::locale("C"));
-  // wss << val;
+  auto old = out.imbue(std::locale("C"));
   out << ": " << val;
-  out.imbue(std::locale(""));
+  out.imbue(old);
   return out;
 }
 
@@ -45,9 +42,9 @@ static std::wostream &writeKeyVal(std::wostream &out, const std::wstring &key,
 static std::wostream &writeKeyVal(std::wostream &out, const std::wstring &key,
                                   size_t val) {
   writeString(out, key);
-  out.imbue(std::locale("C"));
+  auto old = out.imbue(std::locale("C"));
   out << ": " << val;
-  out.imbue(std::locale(""));
+  out.imbue(old);
   return out;
 }
 
