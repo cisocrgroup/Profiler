@@ -42,68 +42,74 @@ static std::wostream &writeKeyVal(std::wostream &out, const std::wstring &key,
 }
 
 void JSONOutputWriter::write() const {
+  std::wofstream tmpout("/tmp/profiler.json");
+  write(tmpout, doc_);
+  write(out_, doc_);
+}
+
+void JSONOutputWriter::write(std::wostream &out, const Document &doc) {
   std::unordered_map<std::wstring, std::pair<size_t, const Token *>> types;
-  for (auto i = doc_.begin(); i != doc_.end(); ++i) {
+  for (auto i = doc.begin(); i != doc.end(); ++i) {
     auto wocr = i->getWOCR();
     std::transform(wocr.begin(), wocr.end(), wocr.begin(), ::towlower);
     types[wocr].first++;
     types[wocr].second = i.operator->();
   }
-  out_ << "{";
+  out << "{";
   wchar_t pre = L'\n';
   for (const auto &t : types) {
     if (t.second.second->isNormal()) {
-      writeNormalToken(pre, *t.second.second, t.second.first);
+      writeNormalToken(out, pre, *t.second.second, t.second.first);
       pre = L',';
     }
   }
-  out_ << "}\n";
+  out << "}\n";
 }
 
-void JSONOutputWriter::writeNormalToken(wchar_t pre, const Token &token,
-                                        size_t n) const {
-  out_ << pre;
-  writeString(out_, token.getWOCR(), true) << ": {\n";
-  writeKeyVal(out_, L"OCR", token.getWOCR(), true) << ",\n";
-  writeKeyVal(out_, L"N", n) << ",\n";
+void JSONOutputWriter::writeNormalToken(std::wostream &out, wchar_t pre,
+                                        const Token &token, size_t n) {
+  out << pre;
+  writeString(out, token.getWOCR(), true) << ": {\n";
+  writeKeyVal(out, L"OCR", token.getWOCR(), true) << ",\n";
+  writeKeyVal(out, L"N", n) << ",\n";
   pre = L'\n';
-  writeString(out_, L"Candidates") << ": [";
+  writeString(out, L"Candidates") << ": [";
   for (auto i = token.candidatesBegin(); i != token.candidatesEnd(); ++i) {
-    writeCandidate(pre, *i);
+    writeCandidate(out, pre, *i);
     pre = L',';
   }
-  out_ << "]\n}";
+  out << "]\n}";
 }
 
-void JSONOutputWriter::writeCandidate(wchar_t pre,
-                                      const Candidate &candidate) const {
-  out_ << pre << "{\n";
-  writeKeyVal(out_, L"Suggestion", candidate.getString(), true) << ",\n";
-  writeKeyVal(out_, L"Modern", candidate.getBaseWord(), true) << ",\n";
-  writeKeyVal(out_, L"Dict", candidate.getDictModule().getName()) << ",\n";
-  writeString(out_, L"HistPatterns") << ": [";
+void JSONOutputWriter::writeCandidate(std::wostream &out, wchar_t pre,
+                                      const Candidate &candidate) {
+  out << pre << "{\n";
+  writeKeyVal(out, L"Suggestion", candidate.getString(), true) << ",\n";
+  writeKeyVal(out, L"Modern", candidate.getBaseWord(), true) << ",\n";
+  writeKeyVal(out, L"Dict", candidate.getDictModule().getName()) << ",\n";
+  writeString(out, L"HistPatterns") << ": [";
   pre = L'\n';
   for (const auto &histp : candidate.getHistInstruction()) {
-    writeInstruction(pre, histp);
+    writeInstruction(out, pre, histp);
     pre = L',';
   }
-  out_ << "],\n";
+  out << "],\n";
   pre = L'\n';
-  writeString(out_, L"OCRPatterns") << ": [";
+  writeString(out, L"OCRPatterns") << ": [";
   for (const auto &ocrp : candidate.getOCRTrace()) {
-    writeInstruction(pre, ocrp);
+    writeInstruction(out, pre, ocrp);
     pre = L',';
   }
-  out_ << "],\n";
-  writeKeyVal(out_, L"Distance", candidate.getDlev()) << ",\n";
-  writeKeyVal(out_, L"Weight", candidate.getVoteWeight()) << "\n";
-  out_ << "}";
+  out << "],\n";
+  writeKeyVal(out, L"Distance", candidate.getDlev()) << ",\n";
+  writeKeyVal(out, L"Weight", candidate.getVoteWeight()) << "\n";
+  out << "}";
 }
 
-void JSONOutputWriter::writeInstruction(wchar_t pre,
-                                        const csl::PosPattern &instr) const {
-  out_ << pre << "{";
-  writeKeyVal(out_, L"Left", instr.getLeft(), true) << ",";
-  writeKeyVal(out_, L"Right", instr.getRight(), true) << ",";
-  writeKeyVal(out_, L"Pos", instr.getPosition()) << "}\n";
+void JSONOutputWriter::writeInstruction(std::wostream &out, wchar_t pre,
+                                        const csl::PosPattern &instr) {
+  out << pre << "{";
+  writeKeyVal(out, L"Left", instr.getLeft(), true) << ",";
+  writeKeyVal(out, L"Right", instr.getRight(), true) << ",";
+  writeKeyVal(out, L"Pos", instr.getPosition()) << "}\n";
 }
