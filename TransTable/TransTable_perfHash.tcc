@@ -169,10 +169,10 @@ namespace csl {
 
 
 #ifdef __GNUC__
-// #if __GNUC_PREREQ(8,0)
+#if __GNUC_PREREQ(8,0)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wclass-memaccess"
-// #endif // __GNUC_PREREQ(8,0)
+#endif // __GNUC_PREREQ(8,0)
 #endif // __GNUC__
     /**
      * resize the array of cells
@@ -186,9 +186,9 @@ namespace csl {
 // std::cout<<"Resized array cells to "<<newNrOfCells<<" cells."<<std::endl;
     }
 #ifdef __GNUC__
-// #if __GNUC_PREREQ(8,0)
+#if __GNUC_PREREQ(8,0)
 #pragma GCC diagnostic pop
-// #endif // __GNUC_PREREQ(8,0)
+#endif // __GNUC_PREREQ(8,0)
 #endif // __GNUC__
 
     template< typename InternalCharType__, typename SizeType__ >
