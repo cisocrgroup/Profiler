@@ -10,6 +10,7 @@
 #include "./Profiler.h"
 #include "DictSearch/AdaptiveLex.h"
 #include "DictSearch/AdditionalLex.h"
+#include "DictSearch/GlobalHistPatterns.hpp"
 #include "ExtReader/ExtReader.h"
 #include "GtDoc/AutoCorrector.h"
 #include "GtDoc/GtDoc.h"
@@ -21,6 +22,14 @@
 #include <DocXML/DocXMLWriter.h>
 #include <Getopt/Getopt.h>
 #include <IBMGroundtruth/IBMGTReader.h>
+
+void addGlobalHistPatterns(const std::wstring &str) {
+  std::wstringstream ss(str);
+  std::wstring token;
+  while (std::getline(ss, token, L',')) {
+    csl::GlobalHistPatterns::instance().addHistPattern(token);
+  }
+}
 
 void printHelp() {
   std::wcerr
@@ -95,8 +104,10 @@ void printHelp() {
          "per line)"
       << std::endl
       << "[--additionalLexMaxLev <k>] Set the max levenshtein distance for the "
-         "addional lexicon (default: 2)"
-         "per line)"
+         "addional lexicon (default: 2) per line)"
+      << std::endl
+      << "[--histPatterns <w:x,y:z[,...]>] Adds the given historical patterns "
+         "to the profiling (comma seperated list of `mod:hist` pairs)"
       << std::endl;
 }
 
@@ -130,6 +141,7 @@ int main(int argc, char const **argv) {
     options.specifyOption("additionalLex", csl::Getopt::STRING);
     options.specifyOption("additionalLexRank", csl::Getopt::STRING, "1");
     options.specifyOption("additionalLexMaxLev", csl::Getopt::STRING, "2");
+    options.specifyOption("histPatterns", csl::Getopt::STRING, "");
     try {
       options.getOptionsAsSpecified(argc, argv);
     } catch (csl::Getopt::Exception &exc) {
@@ -161,6 +173,15 @@ int main(int argc, char const **argv) {
     if (options.hasOption("help")) {
       printHelp();
       exit(EXIT_SUCCESS);
+    }
+
+    //////// add global historical patterns
+    if (options.hasOption("histPatterns")) {
+      addGlobalHistPatterns(
+          OCRCorrection::Utils::utf8(options.getOption("histPatterns")));
+      std::wcerr << "exec_profiler: added "
+                 << csl::GlobalHistPatterns::instance().getHistPatterns().size()
+                 << " global hist patterns\n";
     }
 
     /////// create config file
@@ -341,7 +362,6 @@ int main(int argc, char const **argv) {
 
       writer.writeXML(document, options.getOption("out_doc").c_str());
     }
-
   } catch (OCRCorrection::OCRCException &exc) {
     std::wcerr << "OCRC::Profiler: Caught OCRCException:"
                << OCRCorrection::Utils::utf8(exc.what()) << std::endl;

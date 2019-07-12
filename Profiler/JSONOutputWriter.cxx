@@ -1,6 +1,7 @@
 #include "JSONOutputWriter.hxx"
 #include "Document/Document.h"
 #include <iterator>
+#include <string>
 #include <unordered_map>
 
 using namespace OCRCorrection;
@@ -21,14 +22,32 @@ static std::wostream &writeString(std::wostream &out, const std::wstring &str,
 static std::wostream &writeKeyVal(std::wostream &out, const std::wstring &key,
                                   double val) {
   writeString(out, key);
+  out.imbue(std::locale("C"));
+  // std::wstringstream wss;
+  // wss.imbue(std::locale("C"));
+  // wss << val;
   out << ": " << val;
+  out.imbue(std::locale(""));
+  return out;
+}
+
+static std::wostream &writeKeyVal(std::wostream &out, const std::wstring &key,
+                                  bool val) {
+  writeString(out, key);
+  if (val) {
+    out << ": true";
+  } else {
+    out << ": false";
+  }
   return out;
 }
 
 static std::wostream &writeKeyVal(std::wostream &out, const std::wstring &key,
                                   size_t val) {
   writeString(out, key);
+  out.imbue(std::locale("C"));
   out << ": " << val;
+  out.imbue(std::locale(""));
   return out;
 }
 
@@ -72,6 +91,8 @@ void JSONOutputWriter::writeNormalToken(std::wostream &out, wchar_t pre,
   writeString(out, token.getWOCR(), true) << ": {\n";
   writeKeyVal(out, L"OCR", token.getWOCR(), true) << ",\n";
   writeKeyVal(out, L"N", n) << ",\n";
+  const bool hc = token.candidatesBegin() != token.candidatesEnd();
+  writeKeyVal(out, L"HasCandidates", hc) << ",\n";
   pre = L'\n';
   writeString(out, L"Candidates") << ": [";
   for (auto i = token.candidatesBegin(); i != token.candidatesEnd(); ++i) {
