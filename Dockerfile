@@ -1,6 +1,6 @@
 FROM alpine:latest
 MAINTAINER Florian Fink <finkf@cis.lmu.de>
-ENV DATE='Tue 04 Jun 2019 02:06:35 PM CEST'
+ENV DATE='Mo 23. Sep 14:43:17 CEST 2019'
 ENV PROFILER_BACKEND='/language-data'
 ENV GITURL="https://github.com/cisocrgroup"
 ENV DEPS='cppunit-dev xerces-c icu-dev'
