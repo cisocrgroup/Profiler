@@ -13,6 +13,7 @@ void ExtReader::parse(const std::string &path, Document &document,
     throw std::runtime_error("cannot open: " + std::string(path));
   }
   std::wstring line;
+  int ntokens = 0;
   while (std::getline(is, line)) {
     // skip empty lines
     if (line.empty()) {
@@ -23,6 +24,7 @@ void ExtReader::parse(const std::string &path, Document &document,
       alex.add(line.substr(1));
       continue;
     }
+    ++ntokens;
     // all other lines a are tokens with a possible empty correction
     // seperated by ':'; its an error if a token with no correction
     // does not end with ':'. A line only consiting of one ':' is
@@ -44,4 +46,6 @@ void ExtReader::parse(const std::string &path, Document &document,
           cor;
     }
   }
+  std::wcerr << "read " << ntokens << " tokens and" << alex.size()
+             << " additional lexicon entries\n";
 }

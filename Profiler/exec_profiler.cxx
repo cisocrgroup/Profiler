@@ -292,6 +292,8 @@ int main(int argc, char const **argv) {
         profiler.setAdaptive(true); // EXT reader implies adaptive lexicon
         OCRCorrection::ExtReader reader;
         reader.parse(options.getOption("sourceFile"), document, *alex);
+        std::wcerr << "profiling with " << alex->size()
+                   << " additional lexicon entries\n";
         profiler.addExternalDictModule(alex.release());
       } else {
         std::wcerr << "Unknown sourceFormat! Use: profiler --help" << std::endl;

@@ -23,6 +23,7 @@ public:
   virtual const std::wstring& getName() const override { return name_; }
   virtual bool query(const std::wstring& q, Receiver* res) override;
   void add(const std::wstring &word);
+  size_t size() const {return lex_.size();}
 
  private:
   static void add_candidate(const std::wstring& gt,
