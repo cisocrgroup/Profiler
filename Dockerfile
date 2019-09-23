@@ -16,7 +16,7 @@ RUN apk --no-cache add libintl \
 	&& cd /build \
 	&& cmake -DLOCALE_PROFILE=OFF -DCMAKE_INSTALL_PREFIX:PATH=/usr . \
 	&& make && make install \
-	&& cd .. && rm -r /build
+	&& cd .. && rm -r /build \
 	&& apk del .locale_build
 
 COPY . /build
