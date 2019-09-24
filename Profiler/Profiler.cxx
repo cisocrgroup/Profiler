@@ -9,32 +9,24 @@
 
 namespace OCRCorrection {
 
-Profiler::Profiler()
-  : freqList_()
-  , baseWordFrequencyDic_(0)
-  , htmlStream_(0)
-{}
+Profiler::Profiler() : freqList_(), baseWordFrequencyDic_(0), htmlStream_(0) {}
 
-Profiler::~Profiler()
-{
+Profiler::~Profiler() {
   if (htmlStream_) {
     delete htmlStream_;
     htmlStream_ = 0;
   }
 
   // delete all external DictModules of DictSearch
-  for (std::vector<csl::DictSearch::iDictModule*>::iterator it =
-         externalDictModules_.begin();
-       it != externalDictModules_.end();
-       ++it) {
+  for (std::vector<csl::DictSearch::iDictModule *>::iterator it =
+           externalDictModules_.begin();
+       it != externalDictModules_.end(); ++it) {
     delete (*it);
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void
-Profiler::addExternalDictModule(csl::DictSearch::iDictModule* d)
-{
+void Profiler::addExternalDictModule(csl::DictSearch::iDictModule *d) {
   if (d == nullptr) {
     return;
   }
@@ -42,9 +34,7 @@ Profiler::addExternalDictModule(csl::DictSearch::iDictModule* d)
   dictSearch_.addExternalDictModule(*d);
 }
 
-bool
-Profiler::eop(const Token& token) const
-{
+bool Profiler::eop(const Token &token) const {
   if ((config_.pageRestriction_ != (size_t)-1) &&
       token.getPageIndex() >= config_.pageRestriction_) {
     return true;
@@ -52,16 +42,12 @@ Profiler::eop(const Token& token) const
   return false;
 }
 
-void
-Profiler::readConfiguration(char const* configFile)
-{
+void Profiler::readConfiguration(char const *configFile) {
   csl::INIConfig iniConf(configFile);
   readConfiguration(iniConf);
 }
 
-void
-Profiler::readConfiguration(csl::INIConfig const& iniConf)
-{
+void Profiler::readConfiguration(csl::INIConfig const &iniConf) {
   config_.nrOfIterations_ = iniConf.getint("global:numberOfIterations");
   if (config_.nrOfIterations_ == (size_t)-1)
     throw OCRCException("OCRC::Profiler::readConfiguration: no value found for "
@@ -71,33 +57,33 @@ Profiler::readConfiguration(csl::INIConfig const& iniConf)
   config_.patternCutoff_ocr_ = iniConf.getdouble("global:patternCutoff_ocr");
 
   config_.histPatternSmoothingProb_ =
-    iniConf.getdouble("global:histPatternSmoothingProb");
+      iniConf.getdouble("global:histPatternSmoothingProb");
   config_.ocrPatternSmoothingProb_ =
-    iniConf.getdouble("global:ocrPatternSmoothingProb");
+      iniConf.getdouble("global:ocrPatternSmoothingProb");
 
   config_.ocrPatternStartProb_ =
-    iniConf.getdouble("global:ocrPatternStartProb");
+      iniConf.getdouble("global:ocrPatternStartProb");
 
   config_.resetHistPatternProbabilities_ =
-    iniConf.getint("global:resetHistPatternProbabilities");
+      iniConf.getint("global:resetHistPatternProbabilities");
   config_.resetOCRPatternProbabilities_ =
-    iniConf.getint("global:resetOCRPatternProbabilities");
+      iniConf.getint("global:resetOCRPatternProbabilities");
 
   config_.donttouch_hyphenation_ =
-    iniConf.getbool("global:donttouch_hyphenation");
+      iniConf.getbool("global:donttouch_hyphenation");
   config_.donttouch_lineborders_ =
-    iniConf.getbool("global:donttouch_lineborders");
+      iniConf.getbool("global:donttouch_lineborders");
 
   freqList_.loadFromFile(
-    iniConf.getstring("language_model:freqListFile"),
-    iniConf.getstring("language_model:patternWeightsFile"));
+      iniConf.getstring("language_model:freqListFile"),
+      iniConf.getstring("language_model:patternWeightsFile"));
 
   if (iniConf.hasKey("adaptive_profiling:writeAdaptiveDictionary")) {
     config_.writeAdaptiveDictionary_ =
-      iniConf.getbool("adaptive_profiling:writeAdaptiveDictionary");
+        iniConf.getbool("adaptive_profiling:writeAdaptiveDictionary");
     if (config_.writeAdaptiveDictionary_) {
       config_.adaptiveDictionaryPath_ =
-        iniConf.getstring("adaptive_profiling:adaptiveDictionaryPath");
+          iniConf.getstring("adaptive_profiling:adaptiveDictionaryPath");
     }
   }
 
@@ -106,9 +92,7 @@ Profiler::readConfiguration(csl::INIConfig const& iniConf)
   htmlWriter_.readConfiguration(iniConf);
 }
 
-void
-Profiler::createProfile(Document& sourceDoc)
-{
+void Profiler::createProfile(Document &sourceDoc) {
   config_.print(std::wcerr);
   if (config_.types_) {
     _doCreateProfile(sourceDoc);
@@ -127,44 +111,44 @@ Profiler::createProfile(Document& sourceDoc)
   // }
 }
 
-void
-Profiler::initGlobalOcrPatternProbs(int itn)
-{
+void Profiler::initGlobalOcrPatternProbs(int itn) {
   if (itn <= 1) {
     globalProfile_.ocrPatternProbabilities_.setDefault(
-      csl::PatternWeights::PatternType(1, 1), config_.ocrPatternStartProb_);
+        csl::PatternWeights::PatternType(1, 1), config_.ocrPatternStartProb_);
     globalProfile_.ocrPatternProbabilities_.setDefault(
-      csl::PatternWeights::PatternType(2, 1), config_.ocrPatternStartProb_);
+        csl::PatternWeights::PatternType(2, 1), config_.ocrPatternStartProb_);
     globalProfile_.ocrPatternProbabilities_.setDefault(
-      csl::PatternWeights::PatternType(1, 2), config_.ocrPatternStartProb_);
+        csl::PatternWeights::PatternType(1, 2), config_.ocrPatternStartProb_);
     globalProfile_.ocrPatternProbabilities_.setDefault(
-      csl::PatternWeights::PatternType(0, 1), config_.ocrPatternStartProb_);
+        csl::PatternWeights::PatternType(0, 1), config_.ocrPatternStartProb_);
     globalProfile_.ocrPatternProbabilities_.setDefault(
-      csl::PatternWeights::PatternType(1, 0), config_.ocrPatternStartProb_);
+        csl::PatternWeights::PatternType(1, 0), config_.ocrPatternStartProb_);
   } else {
     // remove default weights for all ocr operations, set smoothing weights
     // instead
     globalProfile_.ocrPatternProbabilities_.setDefault(
-      csl::PatternWeights::PatternType(1, 1), config_.ocrPatternSmoothingProb_);
+        csl::PatternWeights::PatternType(1, 1),
+        config_.ocrPatternSmoothingProb_);
     globalProfile_.ocrPatternProbabilities_.setDefault(
-      csl::PatternWeights::PatternType(2, 1), config_.ocrPatternSmoothingProb_);
+        csl::PatternWeights::PatternType(2, 1),
+        config_.ocrPatternSmoothingProb_);
     globalProfile_.ocrPatternProbabilities_.setDefault(
-      csl::PatternWeights::PatternType(1, 2), config_.ocrPatternSmoothingProb_);
+        csl::PatternWeights::PatternType(1, 2),
+        config_.ocrPatternSmoothingProb_);
     globalProfile_.ocrPatternProbabilities_.setDefault(
-      csl::PatternWeights::PatternType(0, 1), config_.ocrPatternSmoothingProb_);
+        csl::PatternWeights::PatternType(0, 1),
+        config_.ocrPatternSmoothingProb_);
     globalProfile_.ocrPatternProbabilities_.setDefault(
-      csl::PatternWeights::PatternType(1, 0), config_.ocrPatternSmoothingProb_);
+        csl::PatternWeights::PatternType(1, 0),
+        config_.ocrPatternSmoothingProb_);
   }
 }
 
-void
-Profiler::_doCreateProfile(Document& sourceDoc)
-{
+void Profiler::_doCreateProfile(Document &sourceDoc) {
   if (config_.nrOfIterations_ == 0) {
-    std::wcerr
-      << "OCRC::Profiler::createNonAdaptiveProfile: config says 0 iterations, "
-         "so I do nothing."
-      << std::endl;
+    std::wcerr << "OCRC::Profiler::createNonAdaptiveProfile: config says 0 "
+                  "iterations, so I do nothing."
+               << std::endl;
   }
   prepareDocument(sourceDoc);
   freqList_.doApplyStaticFreqs(false);
@@ -173,12 +157,12 @@ Profiler::_doCreateProfile(Document& sourceDoc)
   Profile profile;
   csl::Stopwatch stopwatch;
   std::wcerr << "calculating candidates\n";
-  for (const auto& token : document_) {
+  for (const auto &token : document_) {
     if (eop(token.origin())) {
       break;
     }
     profile.put(token.origin(),
-                [this](const Token& token, csl::DictSearch::CandidateSet& cs) {
+                [this](const Token &token, csl::DictSearch::CandidateSet &cs) {
                   this->calculateCandidateSet(token, cs);
                 });
   }
@@ -207,22 +191,20 @@ Profiler::_doCreateProfile(Document& sourceDoc)
 
   std::wcerr << "connecting corrections to tokens\n";
   stopwatch.start();
-  for (auto& token : document_) {
+  for (auto &token : document_) {
     profile.setCorrection(token.origin());
   }
   std::wcerr << "done connecting corrections in "
              << stopwatch.readMilliseconds() << "ms\n";
 }
 
-void
-Profiler::doCreateProfile(Document& sourceDoc)
-{
+void Profiler::doCreateProfile(Document &sourceDoc) {
 
   if (config_.nrOfIterations_ == 0) {
-    std::wcerr
-      << "OCRC::Profiler::createNonAdaptiveProfile: config says 0 iterations, "
-         "so I do nothing."
-      << std::endl;
+    std::wcerr << "OCRC::Profiler::createNonAdaptiveProfile: config says 0 "
+                  "iterations, "
+                  "so I do nothing."
+               << std::endl;
   }
 
   prepareDocument(sourceDoc);
@@ -235,7 +217,7 @@ Profiler::doCreateProfile(Document& sourceDoc)
   freqList_.setHistPatternSmoothingProb(config_.histPatternSmoothingProb_);
 
   instructionComputer_.connectPatternProbabilities(
-    globalProfile_.ocrPatternProbabilities_);
+      globalProfile_.ocrPatternProbabilities_);
 
   //////// 1ST ITERATION ///////////////////
   initGlobalOcrPatternProbs(1);
@@ -253,7 +235,7 @@ Profiler::doCreateProfile(Document& sourceDoc)
   initGlobalOcrPatternProbs(2);
 
   freqList_.connectPatternProbabilities(
-    &globalProfile_.histPatternProbabilities_);
+      &globalProfile_.histPatternProbabilities_);
   // connectBaseWordFrequency ... is connected below
   freqList_.setNrOfTrainingTokens(nrOfProfiledTokens_);
 
@@ -274,9 +256,7 @@ Profiler::doCreateProfile(Document& sourceDoc)
   // 	ocrPatternFile.close();
 }
 
-void
-Profiler::doIteration(size_t iterationNumber, bool lastIteration)
-{
+void Profiler::doIteration(size_t iterationNumber, bool lastIteration) {
   csl::Stopwatch iterationTime;
 
   std::wcerr << "*** Iteration " << iterationNumber << " ***" << std::endl;
@@ -313,7 +293,7 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
   histCounter_.clear();
   ocrCounter_.clear();
   csl::Stopwatch stopwatch;
-  for (auto& token : document_) {
+  for (auto &token : document_) {
     if (eop(token.origin())) {
       break;
     }
@@ -371,9 +351,8 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
       // cand-scores
       double sumOfProbabilities = 0;
       for (csl::DictSearch::CandidateSet::const_iterator cand =
-             tempCands.begin();
-           cand != tempCands.end();
-           ++cand) {
+               tempCands.begin();
+           cand != tempCands.end(); ++cand) {
         // std::wcerr << "CAND: " << *cand << "\n";
         std::vector<csl::Instruction> ocrInstructions;
 
@@ -396,7 +375,7 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
         // a -> b = not a or b
         assert(not is_unknown or (tempCands.size() == 1));
         instructionComputer_.computeInstruction(
-          cand->getWord(), token.getWOCR_lc(), &ocrInstructions, is_unknown);
+            cand->getWord(), token.getWOCR_lc(), &ocrInstructions, is_unknown);
         // std::wcout << "BLA: Finished" << std::endl;
 
         // std::wcerr << cand->toString() << std::endl;
@@ -411,11 +390,9 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
           continue;
         }
 
-        struct
-        {
-          bool operator()(Profiler_Interpretation const& a,
-                          Profiler_Interpretation const& b) const
-          {
+        struct {
+          bool operator()(Profiler_Interpretation const &a,
+                          Profiler_Interpretation const &b) const {
             return ((a.getHistTrace() == b.getHistTrace()) &&
                     (a.getOCRTrace() == b.getOCRTrace())
 
@@ -440,9 +417,8 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
         // }
         // It's not exactly clear if this is the right thing to do!!
         for (std::vector<csl::Instruction>::const_iterator instruction =
-               ocrInstructions.begin();
-             instruction != ocrInstructions.end();
-             ++instruction) {
+                 ocrInstructions.begin();
+             instruction != ocrInstructions.end(); ++instruction) {
           // std::wcerr<<"Instr: "<<*instruction << std::endl; // DEBUG
           //     std::wcerr << "(POFILER) " << token->getWOCR_lc() << ","
           // 	       << cand->getWord() << "," << cand->getLevDistance()
@@ -514,9 +490,8 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
       // This is the actual run through the interpretations where the profiling
       // is done
       for (std::vector<Profiler_Interpretation>::iterator cand =
-             candidates_.begin();
-           cand != candidates_.end();
-           ++cand) {
+               candidates_.begin();
+           cand != candidates_.end(); ++cand) {
 
         // voteWeight is normalized by the sum of all candProbabilities so all
         // weights will add up to 1
@@ -539,9 +514,8 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
         }
 
         for (csl::Trace::const_iterator pat =
-               cand->getHistInstruction().begin();
-             pat != cand->getInstruction().end();
-             ++pat) {
+                 cand->getHistInstruction().begin();
+             pat != cand->getInstruction().end(); ++pat) {
 
           // std::wcout << "histCounter_[" <<
           // static_cast<csl::Pattern>(*pat).toString() <<"] += "<<
@@ -550,8 +524,7 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
         }
 
         for (csl::Trace::const_iterator pat = cand->getOCRTrace().begin();
-             pat != cand->getOCRTrace().end();
-             ++pat) {
+             pat != cand->getOCRTrace().end(); ++pat) {
 
           // std::wcerr << "ocrCounter_[" << pat->toString() <<"] += "<<
           // token->voteWeight << std::endl;
@@ -575,7 +548,7 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
         }
 
         globalProfile_.dictDistribution_[cand->getDictModule().getName()]
-          .frequency += cand->getVoteWeight();
+            .frequency += cand->getVoteWeight();
 
         ocrCounter_.registerNGrams(cand->getWord(), cand->getVoteWeight());
         histCounter_.registerNGrams(cand->getBaseWord(), cand->getVoteWeight());
@@ -605,14 +578,13 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
           token.setSuspicious(true);
         }
       } else if (candidates_.at(0).getOCRTrace().size() > 0) {
-        Profiler_Interpretation const& topCand = candidates_.at(0);
+        Profiler_Interpretation const &topCand = candidates_.at(0);
         token.setSuspicious(true);
         for (csl::Instruction::const_iterator pat =
-               topCand.getOCRTrace().begin();
-             pat != topCand.getOCRTrace().end();
-             ++pat) {
+                 topCand.getOCRTrace().begin();
+             pat != topCand.getOCRTrace().end(); ++pat) {
           ocrPatterns2Types_[*pat].push_back(
-            std::make_pair(token.getWOCR_lc(), topCand.getWord()));
+              std::make_pair(token.getWOCR_lc(), topCand.getWord()));
         }
       } else {
         token.setSuspicious(false);
@@ -625,9 +597,8 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
 
         std::set<std::wstring> seen;
         for (std::vector<Profiler_Interpretation>::iterator cand =
-               candidates_.begin();
-             cand != candidates_.end();
-             ++cand) {
+                 candidates_.begin();
+             cand != candidates_.end(); ++cand) {
 
           // check if voteWeight is NaN (not a number)
           if (cand->getVoteWeight() != cand->getVoteWeight()) {
@@ -668,8 +639,7 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
     globalProfile_.histPatternProbabilities_.clear();
   }
   for (PatternCounter::PatternIterator it = histCounter_.patternsBegin();
-       it != histCounter_.patternsEnd();
-       ++it) {
+       it != histCounter_.patternsEnd(); ++it) {
 
     // note that config_.patternCutoff_hist_ is a threshold "per 1.000 profiled
     // tokens"
@@ -680,13 +650,13 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
       strippedPattern.strip(); // remove wordBegin/ wordEnd markers
 
       globalProfile_.histPatternProbabilities_.setWeight(
-        it->first, // pattern
-        (it->second / histCounter_.getNGramCount(
-                        strippedPattern.getLeft())), // its count / the (
-                                                     // stripped)
-                                                     // left-hand-side's
-                                                     // nGramCount
-        it->second                                   // absolute freq
+          it->first, // pattern
+          (it->second / histCounter_.getNGramCount(
+                            strippedPattern.getLeft())), // its count / the (
+                                                         // stripped)
+                                                         // left-hand-side's
+                                                         // nGramCount
+          it->second                                     // absolute freq
       );
       // std::wcerr << "globalProfile_.histPatternProbabilities_.setWeight( " <<
       // it->first.toString()
@@ -705,8 +675,7 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
   }
 
   for (PatternCounter::PatternIterator it = ocrCounter_.patternsBegin();
-       it != ocrCounter_.patternsEnd();
-       ++it) {
+       it != ocrCounter_.patternsEnd(); ++it) {
 
     // hack: applies to ins and del
     if (it->first.getLeft().size() + it->first.getRight().size() == 1) {
@@ -748,10 +717,10 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
       // add pattern probability to global profile except it is very very small
       if ((it->second / denominator) > 1e-25) {
         globalProfile_.ocrPatternProbabilities_.setWeight(
-          it->first, // pattern
-          (it->second /
-           denominator), // its count / the left-hand-side's nGramCount
-          it->second);   // absolute freq
+            it->first, // pattern
+            (it->second /
+             denominator), // its count / the left-hand-side's nGramCount
+            it->second);   // absolute freq
 
         //     std::wcout << "globalProfile_.ocrPatternProbabilities_.setWeight(
         //     " << it->first.toString()
@@ -772,9 +741,8 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
 
   baseWordFrequencyDic_->initConstruction();
   for (std::map<std::wstring, float>::const_iterator it =
-         baseWordFrequency.begin();
-       it != baseWordFrequency.end();
-       ++it) {
+           baseWordFrequency.begin();
+       it != baseWordFrequency.end(); ++it) {
     baseWordFrequencyDic_->addToken(it->first.c_str(), it->second);
   }
   baseWordFrequencyDic_->finishConstruction();
@@ -786,9 +754,8 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
 
   // update the proportions of the DictDistributions
   for (std::map<std::wstring, GlobalProfile::DictDistributionPair>::iterator
-         it = globalProfile_.dictDistribution_.begin();
-       it != globalProfile_.dictDistribution_.end();
-       ++it) {
+           it = globalProfile_.dictDistribution_.begin();
+       it != globalProfile_.dictDistribution_.end(); ++it) {
 
     it->second.proportion = it->second.frequency / counter[L"wasProfiled"];
   }
@@ -802,8 +769,8 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
     htmlWriter_.bottomStream() << "<hr><pre>" << std::endl;
     time_t t = time(NULL);
     htmlWriter_.bottomStream()
-      << "created at:" << asctime(localtime(&t)) << "\n<p>\n"
-      << std::endl;
+        << "created at:" << asctime(localtime(&t)) << "\n<p>\n"
+        << std::endl;
     config_.print(htmlWriter_.bottomStream());
     htmlWriter_.bottomStream() << "</pre><hr>" << std::endl;
 
@@ -825,9 +792,7 @@ Profiler::doIteration(size_t iterationNumber, bool lastIteration)
   //            << "\n";
 } // void doIteration
 
-double
-Profiler::getCombinedProb(Profiler_Interpretation& cand) const
-{
+double Profiler::getCombinedProb(Profiler_Interpretation &cand) const {
   // lang Probability
   double langProb = freqList_.getLanguageProbability(cand);
   // give each pattern at least a small probability
@@ -841,8 +806,7 @@ Profiler::getCombinedProb(Profiler_Interpretation& cand) const
   double w = 0.0;
 
   for (csl::Instruction::const_iterator posPat = cand.getOCRTrace().begin();
-       posPat != cand.getOCRTrace().end();
-       ++posPat) {
+       posPat != cand.getOCRTrace().end(); ++posPat) {
 
     w = globalProfile_.ocrPatternProbabilities_.getWeight(*posPat);
     // std::wcerr << "weight for " << ((csl::Pattern)*posPat).toString() << " is
@@ -874,25 +838,21 @@ Profiler::getCombinedProb(Profiler_Interpretation& cand) const
   return combinedProb;
 }
 
-void
-Profiler::profile2xml(char const* filename) const
-{
+void Profiler::profile2xml(char const *filename) const {
   std::wofstream fo(filename);
   if (!fo.good())
     throw OCRCException(
-      std::string(
-        "OCRC::Profiler::profile2xml: Can not open file for writing: ") +
-      filename);
+        std::string(
+            "OCRC::Profiler::profile2xml: Can not open file for writing: ") +
+        filename);
   //	fo.imbue( csl::CSLLocale::Instance() );
   profile2xml(fo);
 }
 
-void
-Profiler::profile2xml(std::wostream& os) const
-{
+void Profiler::profile2xml(std::wostream &os) const {
   if (!os.good())
     throw OCRCException(
-      std::string("OCRC::Profiler::profile2xml: Bad filehandle"));
+        std::string("OCRC::Profiler::profile2xml: Bad filehandle"));
 
   time_t t = time(NULL);
   std::string timeString(asctime(localtime(&t)));
@@ -912,9 +872,8 @@ Profiler::profile2xml(std::wostream& os) const
   os << "<dictionary_distribution>" << std::endl;
   for (std::map<std::wstring,
                 GlobalProfile::DictDistributionPair>::const_iterator it =
-         globalProfile_.dictDistribution_.begin();
-       it != globalProfile_.dictDistribution_.end();
-       ++it) {
+           globalProfile_.dictDistribution_.begin();
+       it != globalProfile_.dictDistribution_.end(); ++it) {
 
     os << "<item dict=\"" << it->first << "\" frequency=\""
        << it->second.frequency << "\" proportion=\"" << it->second.proportion
@@ -930,9 +889,8 @@ Profiler::profile2xml(std::wostream& os) const
   std::vector<std::pair<csl::Pattern, double>> patternsSorted;
   globalProfile_.ocrPatternProbabilities_.sortToVector(&patternsSorted);
   for (std::vector<std::pair<csl::Pattern, double>>::const_iterator pat_freq =
-         patternsSorted.begin();
-       pat_freq != patternsSorted.end();
-       ++pat_freq) {
+           patternsSorted.begin();
+       pat_freq != patternsSorted.end(); ++pat_freq) {
     os << "<pattern left=\"" << pat_freq->first.getLeft() << "\" right=\""
        << pat_freq->first.getRight() << "\""
        << " pat_string=\"" << pat_freq->first.getLeft() << "_"
@@ -942,8 +900,8 @@ Profiler::profile2xml(std::wostream& os) const
        << "\""
        << " absFreq=\""
        << (globalProfile_.ocrPatternProbabilities_.getAbsoluteFreqs().find(
-             pat_freq->first))
-            ->second
+               pat_freq->first))
+              ->second
        << "\""
        << ">" << std::endl;
 
@@ -951,24 +909,23 @@ Profiler::profile2xml(std::wostream& os) const
 
     std::map<csl::Pattern,
              std::vector<std::pair<std::wstring, std::wstring>>>::const_iterator
-      patOcc_it = ocrPatterns2Types_.find(pat_freq->first);
+        patOcc_it = ocrPatterns2Types_.find(pat_freq->first);
 
     if (patOcc_it != ocrPatterns2Types_.end()) {
-      std::vector<std::pair<std::wstring, std::wstring>> const&
-        patternOccurrences = patOcc_it->second;
+      std::vector<std::pair<std::wstring, std::wstring>> const
+          &patternOccurrences = patOcc_it->second;
 
       for (std::vector<std::pair<std::wstring, std::wstring>>::const_iterator
-             word = patternOccurrences.begin();
-           word != patternOccurrences.end();
-           ++word) {
+               word = patternOccurrences.begin();
+           word != patternOccurrences.end(); ++word) {
         // std::wstring wSuggest = word->second; // we need a copy here because
         // we maybe want to capitalize it if( isupper( word->first.at( 0 ), loc
         // ) ) { 	wSuggest = toupper( word->second.at( 0 ), loc );
         // }
         os << "<type wOCR_lc=\"" << word->first << "\" wSuggest=\""
            << word->second << "\" freq=\""
-           << Utils::queryConstMap<std::wstring, size_t>(
-                wOCRFreqlist_, word->first, 0)
+           << Utils::queryConstMap<std::wstring, size_t>(wOCRFreqlist_,
+                                                         word->first, 0)
            << "\"/>" << std::endl;
       }
     }
@@ -979,9 +936,7 @@ Profiler::profile2xml(std::wostream& os) const
   os << "</profile>" << std::endl;
 }
 
-void
-Profiler::prepareDocument(Document& tmpDoc)
-{
+void Profiler::prepareDocument(Document &tmpDoc) {
 
   tmpDoc.findLineBorders();
   tmpDoc.findHyphenation();
@@ -990,13 +945,13 @@ Profiler::prepareDocument(Document& tmpDoc)
        ++tmpToken) {
     document_.push_back(Profiler_Token(*tmpToken));
 
-    Profiler_Token& token = document_.back();
+    Profiler_Token &token = document_.back();
 
     token.setWOCR(tmpToken->getWOCR());
     token.setWOCR_lc(tmpToken->getWOCR_lc());
     token.setWCorr(tmpToken->getWCorr().data());
     token.getAbbyySpecifics().setSuspicious(
-      tmpToken->getAbbyySpecifics().isSuspicious());
+        tmpToken->getAbbyySpecifics().isSuspicious());
 
     if (config_.donttouch_lineborders_) {
       // DONTTOUCH the token if it is at the beginning or endog a line or was
@@ -1022,8 +977,7 @@ Profiler::prepareDocument(Document& tmpDoc)
   std::wcerr << "Create wOCR frequency list ... " << std::flush;
   ocrCharacterCount_ = 0;
   for (Document_t::iterator token = document_.begin(); // for all tokens
-       token != document_.end();
-       ++token) {
+       token != document_.end(); ++token) {
 
     bool firstToken = (token == document_.begin());
     bool lastToken = (token + 1 == document_.end());
@@ -1037,9 +991,7 @@ Profiler::prepareDocument(Document& tmpDoc)
   std::wcerr << "ok" << std::endl;
 }
 
-void
-Profiler::printConfigTemplate(std::wostream& os)
-{
+void Profiler::printConfigTemplate(std::wostream &os) {
   os << "######## Profiler Configuration ########################" << std::endl
      << "#                                                      #" << std::endl
      << "########################################################" << std::endl
@@ -1149,5 +1101,5 @@ Profiler::printConfigTemplate(std::wostream& os)
      << "priority = 90" << std::endl
      << "cascadeRank = 0" << std::endl;
 }
-}
+} // namespace OCRCorrection
 #endif
