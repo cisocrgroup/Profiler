@@ -58,8 +58,8 @@ static std::wostream &writeKeyVal(std::wostream &out, const std::wstring &key,
 }
 
 void JSONOutputWriter::write() const {
-  std::wofstream tmpout("/tmp/profiler.json");
-  write(tmpout, doc_);
+  // std::wofstream tmpout("/tmp/profiler.json");
+  // write(tmpout, doc_);
   write(out_, doc_);
 }
 
