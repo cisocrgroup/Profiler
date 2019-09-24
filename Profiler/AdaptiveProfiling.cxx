@@ -35,9 +35,8 @@ void Profiler::calculateAdaptiveCandidateSet(
   assert(config_.adaptive_);
   assert(t.has_metadata("correction"));
   assert(t.has_metadata("correction-lc"));
-
-  std::wcerr << "(Profiler) Calculating adaptive profile for token "
-             << t.getWOCR() << " (" << t.metadata()["correction"] << ")\n";
+  // std::wcerr << "(Profiler) Calculating adaptive profile for token "
+  //            << t.getWOCR() << " (" << t.metadata()["correction"] << ")\n";
   dictSearch_.query(t.getWOCR_lc(), &candidates);
   // for (const auto& cand: candidates) {
   // 	std::wcerr << "(Profiler) Adaptive candidate (before): "
