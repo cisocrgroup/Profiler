@@ -77,7 +77,6 @@ public:
 
 private:
 #include "./Profiler_Interpretation.h"
-  class Evaluation;
   class Evaluation_Token;
   class HTMLWriter;
 

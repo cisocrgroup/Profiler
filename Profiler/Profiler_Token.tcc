@@ -70,7 +70,7 @@ namespace OCRCorrection {
     }
 
     bool Profiler::Profiler_Token::isNormal() const {
-	return ( bitProperties_ && NORMAL );
+	return ( bitProperties_ & NORMAL );
     }
 
     void Profiler::Profiler_Token::setNormal( bool b ) {

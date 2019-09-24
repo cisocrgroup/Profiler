@@ -167,8 +167,10 @@ namespace csl {
 	ready_ = 1;
     }
 
-
 #ifdef __GNUC__
+#ifndef __GNUC_PREREQ
+# define __GNUC_PREREQ(ma, mi) 0
+#endif // __GNU_PREREQ
 #if __GNUC_PREREQ(8,0)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wclass-memaccess"

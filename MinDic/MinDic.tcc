@@ -174,7 +174,7 @@ namespace csl {
 
 		commonPrefix = lengthOfKey = storedState = 0;
 
-		key = key;
+		// key = key;
 
 		//wprintf(L"input: %ls -> %d\n", key, annotation );
 

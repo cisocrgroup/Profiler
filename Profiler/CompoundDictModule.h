@@ -20,10 +20,10 @@ public:
 	compoundVaam_->setDistance( 0 );
     }
 
-    void query( std::wstring const& query, csl::DictSearch::CandidateSet* answers ) {
+    virtual bool query( std::wstring const& query, csl::DictSearch::iResultReceiver* answers ) {
 
 	// query the compound dictionary including variants
-	compoundVaam_->query( query, answers );
+	return compoundVaam_->query( query, answers );
     }
 
     std::wstring const& getName() const {
