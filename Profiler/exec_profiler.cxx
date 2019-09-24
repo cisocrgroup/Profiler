@@ -82,7 +82,7 @@ void printHelp() {
       << "[--adaptive]                Use adaptive profiler, that uses "
          "correction information"
       << std::endl
-      << "[--evaluate <out-dir>]       Calculate recall and precision of the "
+      << "[--evaluate <out-dir>]      Calculate recall and precision of the "
          "profiler and write results to <out-dir>"
       << std::endl
       << "[--strict yes|no|very]      set the strictness of the evaluation"
@@ -100,8 +100,7 @@ void printHelp() {
          "per line)"
       << std::endl
       << "[--additionalLexRank <r>]   Set the rank of the addional lexicon "
-         "(default: 1)"
-         "per line)"
+         "(default: 1 per line"
       << std::endl
       << "[--additionalLexMaxLev <k>] Set the max levenshtein distance for the "
          "addional lexicon (default: 2) per line)"
