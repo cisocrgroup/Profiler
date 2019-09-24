@@ -14,6 +14,7 @@ void ExtReader::parse(const std::string &path, Document &document,
   }
   std::wstring line;
   int ntokens = 0;
+  int ncor = 0;
   while (std::getline(is, line)) {
     // skip empty lines
     if (line.empty()) {
@@ -26,7 +27,7 @@ void ExtReader::parse(const std::string &path, Document &document,
     }
     ++ntokens;
     // all other lines a are tokens with a possible empty correction
-    // seperated by ':'; its an error if a token with no correction
+    // seperated by ':'. It is an error if a token with no correction
     // does not end with ':'. A line only consiting of one ':' is
     // skipped.
     const auto pos = line.find_last_of(L':');
@@ -40,12 +41,14 @@ void ExtReader::parse(const std::string &path, Document &document,
     auto cor = line.substr(pos + 1);
     document.pushBackToken(ocr, true); // all token are asumed to b normal
     if (not cor.empty()) {
+      ++ncor;
       document.at(document.getNrOfTokens() - 1).metadata()["correction"] = cor;
       std::transform(cor.begin(), cor.end(), cor.begin(), ::towlower);
       document.at(document.getNrOfTokens() - 1).metadata()["correction-lc"] =
           cor;
     }
   }
-  std::wcerr << "read " << ntokens << " tokens and" << alex.size()
+  std::wcerr << "read " << ntokens << " tokens (with " << ncor
+             << " corrections) and " << alex.size()
              << " additional lexicon entries\n";
 }
