@@ -237,7 +237,7 @@ private:
    * Do calculate the profile
    */
   void doCreateProfile(Document& sourceDoc);
-  void _doCreateProfile(Document& sourceDoc);
+  void createProfileTypes(Document& sourceDoc);
 
   /**
    * @brief Execute one iteration of the profiling process.

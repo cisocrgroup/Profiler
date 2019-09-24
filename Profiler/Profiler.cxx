@@ -95,7 +95,7 @@ void Profiler::readConfiguration(csl::INIConfig const &iniConf) {
 void Profiler::createProfile(Document &sourceDoc) {
   config_.print(std::wcerr);
   if (config_.types_) {
-    _doCreateProfile(sourceDoc);
+    createProfileTypes(sourceDoc);
   } else {
     doCreateProfile(sourceDoc);
   }
@@ -144,7 +144,7 @@ void Profiler::initGlobalOcrPatternProbs(int itn) {
   }
 }
 
-void Profiler::_doCreateProfile(Document &sourceDoc) {
+void Profiler::createProfileTypes(Document &sourceDoc) {
   if (config_.nrOfIterations_ == 0) {
     std::wcerr << "OCRC::Profiler::createNonAdaptiveProfile: config says 0 "
                   "iterations, so I do nothing."
