@@ -25,7 +25,7 @@ static bool isInsOrDel(const csl::Pattern &pat);
 static std::unique_ptr<csl::MinDic<float>>
 makeMinDic(const std::map<std::wstring, double> &m);
 
-void Profile::put(const Token &token, F cb) {
+void Profile::put(bool adaptive, const Token &token, F cb) {
   updateCounts(token);
   // skip short, notNormal etc...
   if (not token.isNormal()) {
@@ -36,8 +36,18 @@ void Profile::put(const Token &token, F cb) {
     Tuple t;
     std::get<0>(t) = 0;
     cb(token, std::get<1>(t));
+    std::get<3>(t) = adaptive and token.has_metadata("correction");
     f = types_.emplace_hint(f, token.getWOCR_lc(), std::move(t));
   }
+  // update to correction if adaptive and the token has a correction
+  // and if the existing entry has not yet the adaptive candidate set.
+  if (adaptive and not std::get<3>(f->second) and
+      token.has_metadata("correction")) {
+    std::get<3>(f->second) = true;
+    std::get<1>(f->second).clear();
+    cb(token, std::get<1>(f->second));
+  }
+  // update counts
   std::get<0>(f->second)++;
   ocrCharacterCount_ += token.getWOCR().size();
   // std::wcerr << "ocrCharacterCount: " << ocrCharacterCount_ << "\n";

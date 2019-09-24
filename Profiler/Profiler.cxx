@@ -161,7 +161,7 @@ void Profiler::createProfileTypes(Document &sourceDoc) {
     if (eop(token.origin())) {
       break;
     }
-    profile.put(token.origin(),
+    profile.put(config_.adaptive_, token.origin(),
                 [this](const Token &token, csl::DictSearch::CandidateSet &cs) {
                   this->calculateCandidateSet(token, cs);
                 });

@@ -25,11 +25,11 @@ public:
   };
   using F = std::function<void(const Token &, csl::DictSearch::CandidateSet &)>;
   using Tuple = std::tuple<size_t, csl::DictSearch::CandidateSet,
-                           std::vector<WeightedCandidate>>;
+                           std::vector<WeightedCandidate>, bool>;
   using Map = std::unordered_map<std::wstring, Tuple>;
 
   Profile() = default;
-  void put(const Token &token, F f);
+  void put(bool adaptive, const Token &token, F f);
   void iteration(const LanguageModel &lm);
   void finish();
   void setCorrection(Token &token) const;
