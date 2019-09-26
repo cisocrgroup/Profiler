@@ -6,15 +6,30 @@
 
 using namespace OCRCorrection;
 
+static std::wostream &escapeString(std::wostream &out,
+                                   const std::wstring &str) {
+  std::ios_base::fmtflags f(cout.flags());
+  for (auto c : str) {
+    if (c == '"' or c == '\\' or ('\x00' <= c and c <= '\x1f')) {
+      out << "\\u" << std::hex << std::setw(4) << std::setfill('0') << int(c);
+    } else {
+      o << c;
+    }
+  }
+  out.flags(f);
+  return out;
+}
+
 static std::wostream &writeString(std::wostream &out, const std::wstring &str,
                                   bool tolower = false) {
-  if (not tolower) {
-    out << '"' << str << '"';
-    return out;
-  }
   out << '"';
-  std::transform(str.begin(), str.end(),
-                 std::ostream_iterator<wchar_t, wchar_t>(out), ::towlower);
+  if (not tolower) {
+    escapeString(out, str);
+  } else {
+    auto cpy = str;
+    std::transform(str.begin(), str.end(), cpy.begin(), ::towlower);
+    escapeString(out, cpy);
+  }
   out << '"';
   return out;
 }
