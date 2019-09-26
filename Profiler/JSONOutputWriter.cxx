@@ -89,8 +89,13 @@ void JSONOutputWriter::write() const {
 void JSONOutputWriter::write(std::wostream &out, const Document &doc) {
   std::unordered_map<std::wstring, std::pair<size_t, const Token *>> types;
   for (auto i = doc.begin(); i != doc.end(); ++i) {
+    // skip short or not normal tokens
+    if (i->isShort() or not i->isNormal()) {
+      continue;
+    }
     auto wocr = i->getWOCR();
     std::transform(wocr.begin(), wocr.end(), wocr.begin(), ::towlower);
+
     types[wocr].first++;
     types[wocr].second = i.operator->();
   }
