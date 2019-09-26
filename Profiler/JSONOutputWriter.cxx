@@ -1,5 +1,6 @@
 #include "JSONOutputWriter.hxx"
 #include "Document/Document.h"
+#include <iomanip>
 #include <iterator>
 #include <string>
 #include <unordered_map>
@@ -9,12 +10,12 @@ using namespace OCRCorrection;
 ////////////////////////////////////////////////////////////////////////////////
 static std::wostream &escapeString(std::wostream &out,
                                    const std::wstring &str) {
-  std::ios_base::fmtflags f(cout.flags());
+  std::ios_base::fmtflags f(out.flags());
   for (auto c : str) {
     if (c == '"' or c == '\\' or ('\x00' <= c and c <= '\x1f')) {
-      out << "\\u" << std::hex << std::setw(4) << std::setfill('0') << int(c);
+      out << "\\u" << std::hex << std::setw(4) << std::setfill(L'0') << int(c);
     } else {
-      o << c;
+      out << c;
     }
   }
   out.flags(f);
