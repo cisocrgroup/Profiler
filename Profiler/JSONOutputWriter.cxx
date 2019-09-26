@@ -6,6 +6,7 @@
 
 using namespace OCRCorrection;
 
+////////////////////////////////////////////////////////////////////////////////
 static std::wostream &escapeString(std::wostream &out,
                                    const std::wstring &str) {
   std::ios_base::fmtflags f(cout.flags());
@@ -20,6 +21,7 @@ static std::wostream &escapeString(std::wostream &out,
   return out;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 static std::wostream &writeString(std::wostream &out, const std::wstring &str,
                                   bool tolower = false) {
   out << '"';
@@ -34,6 +36,7 @@ static std::wostream &writeString(std::wostream &out, const std::wstring &str,
   return out;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 static std::wostream &writeKeyVal(std::wostream &out, const std::wstring &key,
                                   double val) {
   writeString(out, key);
@@ -43,6 +46,7 @@ static std::wostream &writeKeyVal(std::wostream &out, const std::wstring &key,
   return out;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 static std::wostream &writeKeyVal(std::wostream &out, const std::wstring &key,
                                   bool val) {
   writeString(out, key);
@@ -53,7 +57,7 @@ static std::wostream &writeKeyVal(std::wostream &out, const std::wstring &key,
   }
   return out;
 }
-
+////////////////////////////////////////////////////////////////////////////////
 static std::wostream &writeKeyVal(std::wostream &out, const std::wstring &key,
                                   size_t val) {
   writeString(out, key);
@@ -63,6 +67,7 @@ static std::wostream &writeKeyVal(std::wostream &out, const std::wstring &key,
   return out;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 static std::wostream &writeKeyVal(std::wostream &out, const std::wstring &key,
                                   const std::wstring &val,
                                   bool tolower = false) {
@@ -72,12 +77,14 @@ static std::wostream &writeKeyVal(std::wostream &out, const std::wstring &key,
   return out;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 void JSONOutputWriter::write() const {
   // std::wofstream tmpout("/tmp/profiler.json");
   // write(tmpout, doc_);
   write(out_, doc_);
 }
 
+////////////////////////////////////////////////////////////////////////////////
 void JSONOutputWriter::write(std::wostream &out, const Document &doc) {
   std::unordered_map<std::wstring, std::pair<size_t, const Token *>> types;
   for (auto i = doc.begin(); i != doc.end(); ++i) {
@@ -97,6 +104,7 @@ void JSONOutputWriter::write(std::wostream &out, const Document &doc) {
   out << "}\n";
 }
 
+////////////////////////////////////////////////////////////////////////////////
 void JSONOutputWriter::writeNormalToken(std::wostream &out, wchar_t pre,
                                         const Token &token, size_t n) {
   out << pre;
@@ -114,6 +122,7 @@ void JSONOutputWriter::writeNormalToken(std::wostream &out, wchar_t pre,
   out << "]\n}";
 }
 
+////////////////////////////////////////////////////////////////////////////////
 void JSONOutputWriter::writeCandidate(std::wostream &out, wchar_t pre,
                                       const Candidate &candidate) {
   out << pre << "{\n";
@@ -139,6 +148,7 @@ void JSONOutputWriter::writeCandidate(std::wostream &out, wchar_t pre,
   out << "}";
 }
 
+////////////////////////////////////////////////////////////////////////////////
 void JSONOutputWriter::writeInstruction(std::wostream &out, wchar_t pre,
                                         const csl::PosPattern &instr) {
   out << pre << "{";
