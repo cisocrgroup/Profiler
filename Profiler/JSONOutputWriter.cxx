@@ -103,18 +103,18 @@ void JSONOutputWriter::write(std::wostream &out, const Document &doc) {
     types[wocr].second = i.operator->();
   }
   out << "{";
-  wchar_t pre = L'\n';
+  auto pre = L"\n";
   for (const auto &t : types) {
     if (t.second.second->isNormal()) {
       writeNormalToken(out, pre, *t.second.second, t.second.first);
-      pre = L',';
+      pre = L",\n";
     }
   }
-  out << "}\n";
+  out << "\n}\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void JSONOutputWriter::writeNormalToken(std::wostream &out, wchar_t pre,
+void JSONOutputWriter::writeNormalToken(std::wostream &out, std::wstring pre,
                                         const Token &token, size_t n) {
   out << pre;
   writeString(out, token.getWOCR(), true) << ": {\n";
@@ -122,34 +122,34 @@ void JSONOutputWriter::writeNormalToken(std::wostream &out, wchar_t pre,
   writeKeyVal(out, L"N", n) << ",\n";
   const bool hc = token.candidatesBegin() != token.candidatesEnd();
   writeKeyVal(out, L"HasCandidates", hc) << ",\n";
-  pre = L'\n';
+  pre = L"\n";
   writeString(out, L"Candidates") << ": [";
   for (auto i = token.candidatesBegin(); i != token.candidatesEnd(); ++i) {
     writeCandidate(out, pre, *i);
-    pre = L',';
+    pre = L",";
   }
-  out << "]\n}";
+  out << "\n]\n}";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void JSONOutputWriter::writeCandidate(std::wostream &out, wchar_t pre,
+void JSONOutputWriter::writeCandidate(std::wostream &out, std::wstring pre,
                                       const Candidate &candidate) {
   out << pre << "{\n";
   writeKeyVal(out, L"Suggestion", candidate.getString(), true) << ",\n";
   writeKeyVal(out, L"Modern", candidate.getBaseWord(), true) << ",\n";
   writeKeyVal(out, L"Dict", candidate.getDictModule().getName()) << ",\n";
   writeString(out, L"HistPatterns") << ": [";
-  pre = L'\n';
+  pre = L"\n";
   for (const auto &histp : candidate.getHistInstruction()) {
     writeInstruction(out, pre, histp);
-    pre = L',';
+    pre = L",";
   }
   out << "],\n";
-  pre = L'\n';
+  pre = L"\n";
   writeString(out, L"OCRPatterns") << ": [";
   for (const auto &ocrp : candidate.getOCRTrace()) {
     writeInstruction(out, pre, ocrp);
-    pre = L',';
+    pre = L",";
   }
   out << "],\n";
   writeKeyVal(out, L"Distance", candidate.getDlev()) << ",\n";
@@ -158,7 +158,7 @@ void JSONOutputWriter::writeCandidate(std::wostream &out, wchar_t pre,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void JSONOutputWriter::writeInstruction(std::wostream &out, wchar_t pre,
+void JSONOutputWriter::writeInstruction(std::wostream &out, std::wstring pre,
                                         const csl::PosPattern &instr) {
   out << pre << "{";
   writeKeyVal(out, L"Left", instr.getLeft(), true) << ",";
