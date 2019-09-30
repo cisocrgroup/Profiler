@@ -28,8 +28,8 @@ public:
                            std::vector<WeightedCandidate>, bool>;
   using Map = std::unordered_map<std::wstring, Tuple>;
 
-  Profile() = default;
-  void put(bool adaptive, const Token &token, F f);
+  Profile(bool adatpive);
+  void put(const Token &token, F f);
   void iteration(const LanguageModel &lm);
   void finish();
   void setCorrection(Token &token) const;
@@ -51,6 +51,7 @@ private:
   std::unique_ptr<csl::MinDic<float>> mindic_;
   size_t ocrCharacterCount_;
   int iteration_;
+  const bool adaptive_;
 };
 } // namespace OCRCorrection
 

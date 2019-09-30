@@ -154,14 +154,14 @@ void Profiler::createProfileTypes(Document &sourceDoc) {
   freqList_.doApplyStaticFreqs(false);
   freqList_.setHistPatternSmoothingProb(config_.histPatternSmoothingProb_);
   // Calculate candidates for each type in the set;
-  Profile profile;
+  Profile profile(config_.adaptive_);
   csl::Stopwatch stopwatch;
   std::wcerr << "calculating candidates\n";
   for (const auto &token : document_) {
     if (eop(token.origin())) {
       break;
     }
-    profile.put(config_.adaptive_, token.origin(),
+    profile.put(token.origin(),
                 [this](const Token &token, csl::DictSearch::CandidateSet &cs) {
                   this->calculateCandidateSet(token, cs);
                 });
