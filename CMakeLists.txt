@@ -108,6 +108,7 @@ SET( OCRCORRECTION_SOURCES
 	Profiler/Profile.cxx
 	Profiler/Profiler.cxx
 	Profiler/SimpleOutputWriter.cxx
+	SimpleXMLReader/SimpleXMLReader.cxx
 	TXTReader/AlignedTXTReader.cxx
 	TXTReader/TXTReader.cxx
 	Token/TokenImageInfoBox.cxx
