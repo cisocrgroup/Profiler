@@ -21,7 +21,6 @@ class Document; // forward decl
 class Xstr {
 public:
   Xstr(const XMLCh *str) : str_(XMLString::transcode(str)) {}
-  Xstr(const XMLCh *chars, const XMLSize_t n);
   ~Xstr() { XMLString::release(&str_); }
   bool operator==(const char *other) const { return strcmp(str_, other) == 0; }
   bool operator<(const char *other) const { return strcmp(str_, other) < 0; }
@@ -39,10 +38,12 @@ public:
   // Parses a simple xml file format.  The root element is of the
   // document should be `<text>`.  All text within is parsed normally.
   // It is possible to encode additinal lexicon entries using
-  // `<alex>entry</alex>` (additional lexicon entries are not assumed
-  // to be part of the text to be processed).  Single tokens in the text can
-  // be marked up with a correction using `<cor val="right">wrong</cor>`.
-  // Anything within `<meta>...</meta>` is ignored.
+  // `<alex entry="entry"/>` (additional lexicon entries are not assumed
+  // to be part of the text to be processed).  Single tokens in the
+  // text can be marked up with a correction using `<cor
+  // val="right">wrong</cor>`.  The `<lb/>` and `<pb/>` tags mark line
+  // or page breaks respectively.  A page break allways implies a line
+  // break as well.  Anything within `<meta>...</meta>` is ignored.
   void parse(const std::string &path, Document &document);
 
   // SAX handles
@@ -58,10 +59,13 @@ public:
 private:
   void addTokens();
   void addCor();
-  void addAlex();
+  void addAlex(const std::string &entry);
+  void addLineBreak();
+  void addPageBreak();
+  void appendText(const XMLCh *chars, const XMLSize_t len);
   static boost::optional<std::string> getAttr(const char *str,
                                               AttributeList &attrs);
-  enum state { start, text, meta, alex, cor };
+  enum state { start, text, meta, cor };
 
   csl::AdditionalLex &alex_;
   Document *doc_;

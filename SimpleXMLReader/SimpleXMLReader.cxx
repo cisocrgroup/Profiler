@@ -6,15 +6,6 @@
 using namespace OCRCorrection;
 
 ////////////////////////////////////////////////////////////////////////////////
-Xstr::Xstr(const XMLCh *chars, const XMLSize_t n) : str_() {
-  auto tmp = std::unique_ptr<XMLCh[]>(new XMLCh[n + 1]);
-  for (XMLSize_t i = 0; i < n; i++) {
-    tmp[i] = chars[i];
-  }
-  str_ = XMLString::transcode(tmp.get());
-}
-
-////////////////////////////////////////////////////////////////////////////////
 void SimpleXMLReader::parse(const std::string &path, Document &document) {
   doc_ = &document;
   xercesc::XMLPlatformUtils::Initialize();
@@ -27,16 +18,12 @@ void SimpleXMLReader::parse(const std::string &path, Document &document) {
 ////////////////////////////////////////////////////////////////////////////////
 void SimpleXMLReader::characters(const XMLCh *const chars, const XMLSize_t n) {
   switch (state_) {
-  case alex:
-    addTokens();
-    text_ += Xstr(chars, n).str();
-    break;
   case text:
-    text_ += Xstr(chars, n).str();
+    appendText(chars, n);
     break;
   case cor:
     addTokens();
-    text_ += Xstr(chars, n).str();
+    appendText(chars, n);
     break;
   default:
     return;
@@ -46,19 +33,28 @@ void SimpleXMLReader::characters(const XMLCh *const chars, const XMLSize_t n) {
 ////////////////////////////////////////////////////////////////////////////////
 void SimpleXMLReader::startElement(const XMLCh *const name,
                                    AttributeList &attrs) {
+  if (state_ == meta) { // count meta tag nesting depth
+    count_++;
+    return;
+  }
   const auto tagName = Xstr(name);
   if (tagName == "text" and state_ == start) {
     state_ = text;
   } else if (tagName == "meta" and state_ == text) {
     state_ = meta;
     count_ = 1;
-  } else if (tagName == "meta" and state_ == meta) {
-    count_++;
   } else if (tagName == "cor" and state_ == text) {
     state_ = cor;
     cor_ = getAttr("cor", attrs);
   } else if (tagName == "alex" and state_ == text) {
-    state_ = alex;
+    const auto alex = getAttr("entry", attrs);
+    if (alex) {
+      addAlex(*alex);
+    }
+  } else if (tagName == "lb" and state_ == text) {
+    addLineBreak();
+  } else if (tagName == "pb" and state_ == text) {
+    addPageBreak();
   } else if (state_ != meta) {
     throw std::runtime_error("sax: simple xml: invalid start element: " +
                              std::string(tagName.str()));
@@ -67,21 +63,24 @@ void SimpleXMLReader::startElement(const XMLCh *const name,
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimpleXMLReader::endElement(const XMLCh *const name) {
-  const auto tagName = Xstr(name);
-  if (tagName == "text" and state_ == text) {
-    state_ = text;
-    addTokens();
-  } else if (tagName == "meta" and state_ == meta) {
+  if (state_ == meta) { // decrease meta tag nesting depth
     count_--;
     if (count_ == 0) {
       state_ = text;
     }
+    return;
+  }
+  const auto tagName = Xstr(name);
+  if (tagName == "text" and state_ == text) {
+    state_ = text;
+    addTokens();
+  } else if (tagName == "alex" and state_ == text) {
+    // that's ok;
   } else if (tagName == "cor" and state_ == cor) {
     state_ = text;
     addCor();
-  } else if (tagName == "alex" and state_ == alex) {
-    state_ = text;
-    addAlex();
+  } else if ((tagName == "lb" or tagName == "pb") and state_ == text) {
+    // that's ok;
   } else {
     throw std::runtime_error("sax: simple xml: invalid end element: " +
                              std::string(tagName.str()));
@@ -98,6 +97,7 @@ void SimpleXMLReader::startDocument() {
 void SimpleXMLReader::endDocument() {
   count_ = 0;
   state_ = start;
+  doc_->findLineBorders();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -118,6 +118,28 @@ boost::optional<std::string> SimpleXMLReader::getAttr(const char *str,
     }
   }
   return {};
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void SimpleXMLReader::appendText(const XMLCh *chars, const XMLSize_t len) {
+  auto buf = std::unique_ptr<XMLCh[]>(new XMLCh[len + 1]);
+  bool start = true;
+  for (XMLSize_t i = 0, j = 0; i < len;) {
+    bool hadWS = false;
+    while (std::iswspace(chars[i]) and i < len) {
+      hadWS = true;
+      i++;
+    }
+    if (hadWS and not start) {
+      buf[j++] = ' ';
+    }
+    if (i < len) {
+      buf[j++] = chars[i++];
+    }
+    buf[j + 1] = 0;
+    start = false;
+  }
+  text_ += std::string(Xstr(buf.get()).str());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -148,7 +170,12 @@ void SimpleXMLReader::addCor() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimpleXMLReader::addAlex() {
-  alex_.add(Utils::utf8(text_));
-  text_.clear();
+void SimpleXMLReader::addAlex(const std::string &entry) {
+  alex_.add(Utils::utf8(entry));
 }
+
+////////////////////////////////////////////////////////////////////////////////
+void SimpleXMLReader::addPageBreak() { addLineBreak(); }
+
+////////////////////////////////////////////////////////////////////////////////
+void SimpleXMLReader::addLineBreak() { doc_->pushBackToken(L"\n", false); }
