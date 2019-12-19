@@ -1,7 +1,6 @@
 #ifndef OCRCorrection_SimpleXMLReader_h__
 #define OCRCorrection_SimpleXMLReader_h__
 
-#include <boost/optional.hpp>
 #include <string>
 #include <xercesc/parsers/SAXParser.hpp>
 #include <xercesc/sax/AttributeList.hpp>
@@ -63,14 +62,13 @@ private:
   void addLineBreak();
   void addPageBreak();
   void appendText(const XMLCh *chars, const XMLSize_t len);
-  static boost::optional<std::string> getAttr(const char *str,
-                                              AttributeList &attrs);
+  static std::string getAttr(const char *str, AttributeList &attrs);
   enum state { start, text, meta, cor };
 
   csl::AdditionalLex &alex_;
   Document *doc_;
   std::string text_;
-  boost::optional<std::string> cor_;
+  std::string cor_;
   state state_;
   int count_;
 };

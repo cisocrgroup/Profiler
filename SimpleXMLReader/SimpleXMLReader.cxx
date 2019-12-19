@@ -48,8 +48,8 @@ void SimpleXMLReader::startElement(const XMLCh *const name,
     cor_ = getAttr("cor", attrs);
   } else if (tagName == "alex" and state_ == text) {
     const auto alex = getAttr("entry", attrs);
-    if (alex) {
-      addAlex(*alex);
+    if (not alex.empty()) {
+      addAlex(alex);
     }
   } else if (tagName == "lb" and state_ == text) {
     addLineBreak();
@@ -109,8 +109,7 @@ void SimpleXMLReader::fatalError(const SAXParseException &ex) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-boost::optional<std::string> SimpleXMLReader::getAttr(const char *str,
-                                                      AttributeList &attrs) {
+std::string SimpleXMLReader::getAttr(const char *str, AttributeList &attrs) {
   for (XMLSize_t i = 0; i < attrs.getLength(); i++) {
     const auto key = Xstr(attrs.getName(i));
     if (key == str) {
@@ -157,11 +156,11 @@ void SimpleXMLReader::addTokens() {
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimpleXMLReader::addCor() {
-  if (not cor_) {
+  if (cor_.empty()) {
     throw std::runtime_error("missing correction for " + text_);
   }
   doc_->pushBackToken(Utils::utf8(text_), true);
-  auto wcor = Utils::utf8(cor_.value());
+  auto wcor = Utils::utf8(cor_);
   doc_->at(doc_->getNrOfTokens() - 1).metadata()["correction"] = wcor;
   std::transform(wcor.begin(), wcor.end(), wcor.begin(), ::towlower);
   doc_->at(doc_->getNrOfTokens() - 1).metadata()["correction-lc"] = wcor;
