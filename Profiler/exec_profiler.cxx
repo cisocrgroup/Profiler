@@ -17,6 +17,7 @@
 #include "JSONOutputWriter.hxx"
 #include "Profiler/Evaluator.h"
 #include "SimpleOutputWriter.h"
+#include "SimpleXMLReader/SimpleXMLReader.hxx"
 #include <AltoXML/AltoXMLReader.h>
 #include <DocXML/DocXMLReader.h>
 #include <DocXML/DocXMLWriter.h>
@@ -35,8 +36,8 @@ void printHelp() {
   std::wcerr
       << "Use like: profiler --config=<iniFile> --sourceFile=<xmlFile>"
       << std::endl
-      << "--sourceFormat DocXML | AltoXML | DocGt | ABBYY_XML_DIR | TXT | EXT  "
-         "(Default: DocXML)"
+      << "--sourceFormat DocXML | AltoXML | DocGt | ABBYY_XML_DIR | TXT | EXT "
+         "| SXML  (Default: DocXML)"
       << std::endl
       << "[--out_xml  <outputFile> ]  Prints xml containing the lists of hist. "
          "variants and ocr errors."
@@ -289,8 +290,20 @@ int main(int argc, char const **argv) {
           alex.reset(new csl::AdditionalLex(rank, maxlev));
         }
         profiler.setAdaptive(true); // EXT reader implies adaptive lexicon
-        OCRCorrection::ExtReader reader;
-        reader.parse(options.getOption("sourceFile"), document, *alex);
+        OCRCorrection::ExtReader reader(*alex);
+        reader.parse(options.getOption("sourceFile"), document);
+        std::wcerr << "profiling with " << alex->size()
+                   << " additional lexicon entries\n";
+        profiler.addExternalDictModule(alex.release());
+      } else if (options.getOption("sourceFormat") == "SXML") {
+        if (not alex) {
+          const auto rank = options.getOptionAsSizeT("additionalLexRank");
+          const auto maxlev = options.getOptionAsSizeT("additionalLexMaxLev");
+          alex.reset(new csl::AdditionalLex(rank, maxlev));
+        }
+        profiler.setAdaptive(true); // SXML reader implies adaptive lexicon
+        OCRCorrection::SimpleXMLReader reader(*alex);
+        reader.parse(options.getOption("sourceFile"), document);
         std::wcerr << "profiling with " << alex->size()
                    << " additional lexicon entries\n";
         profiler.addExternalDictModule(alex.release());

@@ -6,8 +6,7 @@
 using namespace OCRCorrection;
 
 ////////////////////////////////////////////////////////////////////////////////
-void ExtReader::parse(const std::string &path, Document &document,
-                      csl::AdditionalLex &alex) {
+void ExtReader::parse(const std::string &path, Document &document) {
   std::wifstream is(path);
   if (not is.good()) {
     throw std::runtime_error("cannot open: " + std::string(path));
@@ -22,7 +21,7 @@ void ExtReader::parse(const std::string &path, Document &document,
     }
     // add lines with '#' to the lexicon
     if (line[0] == '#') {
-      alex.add(line.substr(1));
+      alex_.add(line.substr(1));
       continue;
     }
     ++ntokens;
@@ -49,6 +48,6 @@ void ExtReader::parse(const std::string &path, Document &document,
     }
   }
   std::wcerr << "read " << ntokens << " tokens (with " << ncor
-             << " corrections) and " << alex.size()
+             << " corrections) and " << alex_.size()
              << " additional lexicon entries\n";
 }
