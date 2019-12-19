@@ -45,7 +45,7 @@ void SimpleXMLReader::startElement(const XMLCh *const name,
     count_ = 1;
   } else if (tagName == "cor" and state_ == text) {
     state_ = cor;
-    cor_ = getAttr("cor", attrs);
+    cor_ = getAttr("val", attrs);
   } else if (tagName == "alex" and state_ == text) {
     const auto alex = getAttr("entry", attrs);
     if (not alex.empty()) {
