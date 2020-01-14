@@ -1,4 +1,6 @@
 #include <regex>
+#include <map>
+#include <system_error>
 #include "AutoCorrector.h"
 #include "Document/Document.h"
 #include "Utils/Utils.h"

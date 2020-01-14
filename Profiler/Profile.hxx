@@ -5,6 +5,8 @@
 #include "WeightedCandidate.hxx"
 #include <functional>
 #include <unordered_map>
+#include <memory>
+
 
 namespace csl {
 template <class T> class MinDic;
