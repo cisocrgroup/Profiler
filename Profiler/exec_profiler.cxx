@@ -338,7 +338,7 @@ int main(int argc, char const **argv) {
     }
     if (options.hasOption("jsonOutput")) {
       auto out = std::wofstream(options.getOption("jsonOutput"));
-      OCRCorrection::JSONOutputWriter(out, document).write();
+      OCRCorrection::JSONOutputWriter(out, document, profiler).write();
       out.close();
     }
     if (options.hasOption("evaluate")) {

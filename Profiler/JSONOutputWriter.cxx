@@ -1,5 +1,6 @@
 #include "JSONOutputWriter.hxx"
 #include "Document/Document.h"
+#include "Profiler.h"
 #include <iomanip>
 #include <iterator>
 #include <string>
@@ -82,11 +83,36 @@ static std::wostream &writeKeyVal(std::wostream &out, const std::wstring &key,
 void JSONOutputWriter::write() const {
   // std::wofstream tmpout("/tmp/profiler.json");
   // write(tmpout, doc_);
-  write(out_, doc_);
+  write(out_, doc_, profiler_);
 }
 
+// ////////////////////////////////////////////////////////////////////////////////
+// void JSONOutputWriter::write2(std::wostream &out, const Document &doc, const Profiler& profiler) {
+//   out << "{\n";
+//   writeString(out, L"GlobalHistPatternProbabilities", false) << ": {\n";
+//   std::wstring pre = L"";
+//   for (const auto& pair: profiler.getHistPatterns()) {
+//     out << pre;
+//     writeKeyVal(pair.first.toString(), pair.second, true);
+//     pre = ",\n";
+//   }
+//   out << "}\n";
+//   writeString(out, L"GlobalOCRPatternProbabilities", false) << ": {\n";
+//   pre = L"";
+//   for (const auto& pair: profiler.getOCRPatterns()) {
+//     out << pre;
+//     writeKeyVal(pair.first.toString(), pair.second, true);
+//     pre = ",\n";
+//   }
+//   out << "}\n";
+//   writeString(out, L"Profile", false) << ": ";
+//   write(out, doc);
+//   out << "}\n";
+// }
+ 
 ////////////////////////////////////////////////////////////////////////////////
-void JSONOutputWriter::write(std::wostream &out, const Document &doc) {
+void JSONOutputWriter::write(std::wostream &out, const Document &doc,
+			     const Profiler& profiler) {
   std::unordered_map<std::wstring, std::pair<size_t, const Token *>> types;
   for (auto i = doc.begin(); i != doc.end(); ++i) {
     // Skip short and/or not normal tokens.
@@ -106,7 +132,7 @@ void JSONOutputWriter::write(std::wostream &out, const Document &doc) {
   auto pre = L"\n";
   for (const auto &t : types) {
     if (t.second.second->isNormal()) {
-      writeNormalToken(out, pre, *t.second.second, t.second.first);
+      writeNormalToken(out, profiler, pre, *t.second.second, t.second.first);
       pre = L",\n";
     }
   }
@@ -114,8 +140,9 @@ void JSONOutputWriter::write(std::wostream &out, const Document &doc) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void JSONOutputWriter::writeNormalToken(std::wostream &out, std::wstring pre,
-                                        const Token &token, size_t n) {
+void JSONOutputWriter::writeNormalToken(std::wostream &out, const Profiler& profiler,
+					std::wstring pre, const Token &token, size_t n) {
+                                        
   out << pre;
   writeString(out, token.getWOCR(), true) << ": {\n";
   writeKeyVal(out, L"OCR", token.getWOCR(), true) << ",\n";
@@ -125,30 +152,29 @@ void JSONOutputWriter::writeNormalToken(std::wostream &out, std::wstring pre,
   pre = L"\n";
   writeString(out, L"Candidates") << ": [";
   for (auto i = token.candidatesBegin(); i != token.candidatesEnd(); ++i) {
-    writeCandidate(out, pre, *i);
+    writeCandidate(out, profiler, pre, *i);
     pre = L",";
   }
   out << "\n]\n}";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void JSONOutputWriter::writeCandidate(std::wostream &out, std::wstring pre,
-                                      const Candidate &candidate) {
-  out << pre << "{\n";
+void JSONOutputWriter::writeCandidate(std::wostream &out, const Profiler& profiler,
+				      std::wstring pre, const Candidate &candidate) {                                  out << pre << "{\n";
   writeKeyVal(out, L"Suggestion", candidate.getString(), true) << ",\n";
   writeKeyVal(out, L"Modern", candidate.getBaseWord(), true) << ",\n";
   writeKeyVal(out, L"Dict", candidate.getDictModule().getName()) << ",\n";
   writeString(out, L"HistPatterns") << ": [";
   pre = L"\n";
   for (const auto &histp : candidate.getHistInstruction()) {
-    writeInstruction(out, pre, histp);
+    writeHistInstruction(out, profiler, pre, histp);
     pre = L",";
   }
   out << "],\n";
   pre = L"\n";
   writeString(out, L"OCRPatterns") << ": [";
   for (const auto &ocrp : candidate.getOCRTrace()) {
-    writeInstruction(out, pre, ocrp);
+    writeOCRInstruction(out, profiler, pre, ocrp);
     pre = L",";
   }
   out << "],\n";
@@ -158,10 +184,23 @@ void JSONOutputWriter::writeCandidate(std::wostream &out, std::wstring pre,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void JSONOutputWriter::writeInstruction(std::wostream &out, std::wstring pre,
-                                        const csl::PosPattern &instr) {
+void JSONOutputWriter::writeOCRInstruction(std::wostream &out, const Profiler& profiler,
+					   std::wstring pre, const csl::PosPattern &instr) {
+  double prob = profiler.getOCRPatterns().getWeight(instr);//0.0;
   out << pre << "{";
   writeKeyVal(out, L"Left", instr.getLeft(), true) << ",";
   writeKeyVal(out, L"Right", instr.getRight(), true) << ",";
-  writeKeyVal(out, L"Pos", instr.getPosition()) << "}\n";
+  writeKeyVal(out, L"Pos", instr.getPosition()) << ",";
+  writeKeyVal(out, L"Prob", prob) << "}\n";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void JSONOutputWriter::writeHistInstruction(std::wostream &out, const Profiler& profiler,
+					    std::wstring pre, const csl::PosPattern &instr) {
+  double prob = profiler.getHistPatterns().getWeight(instr);//0.0;
+  out << pre << "{";
+  writeKeyVal(out, L"Left", instr.getLeft(), true) << ",";
+  writeKeyVal(out, L"Right", instr.getRight(), true) << ",";
+  writeKeyVal(out, L"Pos", instr.getPosition()) << ",";
+  writeKeyVal(out, L"Prob", prob) << "}\n";
 }
