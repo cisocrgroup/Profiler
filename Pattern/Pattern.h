@@ -24,6 +24,11 @@ namespace csl {
 	 */
 	inline Pattern();
 
+      /**
+       * Create a pattern from a simple l:r expression.
+       */
+      Pattern(const std::wstring& expr);
+
 	/**
 	 * @brief A very self-explanatory constructor.
 	 */

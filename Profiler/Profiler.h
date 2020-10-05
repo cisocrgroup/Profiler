@@ -244,6 +244,9 @@ private:
    */
   void doIteration(size_t iterationNumber, bool lastIteration = false);
 
+  // Ban some OCR-patterns by resetting them to a very small weight.
+  void banOCRPatterns();
+
   /**
    * @brief Computes the combined probability for a candidate interpretation.
    *        The name being slightly mis-leading, the function also changes the
@@ -366,7 +369,8 @@ private:
      *        values.
      */
     Configuration()
-      : nrOfIterations_(0)
+      : bannedOCRPatterns_()
+      , nrOfIterations_(0)
       , pageRestriction_((size_t)-1)
       , patternCutoff_hist_(0)
       , patternCutoff_ocr_(0)
@@ -381,6 +385,11 @@ private:
       , writeAdaptiveDictionary_(false)
       , adaptive_(false)
     {}
+
+    /**
+     * List of banned OCR-patterns.
+     */
+    std::vector<csl::Pattern> bannedOCRPatterns_;
 
     /**
      * @todo add doc

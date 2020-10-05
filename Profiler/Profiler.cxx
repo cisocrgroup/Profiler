@@ -48,6 +48,14 @@ void Profiler::readConfiguration(char const *configFile) {
 }
 
 void Profiler::readConfiguration(csl::INIConfig const &iniConf) {
+  if (iniConf.hasKey("global:bannedOCRPatterns")) {
+    std::stringstream sstr(iniConf.getstring("global:bannedOCRPatterns"));
+    std::string pattern;
+    while (std::getline(sstr, pattern, ',')) {
+      config_.bannedOCRPatterns_.push_back(csl::Pattern(Utils::utf8(pattern)));
+    }
+  }
+
   config_.nrOfIterations_ = iniConf.getint("global:numberOfIterations");
   if (config_.nrOfIterations_ == (size_t)-1)
     throw OCRCException("OCRC::Profiler::readConfiguration: no value found for "
@@ -185,6 +193,7 @@ void Profiler::createProfileTypes(Document &sourceDoc) {
     profile.iteration(lm);
     std::wcerr << "iteration " << i + 1 << " done after "
                << stopwatch.readMilliseconds() << "ms\n";
+    banOCRPatterns();
     stopwatch.start();
   }
   profile.finish();
@@ -989,6 +998,13 @@ void Profiler::prepareDocument(Document &tmpDoc) {
     }
   }
   std::wcerr << "ok" << std::endl;
+}
+
+void Profiler::banOCRPatterns() {
+  static const auto w = std::numeric_limits<double>::min();
+  for (const auto& pattern: config_.bannedOCRPatterns_) {
+    globalProfile_.ocrPatternProbabilities_.setWeight(pattern, w, w);
+  }
 }
 
 void Profiler::printConfigTemplate(std::wostream &os) {

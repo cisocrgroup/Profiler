@@ -9,6 +9,18 @@ namespace csl {
 wchar_t Pattern::leftRightDelimiter_ = L':';
 const std::wstring Pattern::UNKNOWN = L"?";
 
+Pattern::Pattern(const std::wstring& expr): left_(), right_() {
+  const auto pos = expr.find(leftRightDelimiter_);
+  if (pos == 0) {
+    right_ = expr.substr(pos+1);
+  } else if (pos == std::wstring::npos) {
+    left_ = expr;
+  } else {
+    left_ = expr.substr(0, pos);
+    right_ = expr.substr(pos+1);
+  }
+}
+
 void
 Pattern::print(std::wostream& os) const
 {
