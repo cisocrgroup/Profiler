@@ -1,8 +1,7 @@
 #ifndef CSL_STOPWATCH_H
 #define CSL_STOPWATCH_H CSL_STOPWATCH_H
 
-
-#include<sys/timeb.h>
+#include <chrono>
 
 namespace csl {
     class Stopwatch {
@@ -13,7 +12,7 @@ namespace csl {
 	inline unsigned long long readMilliseconds() const;
 	
     private:
-	timeb start_;
+      std::chrono::steady_clock::time_point start_;
     };
     
     inline Stopwatch::Stopwatch() {
@@ -21,21 +20,18 @@ namespace csl {
     }
     
     inline void Stopwatch::start() {
-	ftime( &start_ );
+      start_ = std::chrono::steady_clock::now();      
     }
     
     inline unsigned long long Stopwatch::readSeconds() const {
-	timeb now;
-	ftime( &now );
-	return now.time - start_.time;
+      std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+      return std::chrono::duration_cast<std::chrono::seconds>(now - start_).count();
     }
     
     inline unsigned long long Stopwatch::readMilliseconds() const {
-	timeb now;
-	ftime( &now );
-	return ( now.time - start_.time ) * 1000 + ( now.millitm - start_.millitm );
+      std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+      return std::chrono::duration_cast<std::chrono::milliseconds>(now - start_).count();
     }
-
 } // ns csl
     
 #endif
