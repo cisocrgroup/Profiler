@@ -87,6 +87,10 @@ SET( OCRCORRECTION_SOURCES
 	AltoXML/AltoEnrich.cxx
 	AltoXML/AltoXMLReader.cxx
 	CorrectionSystem/CorrectionSystem.cxx
+	DictSearch/AdaptiveLex.cxx
+	DictSearch/DictSearch.cxx
+	DictSearch/GlobalHistPatterns.cpp
+	DictSearch/UnknownVirtualLex.cxx
 	DocXML/DocXMLReader.cxx
 	DocXML/DocXMLWriter.cxx
 	DocXML/LegacyDocXMLReader.cxx
@@ -97,7 +101,15 @@ SET( OCRCORRECTION_SOURCES
 	GlobalProfile/PatternContainerXMLReader.cxx
 	GtDoc/AutoCorrector.cxx
 	GtDoc/GtDoc.cxx
+	INIConfig/dictionary.c
+	INIConfig/INIConfig.cxx
+	INIConfig/INIParser.cxx
+	LevDEA/LevDEA.cxx
 	LevenshteinWeights/LevenshteinWeights.cxx
+	Pattern/ComputeInstruction.cxx
+	Pattern/PatternWeights.cxx
+	Pattern/Instruction.cxx
+	Pattern/Interpretation.cxx
 	Pattern/Pattern.cxx
 	Profiler/AdaptiveProfiling.cxx
 	Profiler/Evaluation.cxx
