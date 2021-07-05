@@ -131,12 +131,14 @@ namespace csl {
 	for (const auto& pattern: GlobalHistPatterns::instance().getHistPatterns()) {
 	  addPattern(pattern);
 	}
+#ifndef PROFILER_NO_LOG	
 	std::wcerr << "csl::PatternSet: Loaded "
 			   << GlobalHistPatterns::instance().getHistPatterns().size()
 			   << " global patterns." << std::endl;
 	std::wcerr << "csl::PatternSet: Loaded "
 			   << patternList_.size() - 1 << " patterns."
 			   << std::endl;
+#endif // PROFILER_NO_LOG				   
   } // PatternSet::loadPatterns
 
   void PatternSet::addPattern(const std::wstring& line) {

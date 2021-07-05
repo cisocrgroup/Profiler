@@ -456,6 +456,7 @@ private:
 
     void print(std::wostream& os = std::wcout)
     {
+#ifndef PROFILER_NO_LOG
       os << "number of iterations:           " << nrOfIterations_ << std::endl
          << std::endl
          << "page restriction:               " << pageRestriction_ << std::endl
@@ -490,6 +491,7 @@ private:
          << "adaptive_:                      " << adaptive_ << std::endl
          << "types_:                         " << types_ << std::endl
          << std::endl;
+#endif // PROFILER_NO_LOG         
     }
 
   }; // class Configuration

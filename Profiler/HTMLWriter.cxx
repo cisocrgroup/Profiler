@@ -15,8 +15,9 @@ Profiler::HTMLWriter::HTMLWriter()
   : nrOfTokens_(0)
   , iterationNumber_(-1)
 {
+#ifndef PROFILER_NO_LOG 
   std::wcerr << "OCRC::Profiler::HTMLWriter::Constructor" << std::endl;
-
+#endif // PROFILER_NO_LOG
   limit_voteWeight_ = 0;
   limit_nrOfTextTokens_ = 10000;
   candlistsForAllIterations_ = false;

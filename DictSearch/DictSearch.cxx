@@ -61,9 +61,10 @@ DictSearch::readConfiguration(INIConfig const& iniConf)
     size_t cascadeRank = iniConf.hasKey(*it + ":cascadeRank")
                            ? iniConf.getint(*it + ":cascadeRank")
                            : 0;
+#ifndef PROFILER_NO_LOG	                           
     std::wcerr << "cslDictSearch::readConfiguration: load DictModule "
                << wideName << ", cascadeRank=" << cascadeRank << std::endl;
-
+#endif // PROFILER_NO_LOG
     if (!iniConf.hasKey(*it + ":dict_type")) {
       throw exceptions::cslException(
         std::string("csl::DictSearch::readConfiguration: dictionary ") + *it +
