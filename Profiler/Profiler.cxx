@@ -153,18 +153,22 @@ void Profiler::initGlobalOcrPatternProbs(int itn) {
 }
 
 void Profiler::createProfileTypes(Document &sourceDoc) {
+#ifndef PROFILER_NO_LOG
   if (config_.nrOfIterations_ == 0) {
     std::wcerr << "OCRC::Profiler::createNonAdaptiveProfile: config says 0 "
                   "iterations, so I do nothing."
                << std::endl;
   }
+#endif // PROFILER_NO_LOG
   prepareDocument(sourceDoc);
   freqList_.doApplyStaticFreqs(false);
   freqList_.setHistPatternSmoothingProb(config_.histPatternSmoothingProb_);
   // Calculate candidates for each type in the set;
   Profile profile(config_.adaptive_);
   csl::Stopwatch stopwatch;
+#ifndef PROFILER_NO_LOG  
   std::wcerr << "calculating candidates\n";
+#endif // PROFILER_NO_LOG
   for (const auto &token : document_) {
     if (eop(token.origin())) {
       break;
@@ -174,8 +178,10 @@ void Profiler::createProfileTypes(Document &sourceDoc) {
                   this->calculateCandidateSet(token, cs);
                 });
   }
+#ifndef PROFILER_NO_LOG  
   std::wcerr << "done calculating candidates in "
              << stopwatch.readMilliseconds() << "ms\n";
+#endif // PROFILER_NO_LOG
   globalProfile_.ocrPatternProbabilities_.setSmartMerge(); // this means that
                                                            // pseudo-merges and
                                                            // splits like ab<>b
@@ -183,7 +189,9 @@ void Profiler::createProfileTypes(Document &sourceDoc) {
                                                            // allowed
   csl::ComputeInstruction computer;
   LanguageModel lm(config_, &freqList_, &globalProfile_, &computer);
+#ifndef PROFILER_NO_LOG  
   std::wcerr << "doing iterations\n";
+#endif // PROFILER_NO_LOG  
   stopwatch.start();
 
   for (size_t i = 0; i < config_.nrOfIterations_; i++) {
@@ -191,30 +199,37 @@ void Profiler::createProfileTypes(Document &sourceDoc) {
       initGlobalOcrPatternProbs(i + 1);
     }
     profile.iteration(lm);
+#ifndef PROFILER_NO_LOG    
     std::wcerr << "iteration " << i + 1 << " done after "
                << stopwatch.readMilliseconds() << "ms\n";
+#endif // PROFILER_NO_LOG               
     banOCRPatterns();
     stopwatch.start();
   }
   profile.finish();
 
+#ifndef PROFILER_NO_LOG
   std::wcerr << "connecting corrections to tokens\n";
+#endif // PROFILER_NO_LOG  
   stopwatch.start();
   for (auto &token : document_) {
     profile.setCorrection(token.origin());
   }
+#ifndef PROFILER_NO_LOG  
   std::wcerr << "done connecting corrections in "
              << stopwatch.readMilliseconds() << "ms\n";
+#endif // PROFILER_NO_LOG             
 }
 
 void Profiler::doCreateProfile(Document &sourceDoc) {
-
+#ifndef PROFILER_NO_LOG
   if (config_.nrOfIterations_ == 0) {
     std::wcerr << "OCRC::Profiler::createNonAdaptiveProfile: config says 0 "
                   "iterations, "
                   "so I do nothing."
                << std::endl;
   }
+#endif // PROFILER_NO_LOG
 
   prepareDocument(sourceDoc);
 
@@ -268,7 +283,9 @@ void Profiler::doCreateProfile(Document &sourceDoc) {
 void Profiler::doIteration(size_t iterationNumber, bool lastIteration) {
   csl::Stopwatch iterationTime;
 
+#ifndef PROFILER_NO_LOG
   std::wcerr << "*** Iteration " << iterationNumber << " ***" << std::endl;
+#endif // PROFILER_NO_LOG  
   // std::wcerr << L" STARTING OCR PROB (s:ſ): "
   //            << globalProfile_.ocrPatternProbabilities_.getWeight(
   //                 csl::Pattern(L"s", L"ſ"))
@@ -340,9 +357,11 @@ void Profiler::doIteration(size_t iterationNumber, bool lastIteration) {
       ++counter[L"normalAndLongTokens"];
       token.setTokenNr(static_cast<size_t>(counter[L"normalAndLongTokens"]));
       if ((int)counter[L"normalAndLongTokens"] % 1000 == 0) {
+#ifndef PROFILER_NO_LOG      
         std::wcerr << counter[L"normalAndLongTokens"] / 1000 << "k/"
                    << document_.size() / 1000 << "k tokens processed in "
                    << stopwatch.readMilliseconds() << "ms" << std::endl;
+#endif // PROFILER_NO_LOG
         stopwatch.start();
       }
       calculateCandidateSet(token.origin(), tempCands);
@@ -644,7 +663,9 @@ void Profiler::doIteration(size_t iterationNumber, bool lastIteration) {
 
   // compute probabilities for hist. variant patterns
   if (config_.resetHistPatternProbabilities_) {
+#ifndef PROFILER_NO_LOG      
     std::wcerr << "clearing hist pattern probabilities\n";
+#endif // PROFILER_NO_LOG    
     globalProfile_.histPatternProbabilities_.clear();
   }
   for (PatternCounter::PatternIterator it = histCounter_.patternsBegin();
@@ -679,7 +700,9 @@ void Profiler::doIteration(size_t iterationNumber, bool lastIteration) {
 
   // compute probabilities for ocr patterns
   if (config_.resetOCRPatternProbabilities_) {
+#ifndef PROFILER_NO_LOG      
     std::wcerr << "clearing OCR pattern probabilities\n";
+#endif // PROFILER_NO_LOG    
     globalProfile_.ocrPatternProbabilities_.clearExplicitWeights();
   }
 
@@ -787,9 +810,10 @@ void Profiler::doIteration(size_t iterationNumber, bool lastIteration) {
       htmlWriter_.print(*htmlStream_);
 
   } // if lastIteration
-
+#ifndef PROFILER_NO_LOG      
   std::wcerr << "Finished iteration in " << iterationTime.readSeconds()
              << " seconds." << std::endl;
+#endif // PROFILER_NO_LOG             
 
   // std::wcerr << L" FINISH OCR PROB (s:ſ): "
   //            << globalProfile_.ocrPatternProbabilities_.getWeight(
@@ -983,7 +1007,9 @@ void Profiler::prepareDocument(Document &tmpDoc) {
     }
   }
 
+#ifndef PROFILER_NO_LOG      
   std::wcerr << "Create wOCR frequency list ... " << std::flush;
+#endif // PROFILER_NO_LOG  
   ocrCharacterCount_ = 0;
   for (Document_t::iterator token = document_.begin(); // for all tokens
        token != document_.end(); ++token) {
@@ -997,7 +1023,9 @@ void Profiler::prepareDocument(Document &tmpDoc) {
       ocrCharacterCount_ += token->getWOCR().length();
     }
   }
+#ifndef PROFILER_NO_LOG
   std::wcerr << "ok" << std::endl;
+#endif // PROFILER_NO_LOG  
 }
 
 void Profiler::banOCRPatterns() {
@@ -1008,6 +1036,7 @@ void Profiler::banOCRPatterns() {
 }
 
 void Profiler::printConfigTemplate(std::wostream &os) {
+#ifndef PROFILER_NO_LOG
   os << "######## Profiler Configuration ########################" << std::endl
      << "#                                                      #" << std::endl
      << "########################################################" << std::endl
@@ -1116,6 +1145,7 @@ void Profiler::printConfigTemplate(std::wostream &os) {
      << "ocrErrorsOnHypothetic = 0" << std::endl
      << "priority = 90" << std::endl
      << "cascadeRank = 0" << std::endl;
+#endif // PROFILER_NO_LOG
 }
 } // namespace OCRCorrection
 #endif
