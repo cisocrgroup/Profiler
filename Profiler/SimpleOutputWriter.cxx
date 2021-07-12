@@ -46,12 +46,13 @@ SimpleOutputWriter::writeNormalToken(const Token& token) const
     const Token& t;
   };
   Candidates candidates(token);
-  os_ << "@" << token.getWOCR();
-  if (token.has_metadata("groundtruth")) {
-    os_ << ":" << token.metadata()["groundtruth"];
-  }
-  os_ << "\n";
+  
   for (const auto& cand : candidates) {
+    os_ << token.getWOCR();
+    if (token.has_metadata("groundtruth")) {
+      os_ << ":" << token.metadata()["groundtruth"];
+    }
+    os_ << "@";
     os_ << cand.getWord() << ":{" << cand.getBaseWord() << "+"
         << cand.getInstruction() << "}+ocr" << cand.getOCRTrace()
         << ",voteWeight=" << cand.getVoteWeight()
