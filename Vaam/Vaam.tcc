@@ -234,12 +234,12 @@ namespace csl {
 	std::wstring word = baseWord_;
 	interpretation.getInstruction().applyTo( &word );
 	interpretation.setWord( word );
-
+	
 	if( ( filterDic_ && filterDic_->lookup( interpretation.getWord() ) )  || // if there's a filterDic_ and interpretation.word is in it or ..
 	    ( interpretation.getInstruction().size() < minNrOfPatterns_ )
 
 	    ) {
-	    return;
+			return;
 	}
 
 	if( wasUpperCase_ ) {
@@ -252,6 +252,7 @@ namespace csl {
 	    tmp.at( 0 ) = std::toupper( tmp.at( 0 ), locale_ );
 	    interpretation.setWord( tmp );
 	}
+	// std::wcerr << word << L" (" << baseWord_ << L"): " << interpretation.getBaseWord() << std::endl;
 
 	foundAnswers_ = true;
 	interpretations_->receive( interpretation );
@@ -263,7 +264,7 @@ namespace csl {
 	    return;
 	}
 	else {
-	    //std::wcout << cur->mother_.first << "," << cur->mother_.second << "," << stack_.at( cur->mother_.first ).size() << std::endl;
+	    // std::wcerr << cur->mother_.first << "," << cur->mother_.second << "," << stack_.at( cur->mother_.first ).size() << std::endl;
 	    reportMatch_rec( &( stack_.at( cur->mother_.first ).at( cur->mother_.second ) ), interpretation );
 	}
 

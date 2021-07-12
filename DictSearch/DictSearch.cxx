@@ -264,6 +264,7 @@ DictSearch::query(std::wstring const& query, iResultReceiver* answers)
        ++dm) {
     // std::wcerr << "cascade Rank: " << cascadeRank << "\n";
     // std::wcerr << "current: " << dm->first << "\n";
+    // std::wcerr << dm->first << " " << cascadeRank << " " << std::endl;
     if (((*dm).first) > cascadeRank) {
       if (foundAnswers) {
         return true;
