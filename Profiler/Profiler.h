@@ -122,6 +122,7 @@ public:
    *
    */
   void setNumberOfIterations(size_t nr) { config_.nrOfIterations_ = nr; }
+  size_t getNumberOfIterations() const noexcept { return config_.nrOfIterations_; }
 
   /**
    * @brief Enable/disable adaptive profiling
@@ -491,7 +492,7 @@ private:
          << "adaptive_:                      " << adaptive_ << std::endl
          << "types_:                         " << types_ << std::endl
          << std::endl;
-#endif // PROFILER_NO_LOG         
+#endif // PROFILER_NO_LOG
     }
 
   }; // class Configuration
