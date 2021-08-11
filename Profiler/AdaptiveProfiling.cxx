@@ -50,10 +50,11 @@ void Profiler::calculateAdaptiveCandidateSet(
   // 	std::wcerr << "(Profiler) Adaptive candidate (after): "
   // 		<< cand << "\n";
   // }
-  if (not candidates.empty())
+  if (not candidates.empty()) {
     std::sort(candidates.begin(), candidates.end());
-  else
+  } else {
     createCandidatesWithCorrection(t, candidates);
+  }
   assert(not candidates.empty());
 }
 
