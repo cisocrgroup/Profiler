@@ -25,27 +25,25 @@ void ExtReader::parse(const std::string &path, Document &document) {
       continue;
     }
     ++ntokens;
-    // all other lines a are tokens with a possible empty correction
-    // seperated by ':'. It is an error if a token with no correction
-    // does not end with ':'. A line only consiting of one ':' is
-    // skipped.
-    const auto pos = line.find_last_of(L':');
+    // All other lines a are tokens with a possible empty correction
+    // seperated by ' ' (U+0020 SPACE).  It is not an error if a token
+    // with no correction does not end with SPACE.  In this case the
+    // token is assumed to not have a correction.
+    const auto pos = line.find_last_of(L' ');
     if (pos == std::wstring::npos) {
-      throw std::runtime_error("invalid input line: missing seperator");
+      document.pushBackToken(line, true); // All tokens are asumed to be normal.
+      continue;
     }
     if (pos == 0) {
       continue;
     }
     const auto ocr = line.substr(0, pos);
     auto cor = line.substr(pos + 1);
-    document.pushBackToken(ocr, true); // all token are asumed to b normal
-    if (not cor.empty()) {
-      ++ncor;
-      document.at(document.getNrOfTokens() - 1).metadata()["correction"] = cor;
-      std::transform(cor.begin(), cor.end(), cor.begin(), ::towlower);
-      document.at(document.getNrOfTokens() - 1).metadata()["correction-lc"] =
-          cor;
-    }
+    document.pushBackToken(ocr, true); // All token are asumed to b normal.
+    ++ncor;
+    document.at(document.getNrOfTokens() - 1).metadata()["correction"] = cor;
+    std::transform(cor.begin(), cor.end(), cor.begin(), ::towlower);
+    document.at(document.getNrOfTokens() - 1).metadata()["correction-lc"] = cor;
   }
   std::wcerr << "read " << ntokens << " tokens (with " << ncor
              << " corrections) and " << alex_.size()
