@@ -131,14 +131,14 @@ void JSONOutputWriter::writeNormalToken(std::wostream &out,
   writeString(out, token.getWOCR(), true) << ": {\n";
   writeKeyVal(out, L"OCR", token.getWOCR(), true) << ",\n";
   writeKeyVal(out, L"N", n) << ",\n";
-  const bool hc = not token.getProfile().get(token).candidates.empty();
+  const bool hc = token.hasCandidates();
   writeKeyVal(out, L"HasCandidates", hc) << ",\n";
   pre = L"\n";
   writeString(out, L"Candidates") << ": [";
-  for (const auto& cand: token.getProfile().get(token).candidates) {
+  token.eachCandidate([&](const Candidate& cand) {
     writeCandidate(out, profiler, pre, cand);
     pre = L",";
-  }
+  });
   out << "\n]\n}";
 }
 

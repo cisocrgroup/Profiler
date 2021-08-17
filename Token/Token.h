@@ -10,6 +10,7 @@
 #include <Vaam/Vaam.h>
 #include <Exceptions.h>
 #include <Candidate/Candidate.h>
+#include <Profiler/Profile.hxx>
 #include "./Character.h"
 #include "./TokenImageInfoBox.h"
 #include "./Metadata.h"
@@ -629,8 +630,33 @@ namespace OCRCorrection {
 	this->profile_ = profile;
       }
 
+      bool hasCandidates() const noexcept {
+	if (hasProfile()) {
+	  return not getProfile().get(*this).candidates.empty();
+	}
+	return candidatesBegin() != candidatesEnd();
+      }
+
+      bool hasProfile() const noexcept {
+	return profile_ != nullptr;
+      }
+
       const Profile& getProfile() const {
 	return *profile_;
+      }
+
+      template<class F> void eachCandidate(F f) const {
+	if (hasProfile()) {
+	  for (const auto& cand: getProfile().get(*this).candidates) {
+	    f(cand);
+	  }
+	  return;
+	}
+	auto b = candidatesBegin();
+	auto e = candidatesEnd();
+	for (auto i = b; i != e; i++) {
+	  f(*i);
+	}
       }
 
 	inline Document& getMyDocument() {

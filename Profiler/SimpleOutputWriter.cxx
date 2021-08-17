@@ -33,12 +33,12 @@ SimpleOutputWriter::write() const
 void
 SimpleOutputWriter::writeNormalToken(const Token& token) const
 {
-  if (token.getProfile().get(token).candidates.empty()) {
+  if (token.hasCandidates()) {
     writeNormalTokenStart(token);
     os_ << "\n";
     return;
   }
-  for (const auto& cand : token.getProfile().get(token).candidates) {
+  token.eachCandidate([&](const Candidate& cand) {
     writeNormalTokenStart(token);
     os_ << "@";
     os_ << cand.getWord() << ":{" << cand.getBaseWord() << "+"
@@ -46,7 +46,7 @@ SimpleOutputWriter::writeNormalToken(const Token& token) const
         << ",voteWeight=" << cand.getVoteWeight()
         << ",levDistance=" << cand.getLevDistance()
         << ",dict=" << cand.getDictModule().getName() << "\n";
-  }
+  });
 }
 
  ////////////////////////////////////////////////////////////////////////////////
