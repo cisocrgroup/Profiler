@@ -14,8 +14,9 @@ namespace OCRCorrection {
 
         private:
                 void writeNormalToken(const Token& token) const;
+	        void writeNormalTokenStart(const Token& token) const;
                 const Document& document_;
-								std::wostream& os_;
+		std::wostream& os_;
         };
 }
 

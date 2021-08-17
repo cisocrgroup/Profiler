@@ -1,5 +1,6 @@
 #include "SimpleOutputWriter.h"
 #include "Document/Document.h"
+#include "Profile.hxx"
 
 using namespace OCRCorrection;
 
@@ -32,26 +33,13 @@ SimpleOutputWriter::write() const
 void
 SimpleOutputWriter::writeNormalToken(const Token& token) const
 {
-  struct Candidates
-  {
-    Candidates(const Token& token)
-      : t(token)
-    {
-    }
-    Token::CandidateIterator begin() const noexcept
-    {
-      return t.candidatesBegin();
-    }
-    Token::CandidateIterator end() const noexcept { return t.candidatesEnd(); }
-    const Token& t;
-  };
-  Candidates candidates(token);
-  
-  for (const auto& cand : candidates) {
-    os_ << token.getWOCR();
-    if (token.has_metadata("groundtruth")) {
-      os_ << ":" << token.metadata()["groundtruth"];
-    }
+  if (token.getProfile().get(token).candidates.empty()) {
+    writeNormalTokenStart(token);
+    os_ << "\n";
+    return;
+  }
+  for (const auto& cand : token.getProfile().get(token).candidates) {
+    writeNormalTokenStart(token);
     os_ << "@";
     os_ << cand.getWord() << ":{" << cand.getBaseWord() << "+"
         << cand.getInstruction() << "}+ocr" << cand.getOCRTrace()
@@ -59,4 +47,14 @@ SimpleOutputWriter::writeNormalToken(const Token& token) const
         << ",levDistance=" << cand.getLevDistance()
         << ",dict=" << cand.getDictModule().getName() << "\n";
   }
+}
+
+ ////////////////////////////////////////////////////////////////////////////////
+void
+SimpleOutputWriter::writeNormalTokenStart(const Token& token) const
+{
+    os_ << token.getWOCR();
+    if (token.has_metadata("groundtruth")) {
+      os_ << ":" << token.metadata()["groundtruth"];
+    }
 }

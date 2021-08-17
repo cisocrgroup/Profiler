@@ -1,6 +1,7 @@
 #ifndef OCRC_PROFILER_CXX
 #define OCRC_PROFILER_CXX OCRC_PROFILER_CXX
 
+#include <memory>
 #include "./Profiler.h"
 #include "./Profiler_Token.tcc"
 #include "LanguageModel.hxx"
@@ -164,21 +165,23 @@ void Profiler::createProfileTypes(Document &sourceDoc) {
   freqList_.doApplyStaticFreqs(false);
   freqList_.setHistPatternSmoothingProb(config_.histPatternSmoothingProb_);
   // Calculate candidates for each type in the set;
-  Profile profile(config_.adaptive_);
+  std::unique_ptr<ProfileBuilder> builder;
+  builder.reset(new ProfileBuilder(config_.adaptive_));
+  //Profile profile(config_.adaptive_);
   csl::Stopwatch stopwatch;
-#ifndef PROFILER_NO_LOG  
+#ifndef PROFILER_NO_LOG
   std::wcerr << "calculating candidates\n";
 #endif // PROFILER_NO_LOG
   for (const auto &token : document_) {
     if (eop(token.origin())) {
       break;
     }
-    profile.put(token.origin(),
+    builder->put(token.origin(),
                 [this](const Token &token, csl::DictSearch::CandidateSet &cs) {
                   this->calculateCandidateSet(token, cs);
                 });
   }
-#ifndef PROFILER_NO_LOG  
+#ifndef PROFILER_NO_LOG
   std::wcerr << "done calculating candidates in "
              << stopwatch.readMilliseconds() << "ms\n";
 #endif // PROFILER_NO_LOG
@@ -189,36 +192,36 @@ void Profiler::createProfileTypes(Document &sourceDoc) {
                                                            // allowed
   csl::ComputeInstruction computer;
   LanguageModel lm(config_, &freqList_, &globalProfile_, &computer);
-#ifndef PROFILER_NO_LOG  
+#ifndef PROFILER_NO_LOG
   std::wcerr << "doing iterations\n";
-#endif // PROFILER_NO_LOG  
-  stopwatch.start();
+#endif // PROFILER_NO_LOG
 
   for (size_t i = 0; i < config_.nrOfIterations_; i++) {
+    stopwatch.start();
     if (i < 2) { // do this for first and second iteration only
       initGlobalOcrPatternProbs(i + 1);
     }
-    profile.iteration(lm);
-#ifndef PROFILER_NO_LOG    
+    builder->iteration(lm);
+#ifndef PROFILER_NO_LOG
     std::wcerr << "iteration " << i + 1 << " done after "
                << stopwatch.readMilliseconds() << "ms\n";
-#endif // PROFILER_NO_LOG               
+#endif // PROFILER_NO_LOG
     banOCRPatterns();
-    stopwatch.start();
   }
-  profile.finish();
+  auto profile = builder->build();
+  builder.reset();
 
 #ifndef PROFILER_NO_LOG
   std::wcerr << "connecting corrections to tokens\n";
-#endif // PROFILER_NO_LOG  
+#endif // PROFILER_NO_LOG
   stopwatch.start();
   for (auto &token : document_) {
-    profile.setCorrection(token.origin());
+    token.origin().setProfile(profile);
   }
-#ifndef PROFILER_NO_LOG  
+#ifndef PROFILER_NO_LOG
   std::wcerr << "done connecting corrections in "
              << stopwatch.readMilliseconds() << "ms\n";
-#endif // PROFILER_NO_LOG             
+#endif // PROFILER_NO_LOG
 }
 
 void Profiler::doCreateProfile(Document &sourceDoc) {
@@ -285,7 +288,7 @@ void Profiler::doIteration(size_t iterationNumber, bool lastIteration) {
 
 #ifndef PROFILER_NO_LOG
   std::wcerr << "*** Iteration " << iterationNumber << " ***" << std::endl;
-#endif // PROFILER_NO_LOG  
+#endif // PROFILER_NO_LOG
   // std::wcerr << L" STARTING OCR PROB (s:ſ): "
   //            << globalProfile_.ocrPatternProbabilities_.getWeight(
   //                 csl::Pattern(L"s", L"ſ"))
@@ -357,7 +360,7 @@ void Profiler::doIteration(size_t iterationNumber, bool lastIteration) {
       ++counter[L"normalAndLongTokens"];
       token.setTokenNr(static_cast<size_t>(counter[L"normalAndLongTokens"]));
       if ((int)counter[L"normalAndLongTokens"] % 1000 == 0) {
-#ifndef PROFILER_NO_LOG      
+#ifndef PROFILER_NO_LOG
         std::wcerr << counter[L"normalAndLongTokens"] / 1000 << "k/"
                    << document_.size() / 1000 << "k tokens processed in "
                    << stopwatch.readMilliseconds() << "ms" << std::endl;
@@ -663,9 +666,9 @@ void Profiler::doIteration(size_t iterationNumber, bool lastIteration) {
 
   // compute probabilities for hist. variant patterns
   if (config_.resetHistPatternProbabilities_) {
-#ifndef PROFILER_NO_LOG      
+#ifndef PROFILER_NO_LOG
     std::wcerr << "clearing hist pattern probabilities\n";
-#endif // PROFILER_NO_LOG    
+#endif // PROFILER_NO_LOG
     globalProfile_.histPatternProbabilities_.clear();
   }
   for (PatternCounter::PatternIterator it = histCounter_.patternsBegin();
@@ -700,9 +703,9 @@ void Profiler::doIteration(size_t iterationNumber, bool lastIteration) {
 
   // compute probabilities for ocr patterns
   if (config_.resetOCRPatternProbabilities_) {
-#ifndef PROFILER_NO_LOG      
+#ifndef PROFILER_NO_LOG
     std::wcerr << "clearing OCR pattern probabilities\n";
-#endif // PROFILER_NO_LOG    
+#endif // PROFILER_NO_LOG
     globalProfile_.ocrPatternProbabilities_.clearExplicitWeights();
   }
 
@@ -810,10 +813,10 @@ void Profiler::doIteration(size_t iterationNumber, bool lastIteration) {
       htmlWriter_.print(*htmlStream_);
 
   } // if lastIteration
-#ifndef PROFILER_NO_LOG      
+#ifndef PROFILER_NO_LOG
   std::wcerr << "Finished iteration in " << iterationTime.readSeconds()
              << " seconds." << std::endl;
-#endif // PROFILER_NO_LOG             
+#endif // PROFILER_NO_LOG
 
   // std::wcerr << L" FINISH OCR PROB (s:ſ): "
   //            << globalProfile_.ocrPatternProbabilities_.getWeight(
@@ -1007,9 +1010,9 @@ void Profiler::prepareDocument(Document &tmpDoc) {
     }
   }
 
-#ifndef PROFILER_NO_LOG      
+#ifndef PROFILER_NO_LOG
   std::wcerr << "Create wOCR frequency list ... " << std::flush;
-#endif // PROFILER_NO_LOG  
+#endif // PROFILER_NO_LOG
   ocrCharacterCount_ = 0;
   for (Document_t::iterator token = document_.begin(); // for all tokens
        token != document_.end(); ++token) {
@@ -1025,7 +1028,7 @@ void Profiler::prepareDocument(Document &tmpDoc) {
   }
 #ifndef PROFILER_NO_LOG
   std::wcerr << "ok" << std::endl;
-#endif // PROFILER_NO_LOG  
+#endif // PROFILER_NO_LOG
 }
 
 void Profiler::banOCRPatterns() {

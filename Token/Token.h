@@ -24,6 +24,7 @@
 
 
 namespace OCRCorrection {
+  class Profile;
 
     /**
      * @brief Represents one token of a document and holds an array of correction candidates for the token.
@@ -587,12 +588,12 @@ namespace OCRCorrection {
 	    CandidateChain* pos_;
 	}; // class CandidateIterator
 
-	CandidateIterator candidatesBegin() const {
-	    return CandidateIterator( candidates_ );
+      CandidateIterator candidatesBegin() const {
+	  return CandidateIterator( candidates_ );
 	}
 
-	CandidateIterator candidatesEnd() const {
-	    return CandidateIterator( 0 );
+      CandidateIterator candidatesEnd() const {
+	  return CandidateIterator( 0 );
 	}
 
 	/**
@@ -624,7 +625,13 @@ namespace OCRCorrection {
 	 */
 	inline void setExternalId( std::wstring const& id );
 
+      void setProfile(std::shared_ptr<Profile> profile) {
+	this->profile_ = profile;
+      }
 
+      const Profile& getProfile() const {
+	return *profile_;
+      }
 
 	inline Document& getMyDocument() {
 	    return myDocument_;
@@ -734,6 +741,8 @@ namespace OCRCorrection {
 	 * Pointer to a Metadata instance
 	 */
 	std::unique_ptr<Metadata> metadata_;
+      // Pointer to the profile.
+      std::shared_ptr<Profile> profile_;
 
 
     }; // class Token

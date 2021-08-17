@@ -40,6 +40,7 @@ namespace OCRCorrection {
     }
 
     inline Candidate const& Token::getTopCandidate() const {
+        assert(hasTopCandidate());
 	return candidates_->getCandidate();
     }
 

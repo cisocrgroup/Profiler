@@ -45,7 +45,9 @@ void ExtReader::parse(const std::string &path, Document &document) {
     std::transform(cor.begin(), cor.end(), cor.begin(), ::towlower);
     document.at(document.getNrOfTokens() - 1).metadata()["correction-lc"] = cor;
   }
+#ifndef PROFILER_NO_LOG
   std::wcerr << "read " << ntokens << " tokens (with " << ncor
              << " corrections) and " << alex_.size()
              << " additional lexicon entries\n";
+#endif // PROFILER_NO_LOG
 }

@@ -17,8 +17,9 @@ class Token;
 class Profile;
 class LanguageModel;
 class PatternCounter;
+class Profile;
 
-class Profile {
+class ProfileBuilder {
 public:
   struct TokenType {
     static const std::wstring NOT_NORMAL, DONT_TOUCH, SHORT, NORMAL,
@@ -26,14 +27,18 @@ public:
         GUESSED_OCR_TRACE_NONEMPTY;
   };
   using F = std::function<void(const Token &, csl::DictSearch::CandidateSet &)>;
-  using Tuple = std::tuple<size_t, csl::DictSearch::CandidateSet,
-                           std::vector<WeightedCandidate>, bool>;
+  struct Tuple {
+    csl::DictSearch::CandidateSet origin;
+    std::vector<WeightedCandidate> candidates;
+    size_t n;
+    bool has_correction;
+  };
   using Map = std::unordered_map<std::wstring, Tuple>;
 
-  Profile(bool adatpive);
+  ProfileBuilder(bool adatpive);
   void put(const Token &token, F f);
   void iteration(const LanguageModel &lm);
-  void finish();
+  std::shared_ptr<Profile> build();
   void setCorrection(Token &token) const;
   int iteration() const { return iteration_; }
 
@@ -55,6 +60,31 @@ private:
   int iteration_;
   const bool adaptive_;
 };
+
+class Profile {
+public:
+  struct Val {
+    std::vector<Candidate> candidates;
+    size_t n;
+  };
+
+  typedef std::unordered_map<std::wstring, Val>::iterator iterator;
+  typedef std::unordered_map<std::wstring, Val>::const_iterator const_iterator;
+  iterator begin() {return map.begin();}
+  iterator end() {return map.end();}
+  const_iterator begin() const {return map.begin();}
+  const_iterator end() const {return map.end();}
+
+  const Val& get(const Token& token) const;
+
+
+private:
+  void put(const std::wstring& typ, size_t n,
+	   const std::vector<WeightedCandidate>& candidates);
+  friend class ProfileBuilder;
+  std::unordered_map<std::wstring, Val> map;
+};
+
 } // namespace OCRCorrection
 
 #endif // OCRC_PROFILE_HXX

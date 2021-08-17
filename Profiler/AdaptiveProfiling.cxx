@@ -39,22 +39,26 @@ void Profiler::calculateAdaptiveCandidateSet(
   //            << t.getWOCR() << " (" << t.metadata()["correction"] << ")\n";
   dictSearch_.query(t.getWOCR_lc(), &candidates);
   // for (const auto& cand: candidates) {
-  // 	std::wcerr << "(Profiler) Adaptive candidate (before): "
-  // 		<< cand << "\n";
+  // 	std::wcerr << "(Profiler) Adaptive candidate (before): " << cand << "\n";
   // }
-  candidates.discard_if([&t](const csl::Interpretation &i) {
-    return i.getBaseWord() != t.metadata()["correction-lc"] and
-           i.getWord() != t.metadata()["correction-lc"];
+  const auto correctionlc = t.metadata()["correction-lc"];
+  candidates.discard_if([&](const csl::Interpretation &i) {
+    const bool ret = i.getBaseWord() != correctionlc or
+      i.getWord() != correctionlc;
+    // std::wcerr << t.getWOCR_lc() << " (" << correctionlc << ")" << std::endl;
+    // std::wcerr << "base word: " << i.getBaseWord()
+    // 	       << " (" << correctionlc << ") " << ret << std::endl;
+    // std::wcerr << "word:      " << i.getWord()
+    // 	       << " (" << correctionlc << ") " << ret << std::endl;
+    return ret;
   });
   // for (const auto& cand: candidates) {
-  // 	std::wcerr << "(Profiler) Adaptive candidate (after): "
-  // 		<< cand << "\n";
+  // 	std::wcerr << "(Profiler) Adaptive candidate (after): " << cand << "\n";
   // }
-  if (not candidates.empty()) {
+  if (not candidates.empty())
     std::sort(candidates.begin(), candidates.end());
-  } else {
+  else
     createCandidatesWithCorrection(t, candidates);
-  }
   assert(not candidates.empty());
 }
 
@@ -66,8 +70,7 @@ void Profiler::createCandidatesWithCorrection(
   // "
   // 	   << t.getWOCR() << " ("
   // 	   << t.origin().metadata()["correction"] << ")\n";
-  csl::AdaptiveLex::add(t.metadata()["correction-lc"], t.getWOCR_lc(),
-                        candidates);
+  csl::AdaptiveLex::add(t.metadata()["correction-lc"], t.getWOCR_lc(), candidates);
   // for (const auto& cand: candidates) {
   // 	std::wcerr << "(Profiler) AdaptiveGt candidate: " << cand << "\n";
   // }
