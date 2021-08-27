@@ -1,6 +1,8 @@
-
+#ifndef OCRCORRECTION_EVALUATION_H__
+#define OCRCORRECTION_EVALUATION_H__
 
 class Evaluation; 
+class Profiler_Interpretation;
 
 /**
  * @brief This structure collects evaluation-related information during the processing of
@@ -169,3 +171,4 @@ private:
     bool finished_;
 };
 
+#endif /* OCRCORRECTION_EVALUATION_H__ */

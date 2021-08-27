@@ -7,13 +7,13 @@ namespace OCRCorrection {
 
     class AlignedTXTWriter {
     public:
-	writeAlignedTXT( Document const& doc ) {
+	void writeAlignedTXT( Document const& doc ) {
 	    if( doc.hasPages() ) {
-		std::wcerr << "OCRC::AlignedTXTWriter: WARNING: Document has page-information, 
-                               which must be ignored for alignged txt output." << std::endl;
+		std::wcerr << "OCRC::AlignedTXTWriter: WARNING: Document has page-information,"
+			   << "which must be ignored for alignged txt output." << std::endl;
 	    }
-	    for( Document::const_iterator token = doc.begin(); token != doc.end(); +++token ) {
-		
+	    for( Document::const_iterator token = doc.begin(); token != doc.end(); ++token ) {
+
 	    }
 	}
     };

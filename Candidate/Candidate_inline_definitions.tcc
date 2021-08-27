@@ -1,3 +1,6 @@
+#ifndef OCRCORRECTION_CANDIDATE_TCC__
+#define OCRCORRECTION_CANDIDATE_TCC__
+
 namespace OCRCorrection {
 
     inline Candidate::Candidate() :
@@ -57,3 +60,4 @@ namespace OCRCorrection {
 
 
 }
+#endif /* OCRCORRECTION_CANDIDATE_TCC__ */

@@ -1,4 +1,5 @@
-
+#ifndef OCRCORRECTION_UTF8_H__
+#define OCRCORRECTION_UTF8_H__
 #include <iostream>
 
 inline int GetUtf8(const char* in, int& offset, int&utf8Offset) {
@@ -126,4 +127,4 @@ inline int GetUtf8(const char* in, int& offset, int&utf8Offset) {
 //   }
 // }
 
-
+#endif /* OCRCORRECTION_UTF8_H__ */

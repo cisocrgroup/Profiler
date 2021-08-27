@@ -1,3 +1,6 @@
+#ifndef OCRCORRECTION_TOKEN_TCC__
+#define OCRCORRECTION_TOKEN_TCC__
+
 namespace OCRCorrection {
 
     inline Document& Token::getDocument() const {
@@ -260,3 +263,4 @@ namespace OCRCorrection {
 
 
 }
+#endif /* OCRCORRECTION_TOKEN_TCC__ */

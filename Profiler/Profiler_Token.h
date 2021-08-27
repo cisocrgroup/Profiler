@@ -1,4 +1,5 @@
-
+#ifndef OCRCORRECTION_PROFILER_TOKEN_H__
+#define OCRCORRECTION_PROFILER_TOKEN_H__
 
 class Profiler_Token {
 
@@ -295,3 +296,4 @@ class Profiler_Token {
 
 
     }; // class Token
+#endif /* OCRCORRECTION_PROFILER_TOKEN_H__ */

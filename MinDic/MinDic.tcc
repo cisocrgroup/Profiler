@@ -1,3 +1,5 @@
+#ifndef OCRCORRECTION_MINDIC_TCC__
+#define OCRCORRECTION_MINDIC_TCC__
 namespace csl {
 
 	template< class AnnType_t >
@@ -381,3 +383,4 @@ namespace csl {
 	}
 
 } //eon
+#endif /* OCRCORRECTION_MINDIC_TCC__ */

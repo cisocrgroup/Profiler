@@ -1,7 +1,10 @@
+#ifndef OCRCORRECTION_DIRK_H__
+#define OCRCORRECTION_DIRK_H__
+
 #include<string>
 #include<sstream>
-#include<csl/TransTable/TransTable.h>
-#include<csl/DictSearch/DictSearch.h>
+#include<TransTable/TransTable.h>
+#include<DictSearch/DictSearch.h>
 #include<Document/Document.h>
 #include <time.h>
 
@@ -26,14 +29,14 @@ public:
 
     void processText( std::string const& source, std::wostream& outStream ) {
 	OCRCorrection::Document document;
-    
+
 	document.parseTXT( source.c_str() );
-    
-    
+
+
 	csl::DictSearch::CandidateSet cands;
-	
+
 	std::wostringstream html_out;
-	
+
 	// set up counter
 	std::map< std::wstring, int > counter;
 	std::vector< std::wstring > counter_keys;
@@ -64,35 +67,35 @@ public:
 	    counter[L"historisch"] = counter[L"historisch, mit Fehlern"] = -1;
 	}
 
-    
+
 
 	for( OCRCorrection::Document::iterator token = document.begin(); // for all tokens
 	     token != document.end();
 	     ++token ) {
-	    
-	    
+
+
 	    std::wstring lowercased = token->getWOCR();
 	    for( std::wstring::iterator c = lowercased.begin(); c != lowercased.end(); ++c ) {
 		*c = std::tolower( *c );
 	    }
-	
+
 	    // OCRCorrection::Document does not distinguish between short words and non-words. They are all "not normal"
-	    bool is_a_word = 
-		token->isNormal() || 
+	    bool is_a_word =
+		token->isNormal() ||
 		( lowercased.find_first_of( L"abcdefghijklmnopqrstuvwxyzäöüß" ) != std::wstring::npos );
-	
+
 	    if( is_a_word ) {
 		++counter[L"tokens"];
 	    }
-	
+
 	    std::wstring color = L"black";
 	    std::wstring bgcolor = L"white";
 	    std::wstring description = L"";
 
-	
+
 	    if( ! token->isNormal() ) {
 		color = L"silver";
-		if( is_a_word ) { 
+		if( is_a_word ) {
 		    description = L"kurz";
 		    ++counter[description];
 		}
@@ -119,9 +122,9 @@ public:
 			<<"<p>Kandidaten/Interpretationen fuer <b>"<<lowercased<<"</b>:</p>" << std::endl
 			<<"(insgesamt: "<<cands.size()<<" Kandidaten)<br>"<<std::endl
 			<<"<pre>" << std::endl;
-		    
+
  		    for( csl::DictSearch::CandidateSet::const_iterator cand = cands.begin(); cand != cands.end(); ++cand ) {
-			if( cand - cands.begin() > 30 ) break; 
+			if( cand - cands.begin() > 30 ) break;
  			html_out <<*cand << std::endl;
  		    }
 		    html_out<<"</pre></div>"<<std::endl;
@@ -191,7 +194,7 @@ public:
 			else ++counter[description];
 		    }
 
-		
+
 		} // there are interpretations
 	    } // normal
 
@@ -238,7 +241,7 @@ public:
 
 	outStream << html_out.str();
 	outStream << "</body></html>"<< std::endl;
-	
+
     }
 
 private:
@@ -246,9 +249,11 @@ private:
     std::string histDictFile_;
     std::string patternFile_;
     std::string compoundFile_;
-    
-    csl::DictSearch dictSearch_; 
+
+    csl::DictSearch dictSearch_;
     CompoundDictModule* compoundModule_;
-    
+
     int verbose_;
 }; // class Dirk
+
+#endif /* OCRCORRECTION_DIRK_H__ */

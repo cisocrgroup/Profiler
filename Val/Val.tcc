@@ -1,3 +1,5 @@
+#ifndef OCRCORRECITON_VAL_TCC__
+#define OCRCORRECITON_VAL_TCC__
 namespace csl {
 
     Val::Val( MinDic_t const& baseDic, char const* patternFile ) :
@@ -201,3 +203,4 @@ namespace csl {
 
 
 } // eon
+#endif /* OCRCORRECITON_VAL_TCC__ */

@@ -1,4 +1,5 @@
-
+#ifndef OCRCORRECTION_HTMLWRITER_H__
+#define OCRCORRECTION_HTMLWRITER_H__
 
 
 /**
@@ -88,3 +89,5 @@ private:
     bool candlistsForAllIterations_;
 
 }; // HTMLWriter
+
+#endif /* OCRCORRECTION_HTMLWRITER_H__ */

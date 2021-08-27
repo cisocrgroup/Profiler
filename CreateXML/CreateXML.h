@@ -5,14 +5,14 @@
 #include "../Document/Document.h"
 #include "../AlphaScore/AlphaScore.h"
 #include "../Stopwatch.h"
-#include <csl/MSMatch/MSMatch.h>
+#include "../MSMatch/MSMatch.h"
 
 
 namespace OCRCorrection {
 
     /**
      *
-     * 
+     *
      */
     class CreateXML {
     public:
@@ -21,7 +21,7 @@ namespace OCRCorrection {
 	~CreateXML();
 
 	/**
-	 * @brief Create a new document object from the given text file 
+	 * @brief Create a new document object from the given text file
 	 */
 	void newDocument( const char* filename );
 
@@ -45,5 +45,3 @@ namespace OCRCorrection {
 } // ns OCRCorrection
 
 #endif
-
-

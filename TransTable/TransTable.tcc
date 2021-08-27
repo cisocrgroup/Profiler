@@ -1,6 +1,6 @@
 #if 1
-#ifndef CSL_TRANSTABLE_TCC
-#define CSL_TRANSTABLE_TCC CSL_TRANSTABLE_TCC
+#ifndef CSL_TRANSTABLE_TCC__
+#define CSL_TRANSTABLE_TCC__ CSL_TRANSTABLE_TCC__
 
 #include "./TransTable.h"
 
@@ -500,5 +500,5 @@ namespace csl {
 
 } // eon
 
-#endif
-#endif
+#endif /* CSL_TRANSTABLE_TCC__ */
+#endif /* 1 */

@@ -1,3 +1,6 @@
+#ifndef OCRCORRECTION_COMPOUND_DICT_MODULE_H__
+#define OCRCORRECTION_COMPOUND_DICT_MODULE_H__
+
 #include<TransTable/TransTable.h>
 #include<Vaam/Vaam.h>
 #include<DictSearch/DictSearch.h>
@@ -44,3 +47,5 @@ private:
     csl::Vaam< TransTable_t >* compoundVaam_;
     int priority_;
 };
+
+#endif /* OCRCORRECTION_COMPOUND_DICT_MODULE_H__ */

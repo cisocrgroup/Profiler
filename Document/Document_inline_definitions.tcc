@@ -1,3 +1,6 @@
+#ifndef OCRCORRECTION_DOCUMENT_TCC__
+#define OCRCORRECTION_DOCUMENT_TCC__
+
 #include <locale>
 #include <unicode/uchar.h>
 
@@ -103,3 +106,4 @@ namespace OCRCorrection {
                 return u_isspace(c);
         }
 }
+#endif /* OCRCORRECTION_DOCUMENT_TCC__ */
