@@ -150,6 +150,71 @@ install(
   DESTINATION lib
   )
 
+#
+# HEADERS
+#
+set(
+  OCRCORRECTION_HEADERS
+  "profiler.h"
+  "Global.h"
+  "Stopwatch.h"
+  "Exceptions.h"
+  "Mainpage.h"
+  )
+install(
+  FILES ${OCRCORRECTION_HEADERS}
+  DESTINATION include/profiler
+  )
+set(
+  OCRCORRECTION_DIRECTORIES
+  "CreateXML"
+  "TransTable"
+  "Val"
+  "CorrectionSystem"
+  "MinDic"
+  "SimpleEnrich"
+  "FBDicString"
+  "Getopt"
+  "MSMatch"
+  "jni"
+  "AltoXML"
+  "Hash"
+  "DocXML"
+  "ExtReader"
+  "Vaam"
+  "PatternCounter"
+  "IBMGroundtruth"
+  "Pattern"
+  "AlphaScore"
+  "DictSearch"
+  "Alphabet"
+  "DocEvaluation"
+  "LevenshteinWeights"
+  "LevDistance"
+  "ResultSet"
+  "Utils"
+  "Token"
+  "GlobalProfile"
+  "Candidate"
+  "iDictionary"
+  "Profiler"
+  "SimpleXMLReader"
+  "AbbyyXmlParser"
+  "TXTReader"
+  "LevDEA"
+  "INIConfig"
+  "GtDoc"
+  "Document"
+  "LevFilter"
+  )
+install(
+  DIRECTORY ${OCRCORRECTION_DIRECTORIES}
+  DESTINATION include/profiler
+  FILES_MATCHING
+  REGEX ".*\\.[th](cc)?$"
+  PATTERN "*Test*" EXCLUDE
+  )
+
 IF( CPPUNIT_FOUND )
 target_link_libraries( OCRCorrection
   ${CPPUNIT_LIBRARIES}
