@@ -168,7 +168,6 @@ install(
 set(
   OCRCORRECTION_DIRECTORIES
   "CreateXML"
-  "TransTable"
   "Val"
   "CorrectionSystem"
   "MinDic"
