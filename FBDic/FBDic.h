@@ -1,9 +1,10 @@
 #ifndef CSL_FBDIC_H
 #define CSL_FBDIC_H CSL_FBDIC_H
 
-#include<vector>
-#include<string>
-#include<algorithm>
+#include <vector>
+#include <string>
+#include <algorithm>
+
 #include "../Global.h"
 #include "../MinDic/MinDic.h"
 

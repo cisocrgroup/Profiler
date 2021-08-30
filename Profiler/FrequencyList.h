@@ -1,19 +1,17 @@
 #ifndef OCRC_FREQUENCYLIST_H
 #define OCRC_FREQUENCYLIST_H OCRC_FREQUENCYLIST_H
 
-#include<stdexcept>
-#include<algorithm>
-#include<stdexcept>
+#include <stdexcept>
+#include <algorithm>
+#include <stdexcept>
 
-#include<DictSearch/DictSearch.h>
-#include<Stopwatch.h>
-#include<MinDic/MinDic.h>
-#include<Pattern/PatternProbabilities.h>
-
-#include <TXTReader/TXTReader.h>
-#include<Document/Document.h>
-#include<LevenshteinWeights/LevenshteinWeights.h>
-
+#include "../DictSearch/DictSearch.h"
+#include "../Stopwatch.h"
+#include "../MinDic/MinDic.h"
+#include "../Pattern/PatternProbabilities.h"
+#include "../TXTReader/TXTReader.h"
+#include "../Document/Document.h"
+#include "../LevenshteinWeights/LevenshteinWeights.h"
 
 namespace OCRCorrection {
 

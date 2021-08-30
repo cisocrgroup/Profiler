@@ -1,12 +1,13 @@
 #ifndef OCRCORRECTION_LEVENSHTEINWEIGHTS_H
 #define OCRCORRECTION_LEVENSHTEINWEIGHTS_H OCRCORRECTION_LEVENSHTEINWEIGHTS_H
 
-#include<string>
-#include<map>
-#include<math.h>
-#include<Pattern/Pattern.h>
-#include<Pattern/PatternWeights.h>
-#include<Document/Document.h>
+#include <string>
+#include <map>
+#include <math.h>
+
+#include "../Pattern/Pattern.h"
+#include "../Pattern/PatternWeights.h"
+#include "../Document/Document.h"
 
 namespace OCRCorrection {
 

@@ -11,19 +11,19 @@
 
 #include "./CompoundDictModule.h"
 #include "./FrequencyList.h"
-#include <AbbyyXmlParser/AbbyyXmlParser.h>
-#include <DictSearch/DictSearch.h>
-#include <Document/Document.h>
-#include <GlobalProfile/GlobalProfile.h>
-#include <INIConfig/INIConfig.h>
-#include <LevenshteinWeights/LevenshteinWeights.h>
-#include <MinDic/MinDic.h>
-#include <Pattern/ComputeInstruction.h>
-#include <Pattern/PatternWeights.h>
-#include <PatternCounter/PatternCounter.h>
-#include <Stopwatch.h>
-#include <TransTable/TransTable.h>
-#include <Utils/Utils.h>
+#include "../AbbyyXmlParser/AbbyyXmlParser.h"
+#include "../DictSearch/DictSearch.h"
+#include "../Document/Document.h"
+#include "../GlobalProfile/GlobalProfile.h"
+#include "../INIConfig/INIConfig.h"
+#include "../LevenshteinWeights/LevenshteinWeights.h"
+#include "../MinDic/MinDic.h"
+#include "../Pattern/ComputeInstruction.h"
+#include "../Pattern/PatternWeights.h"
+#include "../PatternCounter/PatternCounter.h"
+#include "../Stopwatch.h"
+#include "../TransTable/TransTable.h"
+#include "../Utils/Utils.h"
 
 namespace OCRCorrection {
 class LanguageModel;

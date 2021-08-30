@@ -1,7 +1,7 @@
 #ifndef OCRC_TXTREADER_H
 #define OCRC_TXTREADER_H OCRC_TXTREADER_H
 
-#include<Document/Document.h>
+#include "../Document/Document.h"
 
 namespace OCRCorrection {
 

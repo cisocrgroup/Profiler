@@ -1,16 +1,16 @@
 #ifndef CSL_PATTERNGRAPH_H
 #define CSL_PATTERNGRAPH_H CSL_PATTERNGRAPH_H
 
-#include<algorithm>
-#include<fstream>
-#include<iostream>
-#include<map>
-#include<queue>
-#include<string>
-#include<vector>
-#include "Global.h"
-#include "Getopt/Getopt.h"
+#include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <queue>
+#include <string>
+#include <vector>
 
+#include "../Global.h"
+#include "../Getopt/Getopt.h"
 #include "../Pattern/PatternSet.h"
 
 namespace csl {

@@ -6,7 +6,8 @@
 #include <tuple>
 #include <memory>
 #include <system_error>
-#include "Document/Document.h"
+
+#include "../Document/Document.h"
 
 namespace OCRCorrection {
 	class EditOperation {

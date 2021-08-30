@@ -1,10 +1,10 @@
 #ifndef CSL_VAL_H
 #define CSL_VAL_H CSL_VAL_H
 
-#include<vector>
+#include <vector>
 
-#include<Pattern/PatternGraph.h>
-#include<Vaam/Vaam.h>
+#include "../Pattern/PatternGraph.h"
+#include "../Vaam/Vaam.h"
 
 namespace csl {
 

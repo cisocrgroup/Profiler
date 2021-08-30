@@ -1,7 +1,7 @@
 #ifndef OCRC_IBMGTREADER_H
 #define OCRC_IBMGTREADER_H OCRC_IBMGTREADER_H
 
-#include<Document/Document.h>
+#include "../Document/Document.h"
 
 namespace OCRCorrection {
 

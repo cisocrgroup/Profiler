@@ -1,9 +1,10 @@
 #ifndef CSL_POSPATTERN
 #define CSL_POSPATTERN CSL_POSPATTERN
 
-#include<sstream>
-#include "Global.h"
-#include "Pattern.h"
+#include <sstream>
+
+#include "../Global.h"
+#include "./Pattern.h"
 
 
 namespace csl {

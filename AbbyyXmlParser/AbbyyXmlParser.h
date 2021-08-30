@@ -13,8 +13,8 @@
 #include <dirent.h>
 //#include <sys/types.h>
 
-#include <Exceptions.h>
-#include <Document/Document.h>
+#include "../Exceptions.h"
+#include "../Document/Document.h"
 
 #include "./utf8.h"
 

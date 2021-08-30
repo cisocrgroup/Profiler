@@ -1,10 +1,9 @@
 #ifndef CSL_ANNOTATEDDICTMODULE_H
 #define CSL_ANNOTATEDDICTMODULE_H CSL_ANNOTATEDDICTMODULE_H
 
-#include"./DictSearch.h"
-#include<FBDicString/FBDicString.h>
-#include "Utils/Utils.h"
-
+#include "./DictSearch.h"
+#include "../FBDicString/FBDicString.h"
+#include "../Utils/Utils.h"
 
 namespace csl {
 

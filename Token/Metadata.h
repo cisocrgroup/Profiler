@@ -2,7 +2,8 @@
 #define OCRCorrection_Metadata_hpp__
 
 #include <map>
-#include "Utils/IStr.h"
+
+#include "../Utils/IStr.h"
 
 namespace OCRCorrection {
 	class Metadata {

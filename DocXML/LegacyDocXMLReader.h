@@ -1,14 +1,13 @@
 #ifndef OCRC_LEGACY_DOCXMLREADER_H
 #define OCRC_LEGACY_DOCXMLREADER_H OCRC_LEGACY_DOCXMLREADER_H
 
-#include<Document/Document.h>
-
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/util/OutOfMemoryException.hpp>
 #include <xercesc/parsers/SAXParser.hpp>
 #include <xercesc/sax/HandlerBase.hpp>
 #include <xercesc/util/XMLString.hpp>
 
+#include "../Document/Document.h"
 
 XERCES_CPP_NAMESPACE_USE
 

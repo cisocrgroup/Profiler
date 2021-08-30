@@ -2,18 +2,19 @@
 #define OCRCORRECTION_CORRECTIONSYSTEM_H OCRCORRECTION_CORRECTIONSYSTEM_H
 
 #include<stdexcept>
-#include <TXTReader/TXTReader.h>
-#include <TXTReader/AlignedTXTReader.h>
-#include<AbbyyXmlParser/AbbyyXmlParser.h>
-#include <DocXML/DocXMLReader.h>
-#include <Document/Document.h>
-#include <AlphaScore/AlphaScore.h>
-#include <Stopwatch.h>
-#include <Utils/Utils.h>
-#include <Profiler/Profiler.h>
-#include <SimpleEnrich/SimpleEnrich.h>
-#include <DictSearch/DictSearch.h>
-#include <INIConfig/INIConfig.h>
+
+#include "../TXTReader/TXTReader.h"
+#include "../TXTReader/AlignedTXTReader.h"
+#include "../AbbyyXmlParser/AbbyyXmlParser.h"
+#include "../DocXML/DocXMLReader.h"
+#include "../Document/Document.h"
+#include "../AlphaScore/AlphaScore.h"
+#include "../Stopwatch.h"
+#include "../Utils/Utils.h"
+#include "../Profiler/Profiler.h"
+#include "../SimpleEnrich/SimpleEnrich.h"
+#include "../DictSearch/DictSearch.h"
+#include "../INIConfig/INIConfig.h"
 
 namespace OCRCorrection {
 

@@ -1,10 +1,9 @@
 #ifndef OCRCORRECTION_COMPOUND_DICT_MODULE_H__
 #define OCRCORRECTION_COMPOUND_DICT_MODULE_H__
 
-#include<TransTable/TransTable.h>
-#include<Vaam/Vaam.h>
-#include<DictSearch/DictSearch.h>
-
+#include "../TransTable/TransTable.h"
+#include "../Vaam/Vaam.h"
+#include "../DictSearch/DictSearch.h"
 
 class CompoundDictModule : public csl::DictSearch::iDictModule {
 private:

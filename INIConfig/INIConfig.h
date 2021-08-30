@@ -1,14 +1,13 @@
 #ifndef CSL_INICONFIG_H
 #define CSL_INICONFIG_H CSL_INICONFIG_H
 
-#include<string>
-#include<iostream>
-#include<fstream>
-#include<cstdlib>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <cstdlib>
 
-#include<Global.h>
-
-#include"INIParser.h"
+#include "../Global.h"
+#include "./INIParser.h"
 
 
 namespace csl {

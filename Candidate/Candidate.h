@@ -1,9 +1,10 @@
 #ifndef OCRCORRECTION_CANDIDATE_H
 #define OCRCORRECTION_CANDIDATE_H OCRCORRECTION_CANDIDATE_H
 
-#include<string>
-#include<DictSearch/DictSearch.h>
-#include<Pattern/Trace.h>
+#include <string>
+
+#include "../DictSearch/DictSearch.h"
+#include "../Pattern/Trace.h"
 
 /******************************************************/
 /***********  IMPORTANT *******************************/

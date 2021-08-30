@@ -1,12 +1,12 @@
 #ifndef OCRC_ALTOENRICH_H
 #define OCRC_ALTOENRICH_H OCRC_ALTOENRICH_H
 
-#include<string>
+#include <string>
 
-#include<AltoXML/AltoXMLReader.h>
-#include<Document/Document.h>
-#include<Profiler/Profiler.h>
-#include<Utils/XMLReaderHelper.h>
+#include "../AltoXML/AltoXMLReader.h"
+#include "../Document/Document.h"
+#include "../Profiler/Profiler.h"
+#include "../Utils/XMLReaderHelper.h"
 
 #include <xercesc/sax/HandlerBase.hpp>
 

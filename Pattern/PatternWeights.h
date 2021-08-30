@@ -7,8 +7,9 @@
 #include<vector>
 #include<map>
 #include<math.h>
-#include<Global.h>
-#include<Pattern/Pattern.h>
+
+#include "../Global.h"
+#include "../Pattern/Pattern.h"
 
 namespace csl {
 

@@ -1,7 +1,9 @@
+#ifndef OCRCORECTION_MERGEDGROUNDTRUTHREADER_H__
+#define OCRCORECTION_MERGEDGROUNDTRUTHREADER_H__
 
-#include<AbbyyXmlParser/AbbyyXmlParser.h>
-#include<TXTReader/AlignedTXTReader.h>
-#include<DocXML/DocXMLWriter.h>
+#include "../AbbyyXmlParser/AbbyyXmlParser.h"
+#include "../TXTReader/AlignedTXTReader.h"
+#include "../DocXML/DocXMLWriter.h"
 
 namespace OCRCorrection {
 
@@ -61,3 +63,5 @@ namespace OCRCorrection {
     };
 
 } // eon
+
+#endif /* OCRCORECTION_MERGEDGROUNDTRUTHREADER_H__ */

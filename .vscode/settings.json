@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "iostream": "cpp",
-        "*.tcc": "cpp"
-    }
+        "*.tcc": "cpp",
+        "memory": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "Enabled"
 }

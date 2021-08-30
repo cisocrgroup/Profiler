@@ -1,12 +1,11 @@
 #ifndef OCRC_ALTOXMLREADER_H
 #define OCRC_ALTOXMLREADER_H OCRC_ALTOXMLREADER_H
 
-#include<Utils/Utils.h>
-#include<Document/Document.h>
-
-#include<Utils/XMLReaderHelper.h>
 #include<xercesc/sax/HandlerBase.hpp>
 
+#include "../Utils/Utils.h"
+#include "../Document/Document.h"
+#include "../Utils/XMLReaderHelper.h"
 
 namespace OCRCorrection {
 

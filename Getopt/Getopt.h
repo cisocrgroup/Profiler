@@ -7,8 +7,8 @@
 #include <stdexcept>
 #include <vector>
 
-#include "Utils/Utils.h"
-#include <Global.h>
+#include "../Utils/Utils.h"
+#include "../Global.h"
 
 namespace csl {
 

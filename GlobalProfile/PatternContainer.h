@@ -1,11 +1,11 @@
 #ifndef OCRC_PROFILER_PATTERNCONTAINER_H
 #define OCRC_PROFILER_PATTERNCONTAINER_H OCRC_PROFILER_PATTERNCONTAINER_H
 
-#include<map>
-#include<Pattern/Pattern.h>
-#include<Pattern/PatternProbabilities.h>
+#include <map>
 
-#include<Exceptions.h>
+#include "../Pattern/Pattern.h"
+#include "../Pattern/PatternProbabilities.h"
+#include "../Exceptions.h"
 
 namespace OCRCorrection {
 

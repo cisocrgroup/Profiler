@@ -55,6 +55,6 @@ namespace OCRCorrection {
 
 } // ns OCRCorrection
 #include "math.h"
-#include "./AlphaScore.cxx"
+#include "./AlphaScore.tcc"
 
 #endif

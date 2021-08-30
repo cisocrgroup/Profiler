@@ -5,7 +5,7 @@
 #include<vector>
 #include<errno.h>
 
-#include "Utils/Utils.h"
+#include "../Utils/Utils.h"
 #include "../Global.h"
 #include "./Pattern.h"
 #include "../DictSearch/GlobalHistPatterns.hpp"

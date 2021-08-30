@@ -5,8 +5,9 @@
 #include <vector>
 #include <stack>
 #include <errno.h>
-#include "Global.h"
-#include <iDictionary/iDictionary.h>
+
+#include "../Global.h"
+#include "../iDictionary/iDictionary.h"
 #include "../TransTable/TransTable.h"
 #include "../Alphabet/Alphabet.h"
 #include "./StateHash.h"

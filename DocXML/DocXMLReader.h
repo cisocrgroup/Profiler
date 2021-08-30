@@ -1,18 +1,16 @@
 #ifndef OCRC_DOCXMLREADER_H
 #define OCRC_DOCXMLREADER_H OCRC_DOCXMLREADER_H
 
-#include<Document/Document.h>
-#include<GlobalProfile/GlobalProfile.h>
-#include<GlobalProfile/GlobalProfileXMLReader.h>
-
-#include<Utils/XMLReaderHelper.h>
-
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/util/OutOfMemoryException.hpp>
 #include <xercesc/parsers/SAXParser.hpp>
 #include <xercesc/sax/HandlerBase.hpp>
 #include <xercesc/util/XMLString.hpp>
 
+#include "../Document/Document.h"
+#include "../GlobalProfile/GlobalProfile.h"
+#include "../GlobalProfile/GlobalProfileXMLReader.h"
+#include "../Utils/XMLReaderHelper.h"
 
 XERCES_CPP_NAMESPACE_USE
 

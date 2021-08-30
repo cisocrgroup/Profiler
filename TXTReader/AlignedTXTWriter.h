@@ -1,7 +1,7 @@
 #ifndef OCRC_ALIGNED_TXT_WRITER_H
 #define OCRC_ALIGNED_TXT_WRITER_H OCRC_ALIGNED_TXT_WRITER_H
 
-#include<Document/Document.h>
+#include "../Document/Document.h"
 
 namespace OCRCorrection {
 

@@ -1,19 +1,18 @@
 #ifndef CSL_VAAM_H
 #define CSL_VAAM_H CSL_VAAM_H
-#include<iostream>
 
-#include<vector>
-#include<stack>
-#include<set>
-#include<locale>
+#include <iostream>
+#include <vector>
+#include <stack>
+#include <set>
+#include <locale>
 
 #include "../Global.h"
 #include "../Stopwatch.h"
 #include "../MinDic/MinDic.h"
 #include "../LevDEA/LevDEA.h"
-
-#include <Pattern/PatternGraph.h>
-#include <Pattern/Interpretation.h>
+#include "../Pattern/PatternGraph.h"
+#include "../Pattern/Interpretation.h"
 
 
 namespace csl {

@@ -5,14 +5,15 @@
 #include<vector>
 #include<map>
 #include<utility>
-#include<Global.h>
-#include<MinDic/MinDic.h>
-#include<FBDic/FBDic.h>
-#include<MSMatch/MSMatch.h>
-#include<LevFilter/LevFilter.h>
-#include<Vaam/Vaam.h>
-#include<Val/Val.h>
-#include<INIConfig/INIConfig.h>
+
+#include "../Global.h"
+#include "../MinDic/MinDic.h"
+#include "../FBDic/FBDic.h"
+#include "../MSMatch/MSMatch.h"
+#include "../LevFilter/LevFilter.h"
+#include "../Vaam/Vaam.h"
+#include "../Val/Val.h"
+#include "../INIConfig/INIConfig.h"
 
 // "AnnotatedDictModule.h" is included at the end of this header file!
 

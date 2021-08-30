@@ -3,8 +3,8 @@
 
 #include<iostream>
 
-#include<Document/Document.h>
-#include "LevDistance/LevDistance.h"
+#include "../Document/Document.h"
+#include "../LevDistance/LevDistance.h"
 #include"./Counter.h"
 
 namespace OCRCorrection {

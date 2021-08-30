@@ -1,14 +1,14 @@
 #ifndef OCRC_UTILS_H
 #define OCRC_UTILS_H OCRC_UTILS_H
 
-#include"../Global.h"
 #include <algorithm>
-#include<string>
-#include<map>
+#include <string>
+#include <map>
 #include <sstream>
-#include<vector>
+#include <vector>
 
-#include <Exceptions.h>
+#include"../Global.h"
+#include "../Exceptions.h"
 
 namespace OCRCorrection {
         class Utils {

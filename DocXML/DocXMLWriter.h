@@ -1,9 +1,10 @@
 #ifndef OCRC_DOCXMLWRITER_H
 #define OCRC_DOCXMLWRITER_H OCRC_DOCXMLWRITER_H
 
-#include "Document/Document.h"
-#include<string>
-#include<locale>
+#include <string>
+#include <locale>
+
+#include "../Document/Document.h"
 
 namespace OCRCorrection {
 

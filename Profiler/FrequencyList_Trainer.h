@@ -2,7 +2,7 @@
  * DO NOT INCLUDE THIS HEADER ANYWHERE - INCLUDE FrequencyList.h INSTEAD !!!!!!
  */
 
-#include "Utils/Utils.h"
+#include "../Utils/Utils.h"
 
 namespace OCRCorrection {
 

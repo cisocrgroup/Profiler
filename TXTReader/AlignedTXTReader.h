@@ -1,9 +1,10 @@
 #ifndef OCRC_ALIGNED_TXT_READER_H
 #define OCRC_ALIGNED_TXT_READER_H OCRC_ALIGNED_TXT_READER_H
 
-#include<dirent.h>
-#include<locale>
-#include<Document/Document.h>
+#include <dirent.h>
+#include <locale>
+
+#include "../Document/Document.h"
 
 namespace OCRCorrection {
 

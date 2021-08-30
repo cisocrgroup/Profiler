@@ -1,7 +1,7 @@
 #ifndef OCRC_WEIGHTED_CANDIATE_HXX
 #define OCRC_WEIGHTED_CANDIATE_HXX
 
-#include "Candidate/Candidate.h"
+#include "../Candidate/Candidate.h"
 
 namespace OCRCorrection {
 struct Traces

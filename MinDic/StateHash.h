@@ -1,7 +1,7 @@
 #ifndef CSL_STATEHASH_H
 #define CSL_STATEHASH_H CSL_STATEHASH_H
 
-#include <TransTable/TransTable.h>
+#include "../TransTable/TransTable.h"
 
 namespace csl {
 

@@ -2,15 +2,14 @@
 #define OCRC_GLOBALPROFILEXMLREADER_H OCRC_GLOBALPROFILEXMLREADER_H
 
 #include<string>
-#include<GlobalProfile/GlobalProfile.h>
-#include<GlobalProfile/PatternContainerXMLReader.h>
-
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/util/OutOfMemoryException.hpp>
 #include <xercesc/parsers/SAXParser.hpp>
 #include <xercesc/sax/HandlerBase.hpp>
 #include <xercesc/util/XMLString.hpp>
 
+#include "../GlobalProfile/GlobalProfile.h"
+#include "../GlobalProfile/PatternContainerXMLReader.h"
 
 XERCES_CPP_NAMESPACE_USE
 

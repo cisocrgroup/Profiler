@@ -1,10 +1,11 @@
 #ifndef OCRC_SIMPLEENRICH_H
 #define OCRC_SIMPLEENRICH_H OCRC_SIMPLEENRICH_H
 
-#include<string>
-#include<DictSearch/DictSearch.h>
-#include<INIConfig/INIConfig.h>
-#include<Document/Document.h>
+#include <string>
+
+#include "../DictSearch/DictSearch.h"
+#include "../INIConfig/INIConfig.h"
+#include "../Document/Document.h"
 
 namespace OCRCorrection {
 

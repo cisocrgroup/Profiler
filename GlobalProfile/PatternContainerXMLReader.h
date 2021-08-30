@@ -2,16 +2,14 @@
 #define OCRC_PATTERNCONTAINERXMLREADER_H OCRC_PATTERNCONTAINERXMLREADER_H
 
 #include<string>
-#include<GlobalProfile/PatternContainer.h>
-
-#include<Utils/XMLReaderHelper.h>
-
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/util/OutOfMemoryException.hpp>
 #include <xercesc/parsers/SAXParser.hpp>
 #include <xercesc/sax/HandlerBase.hpp>
 #include <xercesc/util/XMLString.hpp>
 
+#include "../GlobalProfile/PatternContainer.h"
+#include "../Utils/XMLReaderHelper.h"
 
 XERCES_CPP_NAMESPACE_USE
 

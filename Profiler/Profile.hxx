@@ -1,12 +1,12 @@
 #ifndef OCRC_PROFILE_HXX
 #define OCRC_PROFILE_HXX
 
-#include "DictSearch/DictSearch.h"
-#include "WeightedCandidate.hxx"
 #include <functional>
 #include <unordered_map>
 #include <memory>
 
+#include "../DictSearch/DictSearch.h"
+#include "./WeightedCandidate.hxx"
 
 namespace csl {
 template <class T> class MinDic;

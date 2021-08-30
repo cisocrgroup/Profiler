@@ -1,7 +1,7 @@
 #ifndef OCRC_GLOBALPROFILE_H
 #define OCRC_GLOBALPROFILE_H OCRC_GLOBALPROFILE_H
 
-#include<GlobalProfile/PatternContainer.h>
+#include "../GlobalProfile/PatternContainer.h"
 
 namespace OCRCorrection {
 

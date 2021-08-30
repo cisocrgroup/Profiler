@@ -1,9 +1,10 @@
 #ifndef CSL_PATTERN_H
 #define CSL_PATTERN_H CSL_PATTERN_H
 
-#include<string>
-#include<iostream>
-#include<Global.h>
+#include <string>
+#include <iostream>
+
+#include "../Global.h"
 
 namespace csl {
 

@@ -2,15 +2,16 @@
 #define csl_ComputeInstruction_hpp__
 
 #include "math.h"
-#include<iostream>
+#include <iostream>
 #include <vector>
 #include <algorithm>
-#include<string>
-#include<limits>
-#include<string.h>
-#include<Global.h>
-#include<Pattern/Instruction.h>
-#include<Pattern/PatternProbabilities.h>
+#include <string>
+#include <limits>
+#include <string.h>
+
+#include "../Global.h"
+#include "../Pattern/Instruction.h"
+#include "../Pattern/PatternProbabilities.h"
 
 namespace csl {
 

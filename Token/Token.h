@@ -6,11 +6,11 @@
 #include<algorithm>
 #include <memory>
 
-#include <LevFilter/LevFilter.h>
-#include <Vaam/Vaam.h>
-#include <Exceptions.h>
-#include <Candidate/Candidate.h>
-#include <Profiler/Profile.hxx>
+#include "../LevFilter/LevFilter.h"
+#include "../Vaam/Vaam.h"
+#include "../Exceptions.h"
+#include "../Candidate/Candidate.h"
+#include "../Profiler/Profile.hxx"
 #include "./Character.h"
 #include "./TokenImageInfoBox.h"
 #include "./Metadata.h"
