@@ -240,7 +240,7 @@ namespace OCRCorrection {
 	 }
 	 fo.close();
 
-	 free( buffer );
+	 delete[] buffer;
       }
     }
 

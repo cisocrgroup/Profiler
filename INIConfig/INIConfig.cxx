@@ -1,6 +1,8 @@
 #ifndef CSL_INICONFIG_CXX
 #define CSL_INICONFIG_CXX CSL_INICONFIG_CXX
 
+#include <limits>
+
 #include "./INIConfig.h"
 #include "Utils/Utils.h"
 
