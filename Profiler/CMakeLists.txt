@@ -18,7 +18,7 @@ add_executable(guessTraces exec_guessTraces.cxx)
 target_link_libraries (guessTraces OCRCorrection )
 
 install(
-  TARGETS profiler
+  TARGETS profiler trainFrequencyList
   DESTINATION bin
   )
 
