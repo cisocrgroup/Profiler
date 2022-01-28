@@ -33,7 +33,7 @@ SimpleOutputWriter::write() const
 void
 SimpleOutputWriter::writeNormalToken(const Token& token) const
 {
-  if (token.hasCandidates()) {
+  if (!token.hasCandidates()) {
     writeNormalTokenStart(token);
     os_ << "\n";
     return;
